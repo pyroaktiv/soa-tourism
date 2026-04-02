@@ -113,8 +113,8 @@ const file_tourism_example_v1_example_proto_rawDesc = "" +
 	"\rCheckResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status2u\n" +
 	"\rHealthService\x12d\n" +
-	"\x05Check\x12 .tourism.example.v1.CheckRequest\x1a!.tourism.example.v1.CheckResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/healthB\xcf\x01\x92A~\x12T\n" +
-	"\x17SOA Tourism Gateway API\x122REST-to-gRPC gateway for the SOA Tourism platform.2\x050.1.0*\x02\x01\x022\x10application/json:\x10application/jsonZLgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/example/v1;examplev1b\x06proto3"
+	"\x05Check\x12 .tourism.example.v1.CheckRequest\x1a!.tourism.example.v1.CheckResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/healthB\xa5\x01\x92AT\x12*\n" +
+	"\vGateway API\x12\x14REST-to-gRPC gateway2\x050.1.0*\x02\x01\x022\x10application/json:\x10application/jsonZLgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/example/v1;examplev1b\x06proto3"
 
 var (
 	file_tourism_example_v1_example_proto_rawDescOnce sync.Once
