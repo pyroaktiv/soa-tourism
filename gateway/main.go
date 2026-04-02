@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	authv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/auth/v1"
 	examplev1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/example/v1"
 	"github.com/pyroaktiv/soa-tourism/gateway/internal/config"
 )
@@ -40,6 +41,12 @@ func main() {
 		ctx, grpcMux, cfg.ServiceAddr("example"), dialOpts,
 	); err != nil {
 		log.Fatalf("register HealthService: %v", err)
+	}
+
+	if err := authv1.RegisterAuthServiceHandlerFromEndpoint(
+		ctx, grpcMux, cfg.ServiceAddr("auth"), dialOpts,
+	); err != nil {
+		log.Fatalf("register AuthService: %v", err)
 	}
 
 	// Strip the "api/swagger" embed prefix so files are at /swagger/<path>.
