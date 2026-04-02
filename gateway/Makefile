@@ -11,7 +11,7 @@ install-tools:
 # generate output should be committed to git
 generate:
 	cd .. && buf dep update
-	PATH="$(GOBIN):$$PATH" buf generate cd .. && buf generate --template gateway/buf.gen.yaml
+	PATH="$(GOBIN):$$PATH" buf generate
 
 lint:
 	buf lint
