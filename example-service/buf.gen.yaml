@@ -1,0 +1,9 @@
+version: v2
+plugins:
+  - remote: buf.build/protocolbuffers/python
+    out: example-service/src
+    include_imports: true
+  - remote: buf.build/grpc/python
+    out: example-service/src
+    include_imports: true
+
