@@ -1,0 +1,88 @@
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    expose:
+      - "27017"
+    volumes:
+      - mongo_data:/data/db
+
+  auth-service:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    environment:
+      GRPC_ADDR: "0.0.0.0:9090"
+      JWT_SECRET: "change-me"
+      ACCESS_TOKEN_DURATION: "1h"
+      REFRESH_TOKEN_DURATION: "168h"
+      MONGO_URI: "mongodb://mongo:27017"
+      MONGO_DB: "authdb"
+    expose:
+      - "9090"
+    depends_on:
+      - mongo
+
+  example-service:
+    build:
+      context: ./example-service
+      dockerfile: Dockerfile
+    environment:
+      GRPC_ADDR: "0.0.0.0:9090"
+    expose:
+      - "9090"
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    command: "server -filer -filer.port=8888"
+    ports:
+      - "8888:8888"
+    volumes:
+      - seaweedfs_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  stakeholders:
+    build:
+      context: ./stakeholders
+      dockerfile: Dockerfile
+    environment:
+      GRPC_ADDR: "0.0.0.0:9090"
+      MONGO_URI: "mongodb://mongo:27017"
+      MONGO_DB: "stakeholdersdb"
+      AUTH_SERVICE_ADDR: "auth-service:9090"
+      SEAWEEDFS_FILER_URL: "http://seaweedfs:8888"
+    expose:
+      - "9090"
+    depends_on:
+      mongo:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      seaweedfs:
+        condition: service_healthy
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      HTTP_ADDR: ":8080"
+      EXAMPLE_SERVICE_ADDR: "example-service:9090"
+      AUTH_SERVICE_ADDR: "auth-service:9090"
+      STAKEHOLDERS_SERVICE_ADDR: "stakeholders:9090"
+      CORS_ALLOWED_ORIGINS: "*"
+    depends_on:
+      - example-service
+      - auth-service
+      - stakeholders
+
+volumes:
+  mongo_data:
+  seaweedfs_data:

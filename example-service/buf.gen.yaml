@@ -1,0 +1,11 @@
+version: v2
+inputs:
+  - proto_file: ../proto/tourism/example/v1/example.proto
+plugins:
+  - remote: buf.build/protocolbuffers/python
+    out: src
+    include_imports: true
+  - remote: buf.build/grpc/python
+    out: src
+    include_imports: true
+

@@ -1,0 +1,11 @@
+version: v2
+inputs:
+  - proto_file: ../proto/tourism/stakeholders/v1/stakeholders.proto
+  - proto_file: ../proto/tourism/auth/v1/auth.proto
+plugins:
+  - remote: buf.build/protocolbuffers/python
+    out: src
+    include_imports: true
+  - remote: buf.build/grpc/python
+    out: src
+    include_imports: true
