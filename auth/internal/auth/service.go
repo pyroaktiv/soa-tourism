@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -207,6 +209,80 @@ func (s *Service) Logout(ctx context.Context, req *authv1.LogoutRequest) (*empty
 	return &emptypb.Empty{}, nil
 }
 
+func (s *Service) ListUsers(ctx context.Context, req *authv1.ListUsersRequest) (*authv1.ListUsersResponse, error) {
+	// Extract and Validate Admin Token
+	claims, err := s.authorizeAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Admin %s listing all users", claims.Username)
+
+	// Setup pagination defaults
+	pageSize := int64(req.GetPageSize())
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+	pageNumber := int64(req.GetPageNumber())
+	if pageNumber < 1 {
+		pageNumber = 1
+	}
+	skip := (pageNumber - 1) * pageSize
+
+	opts := options.Find().SetSort(bson.D{{Key: "username", Value: 1}}).SetLimit(pageSize).SetSkip(skip)
+
+	cursor, err := s.users.Find(ctx, bson.D{}, opts)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to query users")
+	}
+	defer cursor.Close(ctx)
+
+	var users []*authv1.User
+	for cursor.Next(ctx) {
+		var doc userDocument
+		if err := cursor.Decode(&doc); err != nil {
+			continue
+		}
+		users = append(users, toProtoUser(&doc))
+	}
+
+	total, _ := s.users.CountDocuments(ctx, bson.D{})
+
+	return &authv1.ListUsersResponse{
+		Users:      users,
+		TotalCount: total,
+	}, nil
+}
+
+func (s *Service) SearchUsers(ctx context.Context, req *authv1.SearchUsersRequest) (*authv1.SearchUsersResponse, error) {
+	if _, err := s.authorizeAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	query := strings.ToLower(strings.TrimSpace(req.GetUsername()))
+	if query == "" {
+		return &authv1.SearchUsersResponse{}, nil
+	}
+
+	filter := bson.M{"username": bson.M{"$regex": query, "$options": "i"}}
+
+	cursor, err := s.users.Find(ctx, filter, options.Find().SetLimit(10))
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to search users")
+	}
+	defer cursor.Close(ctx)
+
+	var users []*authv1.User
+	for cursor.Next(ctx) {
+		var doc userDocument
+		if err := cursor.Decode(&doc); err != nil {
+			continue
+		}
+		users = append(users, toProtoUser(&doc))
+	}
+
+	return &authv1.SearchUsersResponse{Users: users}, nil
+}
+
 func (s *Service) issueTokenPair(ctx context.Context, user *userDocument) (*authv1.TokenPair, error) {
 	now := time.Now()
 	accessExpiresAt := now.Add(s.cfg.AccessTokenTTL)
@@ -280,6 +356,42 @@ func (s *Service) parseToken(rawToken, expectedType string) (*tokenClaims, error
 	if claims.Type != expectedType {
 		return nil, errors.New("unexpected token type")
 	}
+	return claims, nil
+}
+
+func (s *Service) authorizeAdmin(ctx context.Context) (*tokenClaims, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "missing metadata")
+	}
+
+	values := md.Get("authorization")
+	if len(values) == 0 {
+		return nil, status.Error(codes.Unauthenticated, "missing authorization header")
+	}
+
+	parts := strings.SplitN(values[0], " ", 2)
+	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+		return nil, status.Error(codes.Unauthenticated, "invalid authorization format")
+	}
+
+	claims, err := s.parseToken(parts[1], "access")
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "invalid token")
+	}
+
+	isAdmin := false
+	for _, role := range claims.Roles {
+		if role == "admin" {
+			isAdmin = true
+			break
+		}
+	}
+
+	if !isAdmin {
+		return nil, status.Error(codes.PermissionDenied, "admin role required")
+	}
+
 	return claims, nil
 }
 
