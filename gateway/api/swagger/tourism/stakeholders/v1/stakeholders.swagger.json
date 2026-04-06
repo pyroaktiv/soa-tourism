@@ -1,0 +1,201 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Stakeholders API",
+    "description": "User profile management service",
+    "version": "0.1.0"
+  },
+  "tags": [
+    {
+      "name": "StakeholderService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/stakeholders/profiles/{userId}": {
+      "get": {
+        "summary": "GetProfile returns the profile for the given user. Public — no token required.",
+        "operationId": "StakeholderService_GetProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "StakeholderService"
+        ]
+      },
+      "put": {
+        "summary": "UpdateProfile creates or updates the authenticated user's profile.\nRequires Authorization: Bearer \u003caccess_token\u003e.",
+        "operationId": "StakeholderService_UpdateProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StakeholderServiceUpdateProfileBody"
+            }
+          }
+        ],
+        "tags": [
+          "StakeholderService"
+        ]
+      }
+    },
+    "/api/v1/stakeholders/profiles/{userId}/photo": {
+      "delete": {
+        "summary": "DeleteProfilePhoto removes the profile photo from storage and clears the URL.\nRequires Authorization: Bearer \u003caccess_token\u003e.",
+        "operationId": "StakeholderService_DeleteProfilePhoto",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "StakeholderService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "StakeholderServiceUpdateProfileBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "motto": {
+          "type": "string"
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "photo_url should be the full Filer URL returned after a direct upload to SeaweedFS."
+        }
+      },
+      "description": "UpdateProfileRequest supports partial updates — only fields that are\nexplicitly set (via proto3 optional) will be written to the database."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Profile": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "motto": {
+          "type": "string"
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "photo_url is empty when no photo has been uploaded."
+        }
+      },
+      "description": "Profile holds all public profile fields for a user."
+    }
+  }
+}
