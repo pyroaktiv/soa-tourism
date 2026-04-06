@@ -1,13 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Stakeholders API",
-    "description": "User profile management service",
+    "title": "Blog API",
+    "description": "Servis za upravljanje turističkim blogovima i komentarima",
     "version": "0.1.0"
   },
   "tags": [
     {
-      "name": "StakeholderService"
+      "name": "BlogService"
     }
   ],
   "schemes": [
@@ -21,15 +21,14 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/stakeholders/profiles/{userId}": {
+    "/api/v1/blogs": {
       "get": {
-        "summary": "GetProfile returns the profile for the given user.",
-        "operationId": "StakeholderService_GetProfile",
+        "operationId": "BlogService_GetAllBlogs",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Profile"
+              "$ref": "#/definitions/v1GetAllBlogsResponse"
             }
           },
           "default": {
@@ -39,26 +38,17 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
         "tags": [
-          "StakeholderService"
+          "BlogService"
         ]
       },
-      "put": {
-        "summary": "UpdateProfile creates or updates the authenticated user's profile.\r\nRequires authnz.",
-        "operationId": "StakeholderService_UpdateProfile",
+      "post": {
+        "operationId": "BlogService_CreateBlog",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Profile"
+              "$ref": "#/definitions/v1Blog"
             }
           },
           "default": {
@@ -69,35 +59,28 @@
           }
         },
         "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/StakeholderServiceUpdateProfileBody"
+              "$ref": "#/definitions/v1CreateBlogRequest"
             }
           }
         ],
         "tags": [
-          "StakeholderService"
+          "BlogService"
         ]
       }
     },
-    "/api/v1/stakeholders/profiles/{userId}/photo": {
-      "delete": {
-        "summary": "DeleteProfilePhoto removes the profile photo from storage and clears the URL.\r\nRequires authnz.",
-        "operationId": "StakeholderService_DeleteProfilePhoto",
+    "/api/v1/blogs/{blogId}/comments": {
+      "post": {
+        "operationId": "BlogService_AddComment",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Profile"
+              "$ref": "#/definitions/v1Blog"
             }
           },
           "default": {
@@ -109,41 +92,27 @@
         },
         "parameters": [
           {
-            "name": "userId",
+            "name": "blogId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "comment",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Comment"
+            }
           }
         ],
         "tags": [
-          "StakeholderService"
+          "BlogService"
         ]
       }
     }
   },
   "definitions": {
-    "StakeholderServiceUpdateProfileBody": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "surname": {
-          "type": "string"
-        },
-        "bio": {
-          "type": "string"
-        },
-        "motto": {
-          "type": "string"
-        },
-        "photoUrl": {
-          "type": "string",
-          "description": "photo_url should be the full Filer URL returned after a direct upload to SeaweedFS."
-        }
-      },
-      "description": "UpdateProfileRequest supports partial updates — only fields that are\r\nexplicitly set (via proto3 optional) will be written to the database."
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -172,30 +141,87 @@
         }
       }
     },
-    "v1Profile": {
+    "v1Blog": {
       "type": "object",
       "properties": {
-        "userId": {
+        "id": {
           "type": "string"
         },
-        "name": {
+        "authorId": {
           "type": "string"
         },
-        "surname": {
+        "title": {
           "type": "string"
         },
-        "bio": {
+        "description": {
           "type": "string"
         },
-        "motto": {
+        "creationDate": {
           "type": "string"
         },
-        "photoUrl": {
-          "type": "string",
-          "description": "photo_url is empty when no photo has been uploaded."
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Comment"
+          }
         }
-      },
-      "description": "Profile holds all public profile fields for a user."
+      }
+    },
+    "v1Comment": {
+      "type": "object",
+      "properties": {
+        "authorId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "lastModifiedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateBlogRequest": {
+      "type": "object",
+      "properties": {
+        "authorId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1GetAllBlogsResponse": {
+      "type": "object",
+      "properties": {
+        "blogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Blog"
+          }
+        }
+      }
     }
   }
 }

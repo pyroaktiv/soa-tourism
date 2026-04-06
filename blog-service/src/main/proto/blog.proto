@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package tourism.blog.v1;
+
+option java_multiple_files = true;
+option java_package = "tourism.blog.v1";
+
+service BlogService {
+  rpc CreateBlog(CreateBlogRequest) returns (Blog);
+  rpc GetAllBlogs(GetAllBlogsRequest) returns (GetAllBlogsResponse);
+  rpc AddComment(AddCommentRequest) returns (Blog);
+}
+
+message Comment {
+  string author_id = 1;
+  string text = 2;
+  string created_at = 3;
+  string last_modified_at = 4;
+}
+
+message Blog {
+  string id = 1;
+  string author_id = 2;
+  string title = 3;
+  string description = 4;
+  string creation_date = 5;
+  repeated string images = 6;
+  repeated Comment comments = 7;
+}
+
+message CreateBlogRequest {
+  string author_id = 1;
+  string title = 2;
+  string description = 3;
+  repeated string images = 4;
+}
+
+message GetAllBlogsRequest {}
+
+message GetAllBlogsResponse {
+  repeated Blog blogs = 1;
+}
+
+message AddCommentRequest {
+  string blog_id = 1;
+  Comment comment = 2;
+}
