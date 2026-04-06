@@ -518,6 +518,198 @@ func (x *LogoutRequest) GetRefreshToken() string {
 	return ""
 }
 
+type ListUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageNumber    int32                  `protobuf:"varint,2,opt,name=page_number,json=pageNumber,proto3" json:"page_number,omitempty"` // Simple offset-based pagination
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersRequest) Reset() {
+	*x = ListUsersRequest{}
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersRequest) ProtoMessage() {}
+
+func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
+func (*ListUsersRequest) Descriptor() ([]byte, []int) {
+	return file_tourism_auth_v1_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListUsersRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListUsersRequest) GetPageNumber() int32 {
+	if x != nil {
+		return x.PageNumber
+	}
+	return 0
+}
+
+type ListUsersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Users         []*User                `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	TotalCount    int64                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersResponse) Reset() {
+	*x = ListUsersResponse{}
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersResponse) ProtoMessage() {}
+
+func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
+func (*ListUsersResponse) Descriptor() ([]byte, []int) {
+	return file_tourism_auth_v1_auth_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListUsersResponse) GetUsers() []*User {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+func (x *ListUsersResponse) GetTotalCount() int64 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type SearchUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchUsersRequest) Reset() {
+	*x = SearchUsersRequest{}
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchUsersRequest) ProtoMessage() {}
+
+func (x *SearchUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchUsersRequest.ProtoReflect.Descriptor instead.
+func (*SearchUsersRequest) Descriptor() ([]byte, []int) {
+	return file_tourism_auth_v1_auth_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SearchUsersRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type SearchUsersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Users         []*User                `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchUsersResponse) Reset() {
+	*x = SearchUsersResponse{}
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchUsersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchUsersResponse) ProtoMessage() {}
+
+func (x *SearchUsersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_auth_v1_auth_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchUsersResponse.ProtoReflect.Descriptor instead.
+func (*SearchUsersResponse) Descriptor() ([]byte, []int) {
+	return file_tourism_auth_v1_auth_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SearchUsersResponse) GetUsers() []*User {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
 var File_tourism_auth_v1_auth_proto protoreflect.FileDescriptor
 
 const file_tourism_auth_v1_auth_proto_rawDesc = "" +
@@ -554,13 +746,27 @@ const file_tourism_auth_v1_auth_proto_rawDesc = "" +
 	"\x05valid\x18\x01 \x01(\bR\x05valid\x12)\n" +
 	"\x04user\x18\x02 \x01(\v2\x15.tourism.auth.v1.UserR\x04user\"4\n" +
 	"\rLogoutRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken2\x80\x04\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"P\n" +
+	"\x10ListUsersRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1f\n" +
+	"\vpage_number\x18\x02 \x01(\x05R\n" +
+	"pageNumber\"a\n" +
+	"\x11ListUsersResponse\x12+\n" +
+	"\x05users\x18\x01 \x03(\v2\x15.tourism.auth.v1.UserR\x05users\x12\x1f\n" +
+	"\vtotal_count\x18\x02 \x01(\x03R\n" +
+	"totalCount\"0\n" +
+	"\x12SearchUsersRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"B\n" +
+	"\x13SearchUsersResponse\x12+\n" +
+	"\x05users\x18\x01 \x03(\v2\x15.tourism.auth.v1.UserR\x05users2\xed\x05\n" +
 	"\vAuthService\x12m\n" +
 	"\bRegister\x12 .tourism.auth.v1.RegisterRequest\x1a\x1d.tourism.auth.v1.AuthResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/auth/register\x12d\n" +
 	"\x05Login\x12\x1d.tourism.auth.v1.LoginRequest\x1a\x1d.tourism.auth.v1.AuthResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/login\x12g\n" +
 	"\aRefresh\x12\x1f.tourism.auth.v1.RefreshRequest\x1a\x1a.tourism.auth.v1.TokenPair\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/auth/refresh\x12Q\n" +
 	"\bValidate\x12 .tourism.auth.v1.ValidateRequest\x1a!.tourism.auth.v1.ValidateResponse\"\x00\x12`\n" +
-	"\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/logoutBMZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3"
+	"\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/logout\x12n\n" +
+	"\tListUsers\x12!.tourism.auth.v1.ListUsersRequest\x1a\".tourism.auth.v1.ListUsersResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/auth/users\x12{\n" +
+	"\vSearchUsers\x12#.tourism.auth.v1.SearchUsersRequest\x1a$.tourism.auth.v1.SearchUsersResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/auth/users/searchBMZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3"
 
 var (
 	file_tourism_auth_v1_auth_proto_rawDescOnce sync.Once
@@ -574,38 +780,48 @@ func file_tourism_auth_v1_auth_proto_rawDescGZIP() []byte {
 	return file_tourism_auth_v1_auth_proto_rawDescData
 }
 
-var file_tourism_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_tourism_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_tourism_auth_v1_auth_proto_goTypes = []any{
-	(*User)(nil),             // 0: tourism.auth.v1.User
-	(*TokenPair)(nil),        // 1: tourism.auth.v1.TokenPair
-	(*AuthResponse)(nil),     // 2: tourism.auth.v1.AuthResponse
-	(*RegisterRequest)(nil),  // 3: tourism.auth.v1.RegisterRequest
-	(*LoginRequest)(nil),     // 4: tourism.auth.v1.LoginRequest
-	(*RefreshRequest)(nil),   // 5: tourism.auth.v1.RefreshRequest
-	(*ValidateRequest)(nil),  // 6: tourism.auth.v1.ValidateRequest
-	(*ValidateResponse)(nil), // 7: tourism.auth.v1.ValidateResponse
-	(*LogoutRequest)(nil),    // 8: tourism.auth.v1.LogoutRequest
-	(*emptypb.Empty)(nil),    // 9: google.protobuf.Empty
+	(*User)(nil),                // 0: tourism.auth.v1.User
+	(*TokenPair)(nil),           // 1: tourism.auth.v1.TokenPair
+	(*AuthResponse)(nil),        // 2: tourism.auth.v1.AuthResponse
+	(*RegisterRequest)(nil),     // 3: tourism.auth.v1.RegisterRequest
+	(*LoginRequest)(nil),        // 4: tourism.auth.v1.LoginRequest
+	(*RefreshRequest)(nil),      // 5: tourism.auth.v1.RefreshRequest
+	(*ValidateRequest)(nil),     // 6: tourism.auth.v1.ValidateRequest
+	(*ValidateResponse)(nil),    // 7: tourism.auth.v1.ValidateResponse
+	(*LogoutRequest)(nil),       // 8: tourism.auth.v1.LogoutRequest
+	(*ListUsersRequest)(nil),    // 9: tourism.auth.v1.ListUsersRequest
+	(*ListUsersResponse)(nil),   // 10: tourism.auth.v1.ListUsersResponse
+	(*SearchUsersRequest)(nil),  // 11: tourism.auth.v1.SearchUsersRequest
+	(*SearchUsersResponse)(nil), // 12: tourism.auth.v1.SearchUsersResponse
+	(*emptypb.Empty)(nil),       // 13: google.protobuf.Empty
 }
 var file_tourism_auth_v1_auth_proto_depIdxs = []int32{
-	0, // 0: tourism.auth.v1.AuthResponse.user:type_name -> tourism.auth.v1.User
-	1, // 1: tourism.auth.v1.AuthResponse.tokens:type_name -> tourism.auth.v1.TokenPair
-	0, // 2: tourism.auth.v1.ValidateResponse.user:type_name -> tourism.auth.v1.User
-	3, // 3: tourism.auth.v1.AuthService.Register:input_type -> tourism.auth.v1.RegisterRequest
-	4, // 4: tourism.auth.v1.AuthService.Login:input_type -> tourism.auth.v1.LoginRequest
-	5, // 5: tourism.auth.v1.AuthService.Refresh:input_type -> tourism.auth.v1.RefreshRequest
-	6, // 6: tourism.auth.v1.AuthService.Validate:input_type -> tourism.auth.v1.ValidateRequest
-	8, // 7: tourism.auth.v1.AuthService.Logout:input_type -> tourism.auth.v1.LogoutRequest
-	2, // 8: tourism.auth.v1.AuthService.Register:output_type -> tourism.auth.v1.AuthResponse
-	2, // 9: tourism.auth.v1.AuthService.Login:output_type -> tourism.auth.v1.AuthResponse
-	1, // 10: tourism.auth.v1.AuthService.Refresh:output_type -> tourism.auth.v1.TokenPair
-	7, // 11: tourism.auth.v1.AuthService.Validate:output_type -> tourism.auth.v1.ValidateResponse
-	9, // 12: tourism.auth.v1.AuthService.Logout:output_type -> google.protobuf.Empty
-	8, // [8:13] is the sub-list for method output_type
-	3, // [3:8] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0,  // 0: tourism.auth.v1.AuthResponse.user:type_name -> tourism.auth.v1.User
+	1,  // 1: tourism.auth.v1.AuthResponse.tokens:type_name -> tourism.auth.v1.TokenPair
+	0,  // 2: tourism.auth.v1.ValidateResponse.user:type_name -> tourism.auth.v1.User
+	0,  // 3: tourism.auth.v1.ListUsersResponse.users:type_name -> tourism.auth.v1.User
+	0,  // 4: tourism.auth.v1.SearchUsersResponse.users:type_name -> tourism.auth.v1.User
+	3,  // 5: tourism.auth.v1.AuthService.Register:input_type -> tourism.auth.v1.RegisterRequest
+	4,  // 6: tourism.auth.v1.AuthService.Login:input_type -> tourism.auth.v1.LoginRequest
+	5,  // 7: tourism.auth.v1.AuthService.Refresh:input_type -> tourism.auth.v1.RefreshRequest
+	6,  // 8: tourism.auth.v1.AuthService.Validate:input_type -> tourism.auth.v1.ValidateRequest
+	8,  // 9: tourism.auth.v1.AuthService.Logout:input_type -> tourism.auth.v1.LogoutRequest
+	9,  // 10: tourism.auth.v1.AuthService.ListUsers:input_type -> tourism.auth.v1.ListUsersRequest
+	11, // 11: tourism.auth.v1.AuthService.SearchUsers:input_type -> tourism.auth.v1.SearchUsersRequest
+	2,  // 12: tourism.auth.v1.AuthService.Register:output_type -> tourism.auth.v1.AuthResponse
+	2,  // 13: tourism.auth.v1.AuthService.Login:output_type -> tourism.auth.v1.AuthResponse
+	1,  // 14: tourism.auth.v1.AuthService.Refresh:output_type -> tourism.auth.v1.TokenPair
+	7,  // 15: tourism.auth.v1.AuthService.Validate:output_type -> tourism.auth.v1.ValidateResponse
+	13, // 16: tourism.auth.v1.AuthService.Logout:output_type -> google.protobuf.Empty
+	10, // 17: tourism.auth.v1.AuthService.ListUsers:output_type -> tourism.auth.v1.ListUsersResponse
+	12, // 18: tourism.auth.v1.AuthService.SearchUsers:output_type -> tourism.auth.v1.SearchUsersResponse
+	12, // [12:19] is the sub-list for method output_type
+	5,  // [5:12] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_tourism_auth_v1_auth_proto_init() }
@@ -619,7 +835,7 @@ func file_tourism_auth_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tourism_auth_v1_auth_proto_rawDesc), len(file_tourism_auth_v1_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
