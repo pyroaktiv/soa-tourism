@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package tourism.follower.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/follower/v1;followerv1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Follower API";
+    version: "0.1.0";
+    description: "Follow relationships and recommendations";
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+service FollowerService {
+  // Follow a user. The calling user is identified from the Authorization header.
+  rpc Follow(FollowRequest) returns (FollowResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/followers/{followee_id}/follow"
+      body: "*"
+    };
+  }
+
+  // Unfollow a user. The calling user is identified from the Authorization header.
+  rpc Unfollow(UnfollowRequest) returns (UnfollowResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/followers/{followee_id}/follow"
+    };
+  }
+
+  // List users who follow the given user.
+  rpc GetFollowers(GetFollowersRequest) returns (GetFollowersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/followers/{user_id}/followers"
+    };
+  }
+
+  // List users that the given user follows.
+  rpc GetFollowing(GetFollowingRequest) returns (GetFollowingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/followers/{user_id}/following"
+    };
+  }
+
+  // Check whether follower_id follows followee_id.
+  rpc IsFollowing(IsFollowingRequest) returns (IsFollowingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/followers/{follower_id}/following/{followee_id}"
+    };
+  }
+
+  // Return all user IDs followed by the given user.
+  // Intended for internal service-to-service calls only
+  rpc GetFollowedUserIds(GetFollowedUserIdsRequest) returns (GetFollowedUserIdsResponse) {}
+
+  // Return follow recommendations based on friends-of-friends.
+  // The calling user is identified from the Authorization header.
+  rpc GetRecommendations(GetRecommendationsRequest) returns (GetRecommendationsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/followers/recommendations"
+    };
+  }
+}
+
+// Follow / Unfollow
+
+message FollowRequest {
+  // The user to follow. The follower is the authenticated caller.
+  string followee_id = 1;
+}
+
+message FollowResponse {
+  bool success = 1;
+}
+
+message UnfollowRequest {
+  // The user to unfollow. The follower is the authenticated caller.
+  string followee_id = 1;
+}
+
+message UnfollowResponse {
+  bool success = 1;
+}
+
+// Listings
+
+message GetFollowersRequest {
+  string user_id = 1;
+  int32  limit   = 2;
+  int32  offset  = 3;
+}
+
+message GetFollowersResponse {
+  repeated string user_ids = 1;
+  int32           total    = 2;
+}
+
+message GetFollowingRequest {
+  string user_id = 1;
+  int32  limit   = 2;
+  int32  offset  = 3;
+}
+
+message GetFollowingResponse {
+  repeated string user_ids = 1;
+  int32           total    = 2;
+}
+
+// IsFollowing
+
+message IsFollowingRequest {
+  string follower_id = 1;
+  string followee_id = 2;
+}
+
+message IsFollowingResponse {
+  bool is_following = 1;
+}
+
+// GetFollowedUserIds (internal)
+
+message GetFollowedUserIdsRequest {
+  string user_id = 1;
+}
+
+message GetFollowedUserIdsResponse {
+  repeated string user_ids = 1;
+}
+
+// Recommendations
+
+message GetRecommendationsRequest {
+  // Maximum number of recommendations to return. Defaults to 10 if 0.
+  int32 limit = 1;
+}
+
+message Recommendation {
+  string user_id        = 1;
+  int32  mutual_follows = 2;
+}
+
+message GetRecommendationsResponse {
+  repeated Recommendation recommendations = 1;
+}

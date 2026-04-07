@@ -30,13 +30,13 @@ const (
 //
 // StakeholderService manages user profiles.
 type StakeholderServiceClient interface {
-	// GetProfile returns the profile for the given user. Public — no token required.
+	// GetProfile returns the profile for the given user.
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*Profile, error)
 	// UpdateProfile creates or updates the authenticated user's profile.
-	// Requires Authorization: Bearer <access_token>.
+	// Requires authnz.
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*Profile, error)
 	// DeleteProfilePhoto removes the profile photo from storage and clears the URL.
-	// Requires Authorization: Bearer <access_token>.
+	// Requires authnz.
 	DeleteProfilePhoto(ctx context.Context, in *DeleteProfilePhotoRequest, opts ...grpc.CallOption) (*Profile, error)
 }
 
@@ -84,13 +84,13 @@ func (c *stakeholderServiceClient) DeleteProfilePhoto(ctx context.Context, in *D
 //
 // StakeholderService manages user profiles.
 type StakeholderServiceServer interface {
-	// GetProfile returns the profile for the given user. Public — no token required.
+	// GetProfile returns the profile for the given user.
 	GetProfile(context.Context, *GetProfileRequest) (*Profile, error)
 	// UpdateProfile creates or updates the authenticated user's profile.
-	// Requires Authorization: Bearer <access_token>.
+	// Requires authnz.
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*Profile, error)
 	// DeleteProfilePhoto removes the profile photo from storage and clears the URL.
-	// Requires Authorization: Bearer <access_token>.
+	// Requires authnz.
 	DeleteProfilePhoto(context.Context, *DeleteProfilePhotoRequest) (*Profile, error)
 	mustEmbedUnimplementedStakeholderServiceServer()
 }
