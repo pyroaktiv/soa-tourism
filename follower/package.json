@@ -2,14 +2,15 @@
   "name": "follower-service",
   "version": "0.1.0",
   "private": true,
-  "description": "Social graph microservice — follow relationships and recommendations (Neo4j + gRPC)",
+  "description": "Follower microservice",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "dev": "ts-node src/server.ts",
     "generate": "buf generate"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.11.0",
     "@grpc/grpc-js": "^1.13.4",
     "neo4j-driver": "^5.28.1"
   },
