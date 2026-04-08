@@ -23,7 +23,7 @@
   "paths": {
     "/api/v1/stakeholders/profiles/{userId}": {
       "get": {
-        "summary": "GetProfile returns the profile for the given user. Public — no token required.",
+        "summary": "GetProfile returns the profile for the given user.",
         "operationId": "StakeholderService_GetProfile",
         "responses": {
           "200": {
@@ -52,7 +52,7 @@
         ]
       },
       "put": {
-        "summary": "UpdateProfile creates or updates the authenticated user's profile.\nRequires Authorization: Bearer \u003caccess_token\u003e.",
+        "summary": "UpdateProfile creates or updates the authenticated user's profile.\r\nRequires authnz.",
         "operationId": "StakeholderService_UpdateProfile",
         "responses": {
           "200": {
@@ -91,7 +91,7 @@
     },
     "/api/v1/stakeholders/profiles/{userId}/photo": {
       "delete": {
-        "summary": "DeleteProfilePhoto removes the profile photo from storage and clears the URL.\nRequires Authorization: Bearer \u003caccess_token\u003e.",
+        "summary": "DeleteProfilePhoto removes the profile photo from storage and clears the URL.\r\nRequires authnz.",
         "operationId": "StakeholderService_DeleteProfilePhoto",
         "responses": {
           "200": {
@@ -142,7 +142,7 @@
           "description": "photo_url should be the full Filer URL returned after a direct upload to SeaweedFS."
         }
       },
-      "description": "UpdateProfileRequest supports partial updates — only fields that are\nexplicitly set (via proto3 optional) will be written to the database."
+      "description": "UpdateProfileRequest supports partial updates — only fields that are\r\nexplicitly set (via proto3 optional) will be written to the database."
     },
     "protobufAny": {
       "type": "object",
