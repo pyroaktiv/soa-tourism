@@ -36,7 +36,7 @@ services:
 
   seaweedfs:
     image: chrislusf/seaweedfs:latest
-    command: "server -filer -filer.port=8888"
+    command: "server -filer -filer.port=8888 -ip=0.0.0.0"
     ports:
       - "8888:8888"
     volumes:

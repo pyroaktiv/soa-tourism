@@ -92,7 +92,12 @@ func (s *Service) Register(ctx context.Context, req *authv1.RegisterRequest) (*a
 	username := strings.TrimSpace(req.GetUsername())
 	email := strings.ToLower(strings.TrimSpace(req.GetEmail()))
 	password := req.GetPassword()
-	roles := normalizeRoles(req.GetRoles())
+
+	roles, err := validateAndNormalizeRoles(req.GetRoles())
+
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 
 	if username == "" || email == "" || password == "" {
 		return nil, status.Error(codes.InvalidArgument, "username, email and password are required")
@@ -352,26 +357,34 @@ func toProtoUser(user *userDocument) *authv1.User {
 	}
 }
 
-func normalizeRoles(roles []string) []string {
-	if len(roles) == 0 {
-		return []string{"user"}
+func validateAndNormalizeRoles(inputRoles []string) ([]string, error) {
+	if len(inputRoles) == 0 {
+		return []string{"tourist"}, nil
 	}
 
-	seen := make(map[string]struct{}, len(roles))
-	result := make([]string, 0, len(roles))
-	for _, role := range roles {
-		normalized := strings.ToLower(strings.TrimSpace(role))
+	seen := make(map[string]struct{})
+	var result []string
+
+	for _, r := range inputRoles {
+		normalized := strings.ToLower(strings.TrimSpace(r))
+
 		if normalized == "" {
 			continue
 		}
-		if _, ok := seen[normalized]; ok {
-			continue
+
+		if normalized != "tourist" && normalized != "author" {
+			return nil, fmt.Errorf("invalid role: %s (only 'tourist' or 'author' are allowed via registration)", normalized)
 		}
-		seen[normalized] = struct{}{}
-		result = append(result, normalized)
+
+		if _, ok := seen[normalized]; !ok {
+			seen[normalized] = struct{}{}
+			result = append(result, normalized)
+		}
 	}
+
 	if len(result) == 0 {
-		return []string{"user"}
+		return []string{"tourist"}, nil
 	}
-	return result
+
+	return result, nil
 }
