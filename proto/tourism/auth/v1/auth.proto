@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package tourism.auth.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1";
+
+service AuthService {
+  // Register creates a new user account and returns a token pair.
+  rpc Register(RegisterRequest) returns (AuthResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/register"
+      body: "*"
+    };
+  }
+
+  // Login authenticates with username or email + password and returns a token pair.
+  rpc Login(LoginRequest) returns (AuthResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  // Refresh rotates a refresh token and returns a new token pair.
+  rpc Refresh(RefreshRequest) returns (TokenPair) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/refresh"
+      body: "*"
+    };
+  }
+
+  // Validate verifies an access token and returns the associated user.
+  // Called internally by other services — not exposed through the gateway.
+  rpc Validate(ValidateRequest) returns (ValidateResponse) {}
+
+  // Logout revokes the given refresh token.
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/logout"
+      body: "*"
+    };
+  }
+  // BlockUser blocks a user account, preventing login and token usage.
+  // Requires admin role.
+  rpc BlockUser(BlockUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/block"
+      body: "*"
+    };
+  }
+}
+
+message User {
+  string id       = 1;
+  string username = 2;
+  string email    = 3;
+  repeated string roles = 4;
+  bool blocked = 5;
+}
+
+message TokenPair {
+  string access_token              = 1;
+  int64  access_token_expires_at   = 2;
+  string refresh_token             = 3;
+  int64  refresh_token_expires_at  = 4;
+}
+
+message AuthResponse {
+  User      user   = 1;
+  TokenPair tokens = 2;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string email    = 2;
+  string password = 3;
+  // roles defaults to ["user"] when empty.
+  repeated string roles = 4;
+}
+
+message LoginRequest {
+  // identifier accepts either a username or email address.
+  string identifier = 1;
+  string password   = 2;
+}
+
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+message ValidateRequest {
+  string access_token = 1;
+}
+
+message ValidateResponse {
+  bool valid = 1;
+  // user is populated only when valid is true.
+  User user = 2;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message BlockUserRequest {
+  string user_id = 1;
+}
+
+message BlockUserResponse {
+  bool success = 1;
+}
