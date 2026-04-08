@@ -64,19 +64,18 @@ export async function getFollowers(
 ): Promise<PageResult> {
   const session = getDriver().session();
   try {
-    const [listResult, countResult] = await Promise.all([
-      session.run(
-        `MATCH (f:User)-[:FOLLOWS]->(:User {id: $userId})
-         RETURN f.id AS userId
-         SKIP $offset LIMIT $limit`,
-        { userId, offset: neo4j.int(offset), limit: neo4j.int(limit) },
-      ),
-      session.run(
-        `MATCH (f:User)-[:FOLLOWS]->(:User {id: $userId})
-         RETURN count(f) AS total`,
-        { userId },
-      ),
-    ]);
+    // Neo4j sessions are single-threaded; run queries sequentially.
+    const listResult = await session.run(
+      `MATCH (f:User)-[:FOLLOWS]->(:User {id: $userId})
+       RETURN f.id AS userId
+       SKIP $offset LIMIT $limit`,
+      { userId, offset: neo4j.int(offset), limit: neo4j.int(limit) },
+    );
+    const countResult = await session.run(
+      `MATCH (f:User)-[:FOLLOWS]->(:User {id: $userId})
+       RETURN count(f) AS total`,
+      { userId },
+    );
     return {
       userIds: listResult.records.map((r) => r.get("userId") as string),
       total: (countResult.records[0]?.get("total") as Integer).toNumber(),
@@ -93,19 +92,18 @@ export async function getFollowing(
 ): Promise<PageResult> {
   const session = getDriver().session();
   try {
-    const [listResult, countResult] = await Promise.all([
-      session.run(
-        `MATCH (:User {id: $userId})-[:FOLLOWS]->(f:User)
-         RETURN f.id AS userId
-         SKIP $offset LIMIT $limit`,
-        { userId, offset: neo4j.int(offset), limit: neo4j.int(limit) },
-      ),
-      session.run(
-        `MATCH (:User {id: $userId})-[:FOLLOWS]->(f:User)
-         RETURN count(f) AS total`,
-        { userId },
-      ),
-    ]);
+    // Neo4j sessions are single-threaded; run queries sequentially.
+    const listResult = await session.run(
+      `MATCH (:User {id: $userId})-[:FOLLOWS]->(f:User)
+       RETURN f.id AS userId
+       SKIP $offset LIMIT $limit`,
+      { userId, offset: neo4j.int(offset), limit: neo4j.int(limit) },
+    );
+    const countResult = await session.run(
+      `MATCH (:User {id: $userId})-[:FOLLOWS]->(f:User)
+       RETURN count(f) AS total`,
+      { userId },
+    );
     return {
       userIds: listResult.records.map((r) => r.get("userId") as string),
       total: (countResult.records[0]?.get("total") as Integer).toNumber(),
