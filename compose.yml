@@ -75,6 +75,7 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: "mongodb://mongo:27017/blogdb"
       SPRING_DATA_MONGODB_HOST: "mongo"
+      STAKEHOLDERS_SERVICE_ADDR: "stakeholders:9090"
     expose:
       - "8080"
       - "9090"
