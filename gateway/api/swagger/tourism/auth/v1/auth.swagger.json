@@ -18,14 +18,13 @@
   "paths": {
     "/api/v1/auth/block": {
       "post": {
-        "summary": "BlockUser blocks a user account, preventing login and token usage.\r\nRequires admin role.",
+        "summary": "BlockUser blocks a user account, preventing login and token usage.\nRequires admin role.",
         "operationId": "AuthService_BlockUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "type": "object",
-              "properties": {}
+              "$ref": "#/definitions/v1BlockUserResponse"
             }
           },
           "default": {
@@ -182,6 +181,77 @@
           "AuthService"
         ]
       }
+    },
+    "/api/v1/auth/users": {
+      "get": {
+        "summary": "ListUsers returns a paginated list of all users.",
+        "operationId": "AuthService_ListUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageNumber",
+            "description": "Simple offset-based pagination",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/api/v1/auth/users/search": {
+      "get": {
+        "summary": "SearchUsers finds users by partial username match.",
+        "operationId": "AuthService_SearchUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SearchUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -232,6 +302,30 @@
         }
       }
     },
+    "v1BlockUserResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1User"
+          }
+        },
+        "totalCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "v1LoginRequest": {
       "type": "object",
       "properties": {
@@ -278,6 +372,18 @@
             "type": "string"
           },
           "description": "roles defaults to [\"user\"] when empty."
+        }
+      }
+    },
+    "v1SearchUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1User"
+          }
         }
       }
     },

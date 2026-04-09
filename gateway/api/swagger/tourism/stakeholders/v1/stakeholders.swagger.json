@@ -52,7 +52,7 @@
         ]
       },
       "put": {
-        "summary": "UpdateProfile creates or updates the authenticated user's profile.\r\nRequires authnz.",
+        "summary": "UpdateProfile creates or updates the authenticated user's profile.\nRequires authnz.",
         "operationId": "StakeholderService_UpdateProfile",
         "responses": {
           "200": {
@@ -91,7 +91,7 @@
     },
     "/api/v1/stakeholders/profiles/{userId}/photo": {
       "delete": {
-        "summary": "DeleteProfilePhoto removes the profile photo from storage and clears the URL.\r\nRequires authnz.",
+        "summary": "DeleteProfilePhoto removes the profile photo from storage and clears the URL.\nRequires authnz.",
         "operationId": "StakeholderService_DeleteProfilePhoto",
         "responses": {
           "200": {
@@ -142,7 +142,7 @@
           "description": "photo_url should be the full Filer URL returned after a direct upload to SeaweedFS."
         }
       },
-      "description": "UpdateProfileRequest supports partial updates — only fields that are\r\nexplicitly set (via proto3 optional) will be written to the database."
+      "description": "UpdateProfileRequest supports partial updates — only fields that are\nexplicitly set (via proto3 optional) will be written to the database."
     },
     "protobufAny": {
       "type": "object",

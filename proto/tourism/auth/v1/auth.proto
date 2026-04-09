@@ -43,6 +43,21 @@ service AuthService {
       body: "*"
     };
   }
+
+  // ListUsers returns a paginated list of all users.
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/users"
+    };
+  }
+
+  // SearchUsers finds users by partial username match.
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/users/search"
+    };
+  }
+
   // BlockUser blocks a user account, preventing login and token usage.
   // Requires admin role.
   rpc BlockUser(BlockUserRequest) returns (BlockUserResponse) {
@@ -103,6 +118,24 @@ message ValidateResponse {
 
 message LogoutRequest {
   string refresh_token = 1;
+}
+
+message ListUsersRequest {
+  int32 page_size = 1;
+  int32 page_number = 2; // Simple offset-based pagination
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  int64 total_count = 2;
+}
+
+message SearchUsersRequest {
+  string username = 1;
+}
+
+message SearchUsersResponse {
+  repeated User users = 1;
 }
 
 message BlockUserRequest {
