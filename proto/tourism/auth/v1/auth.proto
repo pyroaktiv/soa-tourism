@@ -43,6 +43,14 @@ service AuthService {
       body: "*"
     };
   }
+  // BlockUser blocks a user account, preventing login and token usage.
+  // Requires admin role.
+  rpc BlockUser(BlockUserRequest) returns (BlockUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/block"
+      body: "*"
+    };
+  }
 }
 
 message User {
@@ -50,6 +58,7 @@ message User {
   string username = 2;
   string email    = 3;
   repeated string roles = 4;
+  bool blocked = 5;
 }
 
 message TokenPair {
@@ -94,4 +103,12 @@ message ValidateResponse {
 
 message LogoutRequest {
   string refresh_token = 1;
+}
+
+message BlockUserRequest {
+  string user_id = 1;
+}
+
+message BlockUserResponse {
+  bool success = 1;
 }
