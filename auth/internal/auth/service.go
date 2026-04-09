@@ -37,6 +37,7 @@ type userDocument struct {
 	Email        string   `bson:"email"`
 	PasswordHash []byte   `bson:"password_hash"`
 	Roles        []string `bson:"roles"`
+	Blocked      bool     `bson:"blocked"`
 }
 
 type sessionDocument struct {
@@ -114,6 +115,7 @@ func (s *Service) Register(ctx context.Context, req *authv1.RegisterRequest) (*a
 		Email:        email,
 		PasswordHash: passwordHash,
 		Roles:        roles,
+		Blocked:      false,
 	}
 
 	if _, err := s.users.InsertOne(ctx, doc); err != nil {
@@ -150,7 +152,9 @@ func (s *Service) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.
 		}
 		return nil, status.Error(codes.Internal, "database error")
 	}
-
+	if doc.Blocked {
+		return nil, status.Error(codes.PermissionDenied, "account is blocked")
+	}
 	if bcrypt.CompareHashAndPassword(doc.PasswordHash, []byte(password)) != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid credentials")
 	}
@@ -168,7 +172,6 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
 	}
-
 	var session sessionDocument
 	if err := s.sessions.FindOneAndDelete(ctx, bson.D{{Key: "_id", Value: claims.ID}}).Decode(&session); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -180,8 +183,10 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 	if time.Now().After(session.ExpiresAt) {
 		return nil, status.Error(codes.Unauthenticated, "refresh token expired or revoked")
 	}
-
 	var user userDocument
+	if user.Blocked {
+		return nil, status.Error(codes.PermissionDenied, "account is blocked")
+	}
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: session.UserID}}).Decode(&user); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -200,6 +205,9 @@ func (s *Service) Validate(ctx context.Context, req *authv1.ValidateRequest) (*a
 
 	var user userDocument
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: claims.UserID}}).Decode(&user); err != nil {
+		return &authv1.ValidateResponse{Valid: false}, nil
+	}
+	if user.Blocked {
 		return &authv1.ValidateResponse{Valid: false}, nil
 	}
 
@@ -286,6 +294,34 @@ func (s *Service) SearchUsers(ctx context.Context, req *authv1.SearchUsersReques
 	}
 
 	return &authv1.SearchUsersResponse{Users: users}, nil
+}
+
+func (s *Service) BlockUser(ctx context.Context, req *authv1.BlockUserRequest) (*authv1.BlockUserResponse, error) {
+	// 1. extract and validate token from context
+	token := getTokenFromContext(ctx)
+	if token == "" {
+		return nil, status.Error(codes.Unauthenticated, "missing token")
+	}
+	claims, err := s.parseToken(token, "access")
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "invalid token")
+	}
+	// 2. check if user has admin role
+	if !containsRole(claims.Roles, "admin") {
+		return nil, status.Error(codes.PermissionDenied, "admin role required")
+	}
+	// 3. find and update the target user
+	filter := bson.D{{Key: "_id", Value: req.GetUserId()}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "blocked", Value: true}}}}
+	result, err := s.users.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "database error")
+	}
+	if result.MatchedCount == 0 {
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	return &authv1.BlockUserResponse{Success: true}, nil
 }
 
 func (s *Service) issueTokenPair(ctx context.Context, user *userDocument) (*authv1.TokenPair, error) {
@@ -400,12 +436,38 @@ func (s *Service) authorizeAdmin(ctx context.Context) (*tokenClaims, error) {
 	return claims, nil
 }
 
+func getTokenFromContext(ctx context.Context) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ""
+	}
+	tokens := md.Get("authorization")
+	if len(tokens) == 0 {
+		return ""
+	}
+	parts := strings.SplitN(tokens[0], " ", 2)
+	if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+		return ""
+	}
+	return parts[1]
+}
+
+func containsRole(roles []string, role string) bool {
+	for _, r := range roles {
+		if r == role {
+			return true
+		}
+	}
+	return false
+}
+
 func toProtoUser(user *userDocument) *authv1.User {
 	return &authv1.User{
 		Id:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
 		Roles:    append([]string(nil), user.Roles...),
+		Blocked:  user.Blocked,
 	}
 }
 

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"embed"
-	"io/fs"
 	"log"
 	"net/http"
 
@@ -18,6 +17,7 @@ import (
 	"github.com/pyroaktiv/soa-tourism/gateway/internal/config"
 )
 
+//go:embed api/swagger
 var swaggerFS embed.FS
 
 func main() {
@@ -57,13 +57,14 @@ func main() {
 	}
 
 	// Strip the "api/swagger" embed prefix so files are at /swagger/<path>.
-	swaggerSub, err := fs.Sub(swaggerFS, "api/swagger")
-	if err != nil {
-		log.Fatalf("swagger sub-fs: %v", err)
-	}
-
+	/*
+		swaggerSub, err := fs.Sub(swaggerFS, "api/swagger")
+		if err != nil {
+			log.Fatalf("swagger sub-fs: %v", err)
+		}
+	*/
 	httpMux := http.NewServeMux()
-	httpMux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.FS(swaggerSub))))
+	httpMux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.FS(swaggerFS))))
 	httpMux.Handle("/", grpcMux)
 
 	handler := cors.New(cors.Options{
