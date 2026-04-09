@@ -655,14 +655,14 @@ const file_tourism_auth_v1_auth_proto_rawDesc = "" +
 	"\x10BlockUserRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"-\n" +
 	"\x11BlockUserResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xe7\x04\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xf3\x04\n" +
 	"\vAuthService\x12m\n" +
 	"\bRegister\x12 .tourism.auth.v1.RegisterRequest\x1a\x1d.tourism.auth.v1.AuthResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/auth/register\x12d\n" +
 	"\x05Login\x12\x1d.tourism.auth.v1.LoginRequest\x1a\x1d.tourism.auth.v1.AuthResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/login\x12g\n" +
 	"\aRefresh\x12\x1f.tourism.auth.v1.RefreshRequest\x1a\x1a.tourism.auth.v1.TokenPair\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/auth/refresh\x12Q\n" +
 	"\bValidate\x12 .tourism.auth.v1.ValidateRequest\x1a!.tourism.auth.v1.ValidateResponse\"\x00\x12`\n" +
-	"\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/logout\x12e\n" +
-	"\tBlockUser\x12!.tourism.auth.v1.BlockUserRequest\x1a\x16.google.protobuf.Empty\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/blockBMZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3"
+	"\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/logout\x12q\n" +
+	"\tBlockUser\x12!.tourism.auth.v1.BlockUserRequest\x1a\".tourism.auth.v1.BlockUserResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/blockBMZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3"
 
 var (
 	file_tourism_auth_v1_auth_proto_rawDescOnce sync.Once
@@ -706,7 +706,7 @@ var file_tourism_auth_v1_auth_proto_depIdxs = []int32{
 	1,  // 11: tourism.auth.v1.AuthService.Refresh:output_type -> tourism.auth.v1.TokenPair
 	7,  // 12: tourism.auth.v1.AuthService.Validate:output_type -> tourism.auth.v1.ValidateResponse
 	11, // 13: tourism.auth.v1.AuthService.Logout:output_type -> google.protobuf.Empty
-	11, // 14: tourism.auth.v1.AuthService.BlockUser:output_type -> google.protobuf.Empty
+	10, // 14: tourism.auth.v1.AuthService.BlockUser:output_type -> tourism.auth.v1.BlockUserResponse
 	9,  // [9:15] is the sub-list for method output_type
 	3,  // [3:9] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name

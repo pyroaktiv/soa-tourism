@@ -171,7 +171,6 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
 	}
-
 	var session sessionDocument
 	if err := s.sessions.FindOneAndDelete(ctx, bson.D{{Key: "_id", Value: claims.ID}}).Decode(&session); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -183,8 +182,10 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 	if time.Now().After(session.ExpiresAt) {
 		return nil, status.Error(codes.Unauthenticated, "refresh token expired or revoked")
 	}
-
 	var user userDocument
+	if user.Blocked {
+		return nil, status.Error(codes.PermissionDenied, "account is blocked")
+	}
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: session.UserID}}).Decode(&user); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -203,6 +204,9 @@ func (s *Service) Validate(ctx context.Context, req *authv1.ValidateRequest) (*a
 
 	var user userDocument
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: claims.UserID}}).Decode(&user); err != nil {
+		return &authv1.ValidateResponse{Valid: false}, nil
+	}
+	if user.Blocked {
 		return &authv1.ValidateResponse{Valid: false}, nil
 	}
 
