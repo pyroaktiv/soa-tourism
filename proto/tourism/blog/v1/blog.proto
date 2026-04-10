@@ -5,6 +5,9 @@ package tourism.blog.v1;
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
+option java_multiple_files = true;
+option java_package = "tourism.blog.v1";
+
 option go_package = "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/blog/v1;blogv1";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {

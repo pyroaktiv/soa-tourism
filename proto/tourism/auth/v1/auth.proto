@@ -5,6 +5,9 @@ package tourism.auth.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
+option java_multiple_files = true;
+option java_package = "tourism.auth.v1"
+
 option go_package = "github.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1";
 
 service AuthService {
