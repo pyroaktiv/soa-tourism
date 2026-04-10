@@ -310,7 +310,12 @@ func (s *Service) BlockUser(ctx context.Context, req *authv1.BlockUserRequest) (
 	if !containsRole(claims.Roles, "admin") {
 		return nil, status.Error(codes.PermissionDenied, "admin role required")
 	}
-	// 3. find and update the target user
+	// 3. prevent self-blocking
+	blockerUserID := claims.UserID
+	if req.GetUserId() == blockerUserID {
+		return nil, status.Error(codes.InvalidArgument, "cannot block yourself")
+	}
+	// 4. find and update the target user
 	filter := bson.D{{Key: "_id", Value: req.GetUserId()}}
 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "blocked", Value: true}}}}
 	result, err := s.users.UpdateOne(ctx, filter, update)
