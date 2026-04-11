@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package tourism.blog.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option java_multiple_files = true;
+option java_package = "tourism.blog.v1";
+
+option go_package = "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/blog/v1;blogv1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Blog API";
+    version: "0.1.0";
+    description: "Servis za upravljanje turističkim blogovima i komentarima";
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+service BlogService {
+  rpc CreateBlog(CreateBlogRequest) returns (Blog) {
+    option (google.api.http) = {
+      post: "/api/v1/blogs"
+      body: "*"
+    };
+  }
+
+  rpc GetAllBlogs(GetAllBlogsRequest) returns (GetAllBlogsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/blogs"
+    };
+  }
+
+  rpc AddComment(AddCommentRequest) returns (Blog) {
+    option (google.api.http) = {
+      post: "/api/v1/blogs/{blog_id}/comments"
+      body: "comment"
+    };
+  }
+}
+
+message Comment {
+  string author_id = 1;
+  string text = 2;
+  string created_at = 3;
+  string last_modified_at = 4;
+}
+
+message Blog {
+  string id = 1;
+  string author_id = 2;
+  string title = 3;
+  string description = 4;
+  string creation_date = 5;
+  repeated string images = 6;
+  repeated Comment comments = 7;
+}
+
+message CreateBlogRequest {
+  string author_id = 1;
+  string title = 2;
+  string description = 3;
+  repeated string images = 4;
+}
+
+message GetAllBlogsRequest {
+}
+
+message GetAllBlogsResponse {
+  repeated Blog blogs = 1;
+}
+
+message AddCommentRequest {
+  string blog_id = 1;
+  Comment comment = 2;
+}

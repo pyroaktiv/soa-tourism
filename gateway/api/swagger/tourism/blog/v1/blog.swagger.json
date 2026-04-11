@@ -1,0 +1,227 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Blog API",
+    "description": "Servis za upravljanje turističkim blogovima i komentarima",
+    "version": "0.1.0"
+  },
+  "tags": [
+    {
+      "name": "BlogService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/blogs": {
+      "get": {
+        "operationId": "BlogService_GetAllBlogs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAllBlogsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "BlogService"
+        ]
+      },
+      "post": {
+        "operationId": "BlogService_CreateBlog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Blog"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateBlogRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BlogService"
+        ]
+      }
+    },
+    "/api/v1/blogs/{blogId}/comments": {
+      "post": {
+        "operationId": "BlogService_AddComment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Blog"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "comment",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Comment"
+            }
+          }
+        ],
+        "tags": [
+          "BlogService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Blog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "authorId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Comment"
+          }
+        }
+      }
+    },
+    "v1Comment": {
+      "type": "object",
+      "properties": {
+        "authorId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "lastModifiedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateBlogRequest": {
+      "type": "object",
+      "properties": {
+        "authorId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1GetAllBlogsResponse": {
+      "type": "object",
+      "properties": {
+        "blogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Blog"
+          }
+        }
+      }
+    }
+  }
+}
