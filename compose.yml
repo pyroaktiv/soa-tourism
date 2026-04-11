@@ -70,8 +70,8 @@ services:
 
   blog-service:
     build:
-      context: ./blog-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: blog-service/Dockerfile
     environment:
       SPRING_DATA_MONGODB_URI: "mongodb://mongo:27017/blogdb"
       SPRING_DATA_MONGODB_HOST: "mongo"
