@@ -22,6 +22,7 @@ const (
 	BlogService_CreateBlog_FullMethodName  = "/tourism.blog.v1.BlogService/CreateBlog"
 	BlogService_GetAllBlogs_FullMethodName = "/tourism.blog.v1.BlogService/GetAllBlogs"
 	BlogService_AddComment_FullMethodName  = "/tourism.blog.v1.BlogService/AddComment"
+	BlogService_ToggleLike_FullMethodName  = "/tourism.blog.v1.BlogService/ToggleLike"
 )
 
 // BlogServiceClient is the client API for BlogService service.
@@ -31,6 +32,7 @@ type BlogServiceClient interface {
 	CreateBlog(ctx context.Context, in *CreateBlogRequest, opts ...grpc.CallOption) (*Blog, error)
 	GetAllBlogs(ctx context.Context, in *GetAllBlogsRequest, opts ...grpc.CallOption) (*GetAllBlogsResponse, error)
 	AddComment(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*Blog, error)
+	ToggleLike(ctx context.Context, in *ToggleLikeRequest, opts ...grpc.CallOption) (*Blog, error)
 }
 
 type blogServiceClient struct {
@@ -71,6 +73,16 @@ func (c *blogServiceClient) AddComment(ctx context.Context, in *AddCommentReques
 	return out, nil
 }
 
+func (c *blogServiceClient) ToggleLike(ctx context.Context, in *ToggleLikeRequest, opts ...grpc.CallOption) (*Blog, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Blog)
+	err := c.cc.Invoke(ctx, BlogService_ToggleLike_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BlogServiceServer is the server API for BlogService service.
 // All implementations must embed UnimplementedBlogServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type BlogServiceServer interface {
 	CreateBlog(context.Context, *CreateBlogRequest) (*Blog, error)
 	GetAllBlogs(context.Context, *GetAllBlogsRequest) (*GetAllBlogsResponse, error)
 	AddComment(context.Context, *AddCommentRequest) (*Blog, error)
+	ToggleLike(context.Context, *ToggleLikeRequest) (*Blog, error)
 	mustEmbedUnimplementedBlogServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedBlogServiceServer) GetAllBlogs(context.Context, *GetAllBlogsR
 }
 func (UnimplementedBlogServiceServer) AddComment(context.Context, *AddCommentRequest) (*Blog, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedBlogServiceServer) ToggleLike(context.Context, *ToggleLikeRequest) (*Blog, error) {
+	return nil, status.Error(codes.Unimplemented, "method ToggleLike not implemented")
 }
 func (UnimplementedBlogServiceServer) mustEmbedUnimplementedBlogServiceServer() {}
 func (UnimplementedBlogServiceServer) testEmbeddedByValue()                     {}
@@ -172,6 +188,24 @@ func _BlogService_AddComment_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlogService_ToggleLike_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ToggleLikeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).ToggleLike(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlogService_ToggleLike_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).ToggleLike(ctx, req.(*ToggleLikeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BlogService_ServiceDesc is the grpc.ServiceDesc for BlogService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +224,10 @@ var BlogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddComment",
 			Handler:    _BlogService_AddComment_Handler,
+		},
+		{
+			MethodName: "ToggleLike",
+			Handler:    _BlogService_ToggleLike_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

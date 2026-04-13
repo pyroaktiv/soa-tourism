@@ -42,6 +42,12 @@ service BlogService {
       body: "comment"
     };
   }
+  rpc ToggleLike(ToggleLikeRequest) returns (Blog) {
+    option (google.api.http) = {
+      post: "/api/v1/blogs/{blog_id}/toggle-like"
+      body: "*"
+    };
+  }
 }
 
 message Comment {
@@ -59,6 +65,7 @@ message Blog {
   string creation_date = 5;
   repeated string images = 6;
   repeated Comment comments = 7;
+  repeated string liked_by_user_ids = 8;
 }
 
 message CreateBlogRequest {
@@ -78,4 +85,8 @@ message GetAllBlogsResponse {
 message AddCommentRequest {
   string blog_id = 1;
   Comment comment = 2;
+}
+message ToggleLikeRequest {
+  string blog_id = 1;
+  string user_id = 2;
 }

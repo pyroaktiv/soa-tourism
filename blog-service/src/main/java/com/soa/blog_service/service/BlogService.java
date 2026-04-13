@@ -1,15 +1,17 @@
 package com.soa.blog_service.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.soa.blog_service.client.StakeholderGrpcClient;
 import com.soa.blog_service.model.Blog;
 import com.soa.blog_service.model.Comment;
 import com.soa.blog_service.repository.BlogRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import tourism.stakeholders.v1.Profile;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import tourism.stakeholders.v1.Profile;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +50,16 @@ public class BlogService {
 
         blog.getComments().add(comment);
 
+        return blogRepository.save(blog);
+    }
+    public Blog toggleLike(String blogId, String userId) {
+        Blog blog = blogRepository.findById(blogId)
+                .orElseThrow(() -> new RuntimeException("Blog sa ID-jem " + blogId + " nije pronađen!"));
+        if (blog.getLikedByUserIds().contains(userId)) {
+            blog.getLikedByUserIds().remove(userId);
+        } else {
+            blog.getLikedByUserIds().add(userId);
+        }
         return blogRepository.save(blog);
     }
 }
