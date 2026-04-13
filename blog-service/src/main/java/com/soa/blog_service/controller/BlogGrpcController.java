@@ -65,6 +65,15 @@ public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
         responseObserver.onNext(mapToGrpcBlog(azuriranBlog));
         responseObserver.onCompleted();
     }
+    @Override
+    public void toggleLike(ToggleLikeRequest request, StreamObserver<tourism.blog.v1.Blog> responseObserver) {
+        String siguranUserId = AuthInterceptor.USER_ID_KEY.get();
+
+        Blog azuriranBlog = blogService.toggleLike(request.getBlogId(), siguranUserId);
+
+        responseObserver.onNext(mapToGrpcBlog(azuriranBlog));
+        responseObserver.onCompleted();
+    }
 
     private tourism.blog.v1.Blog mapToGrpcBlog(Blog blog) {
         tourism.blog.v1.Blog.Builder builder = tourism.blog.v1.Blog.newBuilder()
@@ -73,7 +82,8 @@ public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
                 .setTitle(blog.getTitle() != null ? blog.getTitle() : "")
                 .setDescription(blog.getDescription() != null ? blog.getDescription() : "")
                 .setCreationDate(blog.getCreationDate() != null ? blog.getCreationDate().toString() : "")
-                .addAllImages(blog.getImages() != null ? blog.getImages() : new ArrayList<>());
+                .addAllImages(blog.getImages() != null ? blog.getImages() : new ArrayList<>())
+                .addAllLikedByUserIds(blog.getLikedByUserIds() != null ? blog.getLikedByUserIds() : new ArrayList<>());
 
         if (blog.getComments() != null) {
             for (Comment c : blog.getComments()) {
@@ -92,4 +102,5 @@ public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
                 .setLastModifiedAt(c.getLastModifiedAt() != null ? c.getLastModifiedAt().toString() : "")
                 .build();
     }
+
 }

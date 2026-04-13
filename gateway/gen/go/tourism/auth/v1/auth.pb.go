@@ -868,7 +868,8 @@ const file_tourism_auth_v1_auth_proto_rawDesc = "" +
 	"\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/logout\x12n\n" +
 	"\tListUsers\x12!.tourism.auth.v1.ListUsersRequest\x1a\".tourism.auth.v1.ListUsersResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/auth/users\x12{\n" +
 	"\vSearchUsers\x12#.tourism.auth.v1.SearchUsersRequest\x1a$.tourism.auth.v1.SearchUsersResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/auth/users/search\x12q\n" +
-	"\tBlockUser\x12!.tourism.auth.v1.BlockUserRequest\x1a\".tourism.auth.v1.BlockUserResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/blockBMZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3"
+	"\tBlockUser\x12!.tourism.auth.v1.BlockUserRequest\x1a\".tourism.auth.v1.BlockUserResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/blockB`\n" +
+	"\x0ftourism.auth.v1P\x01ZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3"
 
 var (
 	file_tourism_auth_v1_auth_proto_rawDescOnce sync.Once

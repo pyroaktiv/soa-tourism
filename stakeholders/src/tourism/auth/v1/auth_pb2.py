@@ -26,14 +26,14 @@ from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1atourism/auth/v1/auth.proto\x12\x0ftourism.auth.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"^\n\x04User\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n\x08username\x18\x02 \x01(\tR\x08username\x12\x14\n\x05\x65mail\x18\x03 \x01(\tR\x05\x65mail\x12\x14\n\x05roles\x18\x04 \x03(\tR\x05roles\"\xc3\x01\n\tTokenPair\x12!\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\tR\x0b\x61\x63\x63\x65ssToken\x12\x35\n\x17\x61\x63\x63\x65ss_token_expires_at\x18\x02 \x01(\x03R\x14\x61\x63\x63\x65ssTokenExpiresAt\x12#\n\rrefresh_token\x18\x03 \x01(\tR\x0crefreshToken\x12\x37\n\x18refresh_token_expires_at\x18\x04 \x01(\x03R\x15refreshTokenExpiresAt\"m\n\x0c\x41uthResponse\x12)\n\x04user\x18\x01 \x01(\x0b\x32\x15.tourism.auth.v1.UserR\x04user\x12\x32\n\x06tokens\x18\x02 \x01(\x0b\x32\x1a.tourism.auth.v1.TokenPairR\x06tokens\"u\n\x0fRegisterRequest\x12\x1a\n\x08username\x18\x01 \x01(\tR\x08username\x12\x14\n\x05\x65mail\x18\x02 \x01(\tR\x05\x65mail\x12\x1a\n\x08password\x18\x03 \x01(\tR\x08password\x12\x14\n\x05roles\x18\x04 \x03(\tR\x05roles\"J\n\x0cLoginRequest\x12\x1e\n\nidentifier\x18\x01 \x01(\tR\nidentifier\x12\x1a\n\x08password\x18\x02 \x01(\tR\x08password\"5\n\x0eRefreshRequest\x12#\n\rrefresh_token\x18\x01 \x01(\tR\x0crefreshToken\"4\n\x0fValidateRequest\x12!\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\tR\x0b\x61\x63\x63\x65ssToken\"S\n\x10ValidateResponse\x12\x14\n\x05valid\x18\x01 \x01(\x08R\x05valid\x12)\n\x04user\x18\x02 \x01(\x0b\x32\x15.tourism.auth.v1.UserR\x04user\"4\n\rLogoutRequest\x12#\n\rrefresh_token\x18\x01 \x01(\tR\x0crefreshToken2\x80\x04\n\x0b\x41uthService\x12m\n\x08Register\x12 .tourism.auth.v1.RegisterRequest\x1a\x1d.tourism.auth.v1.AuthResponse\" \x82\xd3\xe4\x93\x02\x1a\"\x15/api/v1/auth/register:\x01*\x12\x64\n\x05Login\x12\x1d.tourism.auth.v1.LoginRequest\x1a\x1d.tourism.auth.v1.AuthResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\"\x12/api/v1/auth/login:\x01*\x12g\n\x07Refresh\x12\x1f.tourism.auth.v1.RefreshRequest\x1a\x1a.tourism.auth.v1.TokenPair\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/auth/refresh:\x01*\x12Q\n\x08Validate\x12 .tourism.auth.v1.ValidateRequest\x1a!.tourism.auth.v1.ValidateResponse\"\x00\x12`\n\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18\"\x13/api/v1/auth/logout:\x01*BMZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1atourism/auth/v1/auth.proto\x12\x0ftourism.auth.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"x\n\x04User\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n\x08username\x18\x02 \x01(\tR\x08username\x12\x14\n\x05\x65mail\x18\x03 \x01(\tR\x05\x65mail\x12\x14\n\x05roles\x18\x04 \x03(\tR\x05roles\x12\x18\n\x07\x62locked\x18\x05 \x01(\x08R\x07\x62locked\"\xc3\x01\n\tTokenPair\x12!\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\tR\x0b\x61\x63\x63\x65ssToken\x12\x35\n\x17\x61\x63\x63\x65ss_token_expires_at\x18\x02 \x01(\x03R\x14\x61\x63\x63\x65ssTokenExpiresAt\x12#\n\rrefresh_token\x18\x03 \x01(\tR\x0crefreshToken\x12\x37\n\x18refresh_token_expires_at\x18\x04 \x01(\x03R\x15refreshTokenExpiresAt\"m\n\x0c\x41uthResponse\x12)\n\x04user\x18\x01 \x01(\x0b\x32\x15.tourism.auth.v1.UserR\x04user\x12\x32\n\x06tokens\x18\x02 \x01(\x0b\x32\x1a.tourism.auth.v1.TokenPairR\x06tokens\"u\n\x0fRegisterRequest\x12\x1a\n\x08username\x18\x01 \x01(\tR\x08username\x12\x14\n\x05\x65mail\x18\x02 \x01(\tR\x05\x65mail\x12\x1a\n\x08password\x18\x03 \x01(\tR\x08password\x12\x14\n\x05roles\x18\x04 \x03(\tR\x05roles\"J\n\x0cLoginRequest\x12\x1e\n\nidentifier\x18\x01 \x01(\tR\nidentifier\x12\x1a\n\x08password\x18\x02 \x01(\tR\x08password\"5\n\x0eRefreshRequest\x12#\n\rrefresh_token\x18\x01 \x01(\tR\x0crefreshToken\"4\n\x0fValidateRequest\x12!\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\tR\x0b\x61\x63\x63\x65ssToken\"S\n\x10ValidateResponse\x12\x14\n\x05valid\x18\x01 \x01(\x08R\x05valid\x12)\n\x04user\x18\x02 \x01(\x0b\x32\x15.tourism.auth.v1.UserR\x04user\"4\n\rLogoutRequest\x12#\n\rrefresh_token\x18\x01 \x01(\tR\x0crefreshToken\"P\n\x10ListUsersRequest\x12\x1b\n\tpage_size\x18\x01 \x01(\x05R\x08pageSize\x12\x1f\n\x0bpage_number\x18\x02 \x01(\x05R\npageNumber\"a\n\x11ListUsersResponse\x12+\n\x05users\x18\x01 \x03(\x0b\x32\x15.tourism.auth.v1.UserR\x05users\x12\x1f\n\x0btotal_count\x18\x02 \x01(\x03R\ntotalCount\"0\n\x12SearchUsersRequest\x12\x1a\n\x08username\x18\x01 \x01(\tR\x08username\"B\n\x13SearchUsersResponse\x12+\n\x05users\x18\x01 \x03(\x0b\x32\x15.tourism.auth.v1.UserR\x05users\"+\n\x10\x42lockUserRequest\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\"-\n\x11\x42lockUserResponse\x12\x18\n\x07success\x18\x01 \x01(\x08R\x07success2\xe0\x06\n\x0b\x41uthService\x12m\n\x08Register\x12 .tourism.auth.v1.RegisterRequest\x1a\x1d.tourism.auth.v1.AuthResponse\" \x82\xd3\xe4\x93\x02\x1a\"\x15/api/v1/auth/register:\x01*\x12\x64\n\x05Login\x12\x1d.tourism.auth.v1.LoginRequest\x1a\x1d.tourism.auth.v1.AuthResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\"\x12/api/v1/auth/login:\x01*\x12g\n\x07Refresh\x12\x1f.tourism.auth.v1.RefreshRequest\x1a\x1a.tourism.auth.v1.TokenPair\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x14/api/v1/auth/refresh:\x01*\x12Q\n\x08Validate\x12 .tourism.auth.v1.ValidateRequest\x1a!.tourism.auth.v1.ValidateResponse\"\x00\x12`\n\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18\"\x13/api/v1/auth/logout:\x01*\x12n\n\tListUsers\x12!.tourism.auth.v1.ListUsersRequest\x1a\".tourism.auth.v1.ListUsersResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/auth/users\x12{\n\x0bSearchUsers\x12#.tourism.auth.v1.SearchUsersRequest\x1a$.tourism.auth.v1.SearchUsersResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/auth/users/search\x12q\n\tBlockUser\x12!.tourism.auth.v1.BlockUserRequest\x1a\".tourism.auth.v1.BlockUserResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\"\x12/api/v1/auth/block:\x01*B`\n\x0ftourism.auth.v1P\x01ZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'tourism.auth.v1.auth_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'ZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1'
+  _globals['DESCRIPTOR']._serialized_options = b'\n\017tourism.auth.v1P\001ZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1'
   _globals['_AUTHSERVICE'].methods_by_name['Register']._loaded_options = None
   _globals['_AUTHSERVICE'].methods_by_name['Register']._serialized_options = b'\202\323\344\223\002\032\"\025/api/v1/auth/register:\001*'
   _globals['_AUTHSERVICE'].methods_by_name['Login']._loaded_options = None
@@ -42,24 +42,42 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_AUTHSERVICE'].methods_by_name['Refresh']._serialized_options = b'\202\323\344\223\002\031\"\024/api/v1/auth/refresh:\001*'
   _globals['_AUTHSERVICE'].methods_by_name['Logout']._loaded_options = None
   _globals['_AUTHSERVICE'].methods_by_name['Logout']._serialized_options = b'\202\323\344\223\002\030\"\023/api/v1/auth/logout:\001*'
+  _globals['_AUTHSERVICE'].methods_by_name['ListUsers']._loaded_options = None
+  _globals['_AUTHSERVICE'].methods_by_name['ListUsers']._serialized_options = b'\202\323\344\223\002\024\022\022/api/v1/auth/users'
+  _globals['_AUTHSERVICE'].methods_by_name['SearchUsers']._loaded_options = None
+  _globals['_AUTHSERVICE'].methods_by_name['SearchUsers']._serialized_options = b'\202\323\344\223\002\033\022\031/api/v1/auth/users/search'
+  _globals['_AUTHSERVICE'].methods_by_name['BlockUser']._loaded_options = None
+  _globals['_AUTHSERVICE'].methods_by_name['BlockUser']._serialized_options = b'\202\323\344\223\002\027\"\022/api/v1/auth/block:\001*'
   _globals['_USER']._serialized_start=106
-  _globals['_USER']._serialized_end=200
-  _globals['_TOKENPAIR']._serialized_start=203
-  _globals['_TOKENPAIR']._serialized_end=398
-  _globals['_AUTHRESPONSE']._serialized_start=400
-  _globals['_AUTHRESPONSE']._serialized_end=509
-  _globals['_REGISTERREQUEST']._serialized_start=511
-  _globals['_REGISTERREQUEST']._serialized_end=628
-  _globals['_LOGINREQUEST']._serialized_start=630
-  _globals['_LOGINREQUEST']._serialized_end=704
-  _globals['_REFRESHREQUEST']._serialized_start=706
-  _globals['_REFRESHREQUEST']._serialized_end=759
-  _globals['_VALIDATEREQUEST']._serialized_start=761
-  _globals['_VALIDATEREQUEST']._serialized_end=813
-  _globals['_VALIDATERESPONSE']._serialized_start=815
-  _globals['_VALIDATERESPONSE']._serialized_end=898
-  _globals['_LOGOUTREQUEST']._serialized_start=900
-  _globals['_LOGOUTREQUEST']._serialized_end=952
-  _globals['_AUTHSERVICE']._serialized_start=955
-  _globals['_AUTHSERVICE']._serialized_end=1467
+  _globals['_USER']._serialized_end=226
+  _globals['_TOKENPAIR']._serialized_start=229
+  _globals['_TOKENPAIR']._serialized_end=424
+  _globals['_AUTHRESPONSE']._serialized_start=426
+  _globals['_AUTHRESPONSE']._serialized_end=535
+  _globals['_REGISTERREQUEST']._serialized_start=537
+  _globals['_REGISTERREQUEST']._serialized_end=654
+  _globals['_LOGINREQUEST']._serialized_start=656
+  _globals['_LOGINREQUEST']._serialized_end=730
+  _globals['_REFRESHREQUEST']._serialized_start=732
+  _globals['_REFRESHREQUEST']._serialized_end=785
+  _globals['_VALIDATEREQUEST']._serialized_start=787
+  _globals['_VALIDATEREQUEST']._serialized_end=839
+  _globals['_VALIDATERESPONSE']._serialized_start=841
+  _globals['_VALIDATERESPONSE']._serialized_end=924
+  _globals['_LOGOUTREQUEST']._serialized_start=926
+  _globals['_LOGOUTREQUEST']._serialized_end=978
+  _globals['_LISTUSERSREQUEST']._serialized_start=980
+  _globals['_LISTUSERSREQUEST']._serialized_end=1060
+  _globals['_LISTUSERSRESPONSE']._serialized_start=1062
+  _globals['_LISTUSERSRESPONSE']._serialized_end=1159
+  _globals['_SEARCHUSERSREQUEST']._serialized_start=1161
+  _globals['_SEARCHUSERSREQUEST']._serialized_end=1209
+  _globals['_SEARCHUSERSRESPONSE']._serialized_start=1211
+  _globals['_SEARCHUSERSRESPONSE']._serialized_end=1277
+  _globals['_BLOCKUSERREQUEST']._serialized_start=1279
+  _globals['_BLOCKUSERREQUEST']._serialized_end=1322
+  _globals['_BLOCKUSERRESPONSE']._serialized_start=1324
+  _globals['_BLOCKUSERRESPONSE']._serialized_end=1369
+  _globals['_AUTHSERVICE']._serialized_start=1372
+  _globals['_AUTHSERVICE']._serialized_end=2236
 # @@protoc_insertion_point(module_scope)

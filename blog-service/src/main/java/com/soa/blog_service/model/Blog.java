@@ -1,14 +1,15 @@
 package com.soa.blog_service.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -30,4 +31,6 @@ public class Blog {
     private List<String> images = new ArrayList<>();
 
     private List<Comment> comments = new ArrayList<>();
+
+    private List<String> likedByUserIds = new ArrayList<>();
 }

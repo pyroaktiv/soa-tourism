@@ -110,9 +110,55 @@
           "BlogService"
         ]
       }
+    },
+    "/api/v1/blogs/{blogId}/toggle-like": {
+      "post": {
+        "operationId": "BlogService_ToggleLike",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Blog"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BlogServiceToggleLikeBody"
+            }
+          }
+        ],
+        "tags": [
+          "BlogService"
+        ]
+      }
     }
   },
   "definitions": {
+    "BlogServiceToggleLikeBody": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -170,6 +216,12 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Comment"
+          }
+        },
+        "likedByUserIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }
