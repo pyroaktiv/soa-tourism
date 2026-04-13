@@ -40,6 +40,21 @@ class AuthServiceStub(object):
                 request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.LogoutRequest.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
+        self.ListUsers = channel.unary_unary(
+                '/tourism.auth.v1.AuthService/ListUsers',
+                request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ListUsersRequest.SerializeToString,
+                response_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ListUsersResponse.FromString,
+                _registered_method=True)
+        self.SearchUsers = channel.unary_unary(
+                '/tourism.auth.v1.AuthService/SearchUsers',
+                request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.SearchUsersRequest.SerializeToString,
+                response_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.SearchUsersResponse.FromString,
+                _registered_method=True)
+        self.BlockUser = channel.unary_unary(
+                '/tourism.auth.v1.AuthService/BlockUser',
+                request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserRequest.SerializeToString,
+                response_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserResponse.FromString,
+                _registered_method=True)
 
 
 class AuthServiceServicer(object):
@@ -81,6 +96,28 @@ class AuthServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListUsers(self, request, context):
+        """ListUsers returns a paginated list of all users.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SearchUsers(self, request, context):
+        """SearchUsers finds users by partial username match.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def BlockUser(self, request, context):
+        """BlockUser blocks a user account, preventing login and token usage.
+        Requires admin role.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AuthServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -108,6 +145,21 @@ def add_AuthServiceServicer_to_server(servicer, server):
                     servicer.Logout,
                     request_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.LogoutRequest.FromString,
                     response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            ),
+            'ListUsers': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListUsers,
+                    request_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ListUsersRequest.FromString,
+                    response_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ListUsersResponse.SerializeToString,
+            ),
+            'SearchUsers': grpc.unary_unary_rpc_method_handler(
+                    servicer.SearchUsers,
+                    request_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.SearchUsersRequest.FromString,
+                    response_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.SearchUsersResponse.SerializeToString,
+            ),
+            'BlockUser': grpc.unary_unary_rpc_method_handler(
+                    servicer.BlockUser,
+                    request_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserRequest.FromString,
+                    response_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -245,6 +297,87 @@ class AuthService(object):
             '/tourism.auth.v1.AuthService/Logout',
             tourism_dot_auth_dot_v1_dot_auth__pb2.LogoutRequest.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListUsers(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.auth.v1.AuthService/ListUsers',
+            tourism_dot_auth_dot_v1_dot_auth__pb2.ListUsersRequest.SerializeToString,
+            tourism_dot_auth_dot_v1_dot_auth__pb2.ListUsersResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SearchUsers(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.auth.v1.AuthService/SearchUsers',
+            tourism_dot_auth_dot_v1_dot_auth__pb2.SearchUsersRequest.SerializeToString,
+            tourism_dot_auth_dot_v1_dot_auth__pb2.SearchUsersResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def BlockUser(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.auth.v1.AuthService/BlockUser',
+            tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserRequest.SerializeToString,
+            tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserResponse.FromString,
             options,
             channel_credentials,
             insecure,

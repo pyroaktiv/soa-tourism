@@ -37,7 +37,7 @@ class StakeholderServiceServicer(object):
     """
 
     def GetProfile(self, request, context):
-        """GetProfile returns the profile for the given user. Public — no token required.
+        """GetProfile returns the profile for the given user.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -45,7 +45,7 @@ class StakeholderServiceServicer(object):
 
     def UpdateProfile(self, request, context):
         """UpdateProfile creates or updates the authenticated user's profile.
-        Requires Authorization: Bearer <access_token>.
+        Requires authnz.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,7 +53,7 @@ class StakeholderServiceServicer(object):
 
     def DeleteProfilePhoto(self, request, context):
         """DeleteProfilePhoto removes the profile photo from storage and clears the URL.
-        Requires Authorization: Bearer <access_token>.
+        Requires authnz.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
