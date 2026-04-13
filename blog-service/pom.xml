@@ -56,7 +56,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.google.api.grpc</groupId>
+			<artifactId>proto-google-common-protos</artifactId>
+			<version>2.29.0</version>
+		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-netty-shaded</artifactId>
@@ -66,6 +70,13 @@
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-protobuf</artifactId>
 			<version>1.62.2</version>
+		</dependency>
+		<!-- Source: https://mvnrepository.com/artifact/com.engine/grpc-ecosystem-protoc-gen-openapiv2 -->
+		<dependency>
+			<groupId>com.engine</groupId>
+			<artifactId>grpc-ecosystem-protoc-gen-openapiv2</artifactId>
+			<version>2.1.1</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
