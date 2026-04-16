@@ -1,0 +1,366 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Follower API",
+    "description": "Follow relationships and recommendations",
+    "version": "0.1.0"
+  },
+  "tags": [
+    {
+      "name": "FollowerService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/followers/recommendations": {
+      "get": {
+        "summary": "Return follow recommendations based on friends-of-friends.\nThe calling user is identified from the Authorization header.",
+        "operationId": "FollowerService_GetRecommendations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetRecommendationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "description": "Maximum number of recommendations to return. Defaults to 10 if 0.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "FollowerService"
+        ]
+      }
+    },
+    "/api/v1/followers/{followeeId}/follow": {
+      "delete": {
+        "summary": "Unfollow a user. The calling user is identified from the Authorization header.",
+        "operationId": "FollowerService_Unfollow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UnfollowResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "followeeId",
+            "description": "The user to unfollow. The follower is the authenticated caller.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FollowerService"
+        ]
+      },
+      "post": {
+        "summary": "Follow a user. The calling user is identified from the Authorization header.",
+        "operationId": "FollowerService_Follow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FollowResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "followeeId",
+            "description": "The user to follow. The follower is the authenticated caller.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FollowerServiceFollowBody"
+            }
+          }
+        ],
+        "tags": [
+          "FollowerService"
+        ]
+      }
+    },
+    "/api/v1/followers/{followerId}/following/{followeeId}": {
+      "get": {
+        "summary": "Check whether follower_id follows followee_id.",
+        "operationId": "FollowerService_IsFollowing",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IsFollowingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "followerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "followeeId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FollowerService"
+        ]
+      }
+    },
+    "/api/v1/followers/{userId}/followers": {
+      "get": {
+        "summary": "List users who follow the given user.",
+        "operationId": "FollowerService_GetFollowers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetFollowersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "FollowerService"
+        ]
+      }
+    },
+    "/api/v1/followers/{userId}/following": {
+      "get": {
+        "summary": "List users that the given user follows.",
+        "operationId": "FollowerService_GetFollowing",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetFollowingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "FollowerService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "FollowerServiceFollowBody": {
+      "type": "object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1FollowResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetFollowersResponse": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1GetFollowingResponse": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1GetRecommendationsResponse": {
+      "type": "object",
+      "properties": {
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Recommendation"
+          }
+        }
+      }
+    },
+    "v1IsFollowingResponse": {
+      "type": "object",
+      "properties": {
+        "isFollowing": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Recommendation": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "mutualFollows": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1UnfollowResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

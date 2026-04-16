@@ -14,6 +14,7 @@ import (
 	authv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/auth/v1"
 	blogv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/blog/v1"
 	examplev1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/example/v1"
+	followerv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/follower/v1"
 	stakeholdersv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/stakeholders/v1"
 	"github.com/pyroaktiv/soa-tourism/gateway/internal/config"
 )
@@ -61,6 +62,12 @@ func main() {
 		ctx, grpcMux, cfg.ServiceAddr("stakeholders"), dialOpts,
 	); err != nil {
 		log.Fatalf("register StakeholderService: %v", err)
+	}
+
+	if err := followerv1.RegisterFollowerServiceHandlerFromEndpoint(
+		ctx, grpcMux, cfg.ServiceAddr("follower"), dialOpts,
+	); err != nil {
+		log.Fatalf("register FollowerService: %v", err)
 	}
 
 	// Strip the "api/swagger" embed prefix so files are at /swagger/<path>.
