@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	BlogService_CreateBlog_FullMethodName  = "/tourism.blog.v1.BlogService/CreateBlog"
 	BlogService_GetAllBlogs_FullMethodName = "/tourism.blog.v1.BlogService/GetAllBlogs"
+	BlogService_GetBlog_FullMethodName     = "/tourism.blog.v1.BlogService/GetBlog"
 	BlogService_AddComment_FullMethodName  = "/tourism.blog.v1.BlogService/AddComment"
 	BlogService_ToggleLike_FullMethodName  = "/tourism.blog.v1.BlogService/ToggleLike"
 )
@@ -31,6 +32,7 @@ const (
 type BlogServiceClient interface {
 	CreateBlog(ctx context.Context, in *CreateBlogRequest, opts ...grpc.CallOption) (*Blog, error)
 	GetAllBlogs(ctx context.Context, in *GetAllBlogsRequest, opts ...grpc.CallOption) (*GetAllBlogsResponse, error)
+	GetBlog(ctx context.Context, in *GetBlogAuthorIdRequest, opts ...grpc.CallOption) (*GetBlogAuthorIdResponse, error)
 	AddComment(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*Blog, error)
 	ToggleLike(ctx context.Context, in *ToggleLikeRequest, opts ...grpc.CallOption) (*Blog, error)
 }
@@ -63,6 +65,16 @@ func (c *blogServiceClient) GetAllBlogs(ctx context.Context, in *GetAllBlogsRequ
 	return out, nil
 }
 
+func (c *blogServiceClient) GetBlog(ctx context.Context, in *GetBlogAuthorIdRequest, opts ...grpc.CallOption) (*GetBlogAuthorIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBlogAuthorIdResponse)
+	err := c.cc.Invoke(ctx, BlogService_GetBlog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *blogServiceClient) AddComment(ctx context.Context, in *AddCommentRequest, opts ...grpc.CallOption) (*Blog, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Blog)
@@ -89,6 +101,7 @@ func (c *blogServiceClient) ToggleLike(ctx context.Context, in *ToggleLikeReques
 type BlogServiceServer interface {
 	CreateBlog(context.Context, *CreateBlogRequest) (*Blog, error)
 	GetAllBlogs(context.Context, *GetAllBlogsRequest) (*GetAllBlogsResponse, error)
+	GetBlog(context.Context, *GetBlogAuthorIdRequest) (*GetBlogAuthorIdResponse, error)
 	AddComment(context.Context, *AddCommentRequest) (*Blog, error)
 	ToggleLike(context.Context, *ToggleLikeRequest) (*Blog, error)
 	mustEmbedUnimplementedBlogServiceServer()
@@ -106,6 +119,9 @@ func (UnimplementedBlogServiceServer) CreateBlog(context.Context, *CreateBlogReq
 }
 func (UnimplementedBlogServiceServer) GetAllBlogs(context.Context, *GetAllBlogsRequest) (*GetAllBlogsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAllBlogs not implemented")
+}
+func (UnimplementedBlogServiceServer) GetBlog(context.Context, *GetBlogAuthorIdRequest) (*GetBlogAuthorIdResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBlog not implemented")
 }
 func (UnimplementedBlogServiceServer) AddComment(context.Context, *AddCommentRequest) (*Blog, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddComment not implemented")
@@ -170,6 +186,24 @@ func _BlogService_GetAllBlogs_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlogService_GetBlog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBlogAuthorIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).GetBlog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlogService_GetBlog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).GetBlog(ctx, req.(*GetBlogAuthorIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BlogService_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddCommentRequest)
 	if err := dec(in); err != nil {
@@ -220,6 +254,10 @@ var BlogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllBlogs",
 			Handler:    _BlogService_GetAllBlogs_Handler,
+		},
+		{
+			MethodName: "GetBlog",
+			Handler:    _BlogService_GetBlog_Handler,
 		},
 		{
 			MethodName: "AddComment",

@@ -2,6 +2,7 @@ package com.soa.blog_service.controller;
 
 import java.util.List;
 
+import io.grpc.Context;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class BlogController {
 
     @GetMapping
     public ResponseEntity<List<Blog>> getAllBlogs() {
-        return ResponseEntity.ok(blogService.getAllBlogs());
+        return ResponseEntity.ok(blogService.getAllBlogs(Context.key("user_id").get().toString()));
     }
     
     @PostMapping("/{blogId}/comments")

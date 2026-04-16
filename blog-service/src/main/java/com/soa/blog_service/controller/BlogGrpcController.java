@@ -1,9 +1,11 @@
 package com.soa.blog_service.controller;
 
+import com.soa.blog_service.client.FollowerGrpcClient;
 import com.soa.blog_service.model.Blog;
 import com.soa.blog_service.model.Comment;
 import com.soa.blog_service.security.AuthInterceptor;
 import com.soa.blog_service.service.BlogService;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.springframework.stereotype.Controller;
 import tourism.blog.v1.*;
@@ -15,9 +17,11 @@ import java.util.List;
 public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
 
     private final BlogService blogService;
+    private final FollowerGrpcClient followerGrpcClient;
 
-    public BlogGrpcController(BlogService blogService) {
+    public BlogGrpcController(BlogService blogService, FollowerGrpcClient followerGrpcClient) {
         this.blogService = blogService;
+        this.followerGrpcClient = followerGrpcClient;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
 
     @Override
     public void getAllBlogs(GetAllBlogsRequest request, StreamObserver<GetAllBlogsResponse> responseObserver) {
-        List<Blog> sviBlogovi = blogService.getAllBlogs();
+        List<Blog> sviBlogovi = blogService.getAllBlogs(AuthInterceptor.USER_ID_KEY.get());
 
         GetAllBlogsResponse.Builder responseBuilder = GetAllBlogsResponse.newBuilder();
 
@@ -54,16 +58,24 @@ public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
     @Override
     public void addComment(AddCommentRequest request, StreamObserver<tourism.blog.v1.Blog> responseObserver) {
         String siguranAutorId = AuthInterceptor.USER_ID_KEY.get();
+        String blogAuthorId = blogService.getBlogAuthorId(request.getBlogId());
 
-        Comment noviKomentar = new Comment();
-        noviKomentar.setAuthorId(siguranAutorId);
+        boolean following = followerGrpcClient.isFollowing(AuthInterceptor.USER_ID_KEY.get(), blogAuthorId).getIsFollowing();
 
-        noviKomentar.setText(request.getComment().getText());
+        if(following || AuthInterceptor.ROLES.get().contains("admin")){
+            Comment noviKomentar = new Comment();
+            noviKomentar.setAuthorId(siguranAutorId);
 
-        Blog azuriranBlog = blogService.addComment(request.getBlogId(), noviKomentar);
+            noviKomentar.setText(request.getComment().getText());
 
-        responseObserver.onNext(mapToGrpcBlog(azuriranBlog));
-        responseObserver.onCompleted();
+            Blog azuriranBlog = blogService.addComment(request.getBlogId(), noviKomentar);
+
+            responseObserver.onNext(mapToGrpcBlog(azuriranBlog));
+            responseObserver.onCompleted();
+        }
+        else {
+            responseObserver.onError(Status.PERMISSION_DENIED.withDescription("Morate zapratiti autora da biste ostavili komentar.").asRuntimeException());
+        }
     }
     @Override
     public void toggleLike(ToggleLikeRequest request, StreamObserver<tourism.blog.v1.Blog> responseObserver) {

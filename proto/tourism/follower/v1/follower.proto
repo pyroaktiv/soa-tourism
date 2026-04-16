@@ -5,6 +5,9 @@ package tourism.follower.v1;
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
+option java_multiple_files = true;
+option java_package = "tourism.follower.v1";
+
 option go_package = "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/follower/v1;followerv1";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {

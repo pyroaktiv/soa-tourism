@@ -104,6 +104,12 @@
             "schema": {
               "$ref": "#/definitions/v1Comment"
             }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

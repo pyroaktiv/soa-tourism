@@ -36,6 +36,9 @@ service BlogService {
     };
   }
 
+  rpc GetBlog(GetBlogAuthorIdRequest) returns (GetBlogAuthorIdResponse) {
+  }
+
   rpc AddComment(AddCommentRequest) returns (Blog) {
     option (google.api.http) = {
       post: "/api/v1/blogs/{blog_id}/comments"
@@ -82,9 +85,17 @@ message GetAllBlogsResponse {
   repeated Blog blogs = 1;
 }
 
+message GetBlogAuthorIdRequest {
+}
+
+message GetBlogAuthorIdResponse {
+  Blog blog = 1;
+}
+
 message AddCommentRequest {
-  string blog_id = 1;
-  Comment comment = 2;
+  string user_id = 1;
+  string blog_id = 2;
+  Comment comment = 3;
 }
 message ToggleLikeRequest {
   string blog_id = 1;
