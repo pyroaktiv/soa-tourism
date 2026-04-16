@@ -1,8 +1,13 @@
 package com.soa.blog_service.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.soa.blog_service.client.AuthGrpcClient;
+import com.soa.blog_service.client.FollowerGrpcClient;
+import com.soa.blog_service.security.AuthInterceptor;
 import org.springframework.stereotype.Service;
 
 import com.soa.blog_service.client.StakeholderGrpcClient;
@@ -11,6 +16,8 @@ import com.soa.blog_service.model.Comment;
 import com.soa.blog_service.repository.BlogRepository;
 
 import lombok.RequiredArgsConstructor;
+import tourism.follower.v1.Follower;
+import tourism.follower.v1.GetFollowedUserIdsResponse;
 import tourism.stakeholders.v1.Profile;
 
 @Service
@@ -19,6 +26,8 @@ public class BlogService {
 
     private final BlogRepository blogRepository;
     private final StakeholderGrpcClient stakeholderClient;
+    private final FollowerGrpcClient followerClient;
+    private final AuthGrpcClient authClient;
 
     public Blog createBlog(Blog blog) {
 
@@ -37,8 +46,23 @@ public class BlogService {
         return blogRepository.save(blog);
     }
 
-    public List<Blog> getAllBlogs() {
-        return blogRepository.findAll();
+    public List<Blog> getAllBlogs(String requesterId) {
+        List<String> targetIds = new ArrayList<>(followerClient.getFollowedUserIds(requesterId).getUserIdsList());
+        targetIds.add(requesterId);
+        List<String> roles = AuthInterceptor.ROLES.get();
+
+        if(roles.contains("author") || roles.contains("tourist")){
+            return blogRepository.findAllByAuthorIdIn(targetIds);
+        }
+        else {
+            return blogRepository.findAll();
+        }
+    }
+
+    public String getBlogAuthorId(String blogId){
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog nije pronadjen"));
+
+        return blog.getAuthorId();
     }
 
     public Blog addComment(String blogId, Comment comment) {
