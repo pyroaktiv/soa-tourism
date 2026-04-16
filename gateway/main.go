@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"embed"
-	"io/fs"
 	"log"
 	"net/http"
 
@@ -13,12 +12,14 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	authv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/auth/v1"
+	blogv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/blog/v1"
 	examplev1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/example/v1"
 	followerv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/follower/v1"
 	stakeholdersv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/stakeholders/v1"
 	"github.com/pyroaktiv/soa-tourism/gateway/internal/config"
 )
 
+//go:embed api/swagger
 var swaggerFS embed.FS
 
 func main() {
@@ -51,6 +52,12 @@ func main() {
 		log.Fatalf("register AuthService: %v", err)
 	}
 
+    if err := blogv1.RegisterBlogServiceHandlerFromEndpoint(
+           ctx, grpcMux, cfg.ServiceAddr("blog"), dialOpts,
+        ); err != nil {
+           log.Fatalf("register BlogService: %v", err)
+    }
+
 	if err := stakeholdersv1.RegisterStakeholderServiceHandlerFromEndpoint(
 		ctx, grpcMux, cfg.ServiceAddr("stakeholders"), dialOpts,
 	); err != nil {
@@ -64,13 +71,14 @@ func main() {
 	}
 
 	// Strip the "api/swagger" embed prefix so files are at /swagger/<path>.
-	swaggerSub, err := fs.Sub(swaggerFS, "api/swagger")
-	if err != nil {
-		log.Fatalf("swagger sub-fs: %v", err)
-	}
-
+	/*
+		swaggerSub, err := fs.Sub(swaggerFS, "api/swagger")
+		if err != nil {
+			log.Fatalf("swagger sub-fs: %v", err)
+		}
+	*/
 	httpMux := http.NewServeMux()
-	httpMux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.FS(swaggerSub))))
+	httpMux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.FS(swaggerFS))))
 	httpMux.Handle("/", grpcMux)
 
 	handler := cors.New(cors.Options{

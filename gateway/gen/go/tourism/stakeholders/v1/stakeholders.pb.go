@@ -318,8 +318,9 @@ const file_tourism_stakeholders_v1_stakeholders_proto_rawDesc = "" +
 	"\n" +
 	"GetProfile\x12*.tourism.stakeholders.v1.GetProfileRequest\x1a .tourism.stakeholders.v1.Profile\"/\x82\xd3\xe4\x93\x02)\x12'/api/v1/stakeholders/profiles/{user_id}\x12\x94\x01\n" +
 	"\rUpdateProfile\x12-.tourism.stakeholders.v1.UpdateProfileRequest\x1a .tourism.stakeholders.v1.Profile\"2\x82\xd3\xe4\x93\x02,:\x01*\x1a'/api/v1/stakeholders/profiles/{user_id}\x12\xa1\x01\n" +
-	"\x12DeleteProfilePhoto\x122.tourism.stakeholders.v1.DeleteProfilePhotoRequest\x1a .tourism.stakeholders.v1.Profile\"5\x82\xd3\xe4\x93\x02/*-/api/v1/stakeholders/profiles/{user_id}/photoB\xbf\x01\x92Ad\x12:\n" +
-	"\x10Stakeholders API\x12\x1fUser profile management service2\x050.1.0*\x02\x01\x022\x10application/json:\x10application/jsonZVgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/stakeholders/v1;stakeholdersv1b\x06proto3"
+	"\x12DeleteProfilePhoto\x122.tourism.stakeholders.v1.DeleteProfilePhotoRequest\x1a .tourism.stakeholders.v1.Profile\"5\x82\xd3\xe4\x93\x02/*-/api/v1/stakeholders/profiles/{user_id}/photoB\xda\x01\x92Ad\x12:\n" +
+	"\x10Stakeholders API\x12\x1fUser profile management service2\x050.1.0*\x02\x01\x022\x10application/json:\x10application/json\n" +
+	"\x17tourism.stakeholders.v1P\x01ZVgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/stakeholders/v1;stakeholdersv1b\x06proto3"
 
 var (
 	file_tourism_stakeholders_v1_stakeholders_proto_rawDescOnce sync.Once

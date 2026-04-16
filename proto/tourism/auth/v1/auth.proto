@@ -5,6 +5,9 @@ package tourism.auth.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
+option java_multiple_files = true;
+option java_package = "tourism.auth.v1";
+
 option go_package = "github.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1";
 
 service AuthService {
@@ -43,6 +46,29 @@ service AuthService {
       body: "*"
     };
   }
+
+  // ListUsers returns a paginated list of all users.
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/users"
+    };
+  }
+
+  // SearchUsers finds users by partial username match.
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/users/search"
+    };
+  }
+
+  // BlockUser blocks a user account, preventing login and token usage.
+  // Requires admin role.
+  rpc BlockUser(BlockUserRequest) returns (BlockUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/block"
+      body: "*"
+    };
+  }
 }
 
 message User {
@@ -50,6 +76,7 @@ message User {
   string username = 2;
   string email    = 3;
   repeated string roles = 4;
+  bool blocked = 5;
 }
 
 message TokenPair {
@@ -94,4 +121,30 @@ message ValidateResponse {
 
 message LogoutRequest {
   string refresh_token = 1;
+}
+
+message ListUsersRequest {
+  int32 page_size = 1;
+  int32 page_number = 2; // Simple offset-based pagination
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  int64 total_count = 2;
+}
+
+message SearchUsersRequest {
+  string username = 1;
+}
+
+message SearchUsersResponse {
+  repeated User users = 1;
+}
+
+message BlockUserRequest {
+  string user_id = 1;
+}
+
+message BlockUserResponse {
+  bool success = 1;
 }

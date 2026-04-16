@@ -20,11 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Register_FullMethodName = "/tourism.auth.v1.AuthService/Register"
-	AuthService_Login_FullMethodName    = "/tourism.auth.v1.AuthService/Login"
-	AuthService_Refresh_FullMethodName  = "/tourism.auth.v1.AuthService/Refresh"
-	AuthService_Validate_FullMethodName = "/tourism.auth.v1.AuthService/Validate"
-	AuthService_Logout_FullMethodName   = "/tourism.auth.v1.AuthService/Logout"
+	AuthService_Register_FullMethodName    = "/tourism.auth.v1.AuthService/Register"
+	AuthService_Login_FullMethodName       = "/tourism.auth.v1.AuthService/Login"
+	AuthService_Refresh_FullMethodName     = "/tourism.auth.v1.AuthService/Refresh"
+	AuthService_Validate_FullMethodName    = "/tourism.auth.v1.AuthService/Validate"
+	AuthService_Logout_FullMethodName      = "/tourism.auth.v1.AuthService/Logout"
+	AuthService_ListUsers_FullMethodName   = "/tourism.auth.v1.AuthService/ListUsers"
+	AuthService_SearchUsers_FullMethodName = "/tourism.auth.v1.AuthService/SearchUsers"
+	AuthService_BlockUser_FullMethodName   = "/tourism.auth.v1.AuthService/BlockUser"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -42,6 +45,13 @@ type AuthServiceClient interface {
 	Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
 	// Logout revokes the given refresh token.
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// ListUsers returns a paginated list of all users.
+	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
+	// SearchUsers finds users by partial username match.
+	SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...grpc.CallOption) (*SearchUsersResponse, error)
+	// BlockUser blocks a user account, preventing login and token usage.
+	// Requires admin role.
+	BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockUserResponse, error)
 }
 
 type authServiceClient struct {
@@ -102,6 +112,36 @@ func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts 
 	return out, nil
 }
 
+func (c *authServiceClient) ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListUsersResponse)
+	err := c.cc.Invoke(ctx, AuthService_ListUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...grpc.CallOption) (*SearchUsersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SearchUsersResponse)
+	err := c.cc.Invoke(ctx, AuthService_SearchUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BlockUserResponse)
+	err := c.cc.Invoke(ctx, AuthService_BlockUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -117,6 +157,13 @@ type AuthServiceServer interface {
 	Validate(context.Context, *ValidateRequest) (*ValidateResponse, error)
 	// Logout revokes the given refresh token.
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
+	// ListUsers returns a paginated list of all users.
+	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
+	// SearchUsers finds users by partial username match.
+	SearchUsers(context.Context, *SearchUsersRequest) (*SearchUsersResponse, error)
+	// BlockUser blocks a user account, preventing login and token usage.
+	// Requires admin role.
+	BlockUser(context.Context, *BlockUserRequest) (*BlockUserResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -141,6 +188,15 @@ func (UnimplementedAuthServiceServer) Validate(context.Context, *ValidateRequest
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedAuthServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (UnimplementedAuthServiceServer) SearchUsers(context.Context, *SearchUsersRequest) (*SearchUsersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SearchUsers not implemented")
+}
+func (UnimplementedAuthServiceServer) BlockUser(context.Context, *BlockUserRequest) (*BlockUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BlockUser not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -253,6 +309,60 @@ func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_ListUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ListUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ListUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ListUsers(ctx, req.(*ListUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SearchUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SearchUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SearchUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SearchUsers(ctx, req.(*SearchUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_BlockUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlockUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).BlockUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_BlockUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).BlockUser(ctx, req.(*BlockUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -279,6 +389,18 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _AuthService_Logout_Handler,
+		},
+		{
+			MethodName: "ListUsers",
+			Handler:    _AuthService_ListUsers_Handler,
+		},
+		{
+			MethodName: "SearchUsers",
+			Handler:    _AuthService_SearchUsers_Handler,
+		},
+		{
+			MethodName: "BlockUser",
+			Handler:    _AuthService_BlockUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -2,6 +2,8 @@ services:
   mongo:
     image: mongo:8
     restart: unless-stopped
+    ports:
+      - "27017:27017"
     expose:
       - "27017"
     volumes:
@@ -40,7 +42,7 @@ services:
     volumes:
       - seaweedfs_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/healthz || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -100,7 +102,21 @@ services:
       auth-service:
         condition: service_started
       seaweedfs:
-        condition: service_healthy
+        condition: service_started
+
+  blog-service:
+    build:
+      context: .
+      dockerfile: blog-service/Dockerfile
+    environment:
+      SPRING_DATA_MONGODB_URI: "mongodb://mongo:27017/blogdb"
+      SPRING_DATA_MONGODB_HOST: "mongo"
+      STAKEHOLDERS_SERVICE_ADDR: "stakeholders:9090"
+    expose:
+      - "8080"
+      - "9090"
+    depends_on:
+      - mongo
 
   gateway:
     build:
@@ -114,12 +130,14 @@ services:
       AUTH_SERVICE_ADDR: "auth-service:9090"
       STAKEHOLDERS_SERVICE_ADDR: "stakeholders:9090"
       FOLLOWER_SERVICE_ADDR: "follower:9090"
+      BLOG_SERVICE_ADDR: "blog-service:9090"
       CORS_ALLOWED_ORIGINS: "*"
     depends_on:
       - example-service
       - auth-service
       - stakeholders
       - follower
+      - blog-service
 
 volumes:
   mongo_data:

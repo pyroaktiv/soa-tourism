@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -35,6 +37,7 @@ type userDocument struct {
 	Email        string   `bson:"email"`
 	PasswordHash []byte   `bson:"password_hash"`
 	Roles        []string `bson:"roles"`
+	Blocked      bool     `bson:"blocked"`
 }
 
 type sessionDocument struct {
@@ -90,7 +93,12 @@ func (s *Service) Register(ctx context.Context, req *authv1.RegisterRequest) (*a
 	username := strings.TrimSpace(req.GetUsername())
 	email := strings.ToLower(strings.TrimSpace(req.GetEmail()))
 	password := req.GetPassword()
-	roles := normalizeRoles(req.GetRoles())
+
+	roles, err := validateAndNormalizeRoles(req.GetRoles())
+
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 
 	if username == "" || email == "" || password == "" {
 		return nil, status.Error(codes.InvalidArgument, "username, email and password are required")
@@ -107,6 +115,7 @@ func (s *Service) Register(ctx context.Context, req *authv1.RegisterRequest) (*a
 		Email:        email,
 		PasswordHash: passwordHash,
 		Roles:        roles,
+		Blocked:      false,
 	}
 
 	if _, err := s.users.InsertOne(ctx, doc); err != nil {
@@ -143,7 +152,9 @@ func (s *Service) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.
 		}
 		return nil, status.Error(codes.Internal, "database error")
 	}
-
+	if doc.Blocked {
+		return nil, status.Error(codes.PermissionDenied, "account is blocked")
+	}
 	if bcrypt.CompareHashAndPassword(doc.PasswordHash, []byte(password)) != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid credentials")
 	}
@@ -161,7 +172,6 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid refresh token")
 	}
-
 	var session sessionDocument
 	if err := s.sessions.FindOneAndDelete(ctx, bson.D{{Key: "_id", Value: claims.ID}}).Decode(&session); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -173,8 +183,10 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 	if time.Now().After(session.ExpiresAt) {
 		return nil, status.Error(codes.Unauthenticated, "refresh token expired or revoked")
 	}
-
 	var user userDocument
+	if user.Blocked {
+		return nil, status.Error(codes.PermissionDenied, "account is blocked")
+	}
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: session.UserID}}).Decode(&user); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, status.Error(codes.NotFound, "user not found")
@@ -195,6 +207,9 @@ func (s *Service) Validate(ctx context.Context, req *authv1.ValidateRequest) (*a
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: claims.UserID}}).Decode(&user); err != nil {
 		return &authv1.ValidateResponse{Valid: false}, nil
 	}
+	if user.Blocked {
+		return &authv1.ValidateResponse{Valid: false}, nil
+	}
 
 	return &authv1.ValidateResponse{Valid: true, User: toProtoUser(&user)}, nil
 }
@@ -205,6 +220,113 @@ func (s *Service) Logout(ctx context.Context, req *authv1.LogoutRequest) (*empty
 		_, _ = s.sessions.DeleteOne(ctx, bson.D{{Key: "_id", Value: claims.ID}})
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) ListUsers(ctx context.Context, req *authv1.ListUsersRequest) (*authv1.ListUsersResponse, error) {
+	// Extract and Validate Admin Token
+	claims, err := s.authorizeAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Admin %s listing all users", claims.Username)
+
+	// Setup pagination defaults
+	pageSize := int64(req.GetPageSize())
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+	pageNumber := int64(req.GetPageNumber())
+	if pageNumber < 1 {
+		pageNumber = 1
+	}
+	skip := (pageNumber - 1) * pageSize
+
+	opts := options.Find().SetSort(bson.D{{Key: "username", Value: 1}}).SetLimit(pageSize).SetSkip(skip)
+
+	cursor, err := s.users.Find(ctx, bson.D{}, opts)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to query users")
+	}
+	defer cursor.Close(ctx)
+
+	var users []*authv1.User
+	for cursor.Next(ctx) {
+		var doc userDocument
+		if err := cursor.Decode(&doc); err != nil {
+			continue
+		}
+		users = append(users, toProtoUser(&doc))
+	}
+
+	total, _ := s.users.CountDocuments(ctx, bson.D{})
+
+	return &authv1.ListUsersResponse{
+		Users:      users,
+		TotalCount: total,
+	}, nil
+}
+
+func (s *Service) SearchUsers(ctx context.Context, req *authv1.SearchUsersRequest) (*authv1.SearchUsersResponse, error) {
+	if _, err := s.authorizeAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	query := strings.ToLower(strings.TrimSpace(req.GetUsername()))
+	if query == "" {
+		return &authv1.SearchUsersResponse{}, nil
+	}
+
+	filter := bson.M{"username": bson.M{"$regex": query, "$options": "i"}}
+
+	cursor, err := s.users.Find(ctx, filter, options.Find().SetLimit(10))
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to search users")
+	}
+	defer cursor.Close(ctx)
+
+	var users []*authv1.User
+	for cursor.Next(ctx) {
+		var doc userDocument
+		if err := cursor.Decode(&doc); err != nil {
+			continue
+		}
+		users = append(users, toProtoUser(&doc))
+	}
+
+	return &authv1.SearchUsersResponse{Users: users}, nil
+}
+
+func (s *Service) BlockUser(ctx context.Context, req *authv1.BlockUserRequest) (*authv1.BlockUserResponse, error) {
+	// 1. extract and validate token from context
+	token := getTokenFromContext(ctx)
+	if token == "" {
+		return nil, status.Error(codes.Unauthenticated, "missing token")
+	}
+	claims, err := s.parseToken(token, "access")
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "invalid token")
+	}
+	// 2. check if user has admin role
+	if !containsRole(claims.Roles, "admin") {
+		return nil, status.Error(codes.PermissionDenied, "admin role required")
+	}
+	// 3. prevent self-blocking
+	blockerUserID := claims.UserID
+	if req.GetUserId() == blockerUserID {
+		return nil, status.Error(codes.InvalidArgument, "cannot block yourself")
+	}
+	// 4. find and update the target user
+	filter := bson.D{{Key: "_id", Value: req.GetUserId()}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "blocked", Value: true}}}}
+	result, err := s.users.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "database error")
+	}
+	if result.MatchedCount == 0 {
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	return &authv1.BlockUserResponse{Success: true}, nil
 }
 
 func (s *Service) issueTokenPair(ctx context.Context, user *userDocument) (*authv1.TokenPair, error) {
@@ -283,35 +405,105 @@ func (s *Service) parseToken(rawToken, expectedType string) (*tokenClaims, error
 	return claims, nil
 }
 
+func (s *Service) authorizeAdmin(ctx context.Context) (*tokenClaims, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "missing metadata")
+	}
+
+	values := md.Get("authorization")
+	if len(values) == 0 {
+		return nil, status.Error(codes.Unauthenticated, "missing authorization header")
+	}
+
+	parts := strings.SplitN(values[0], " ", 2)
+	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+		return nil, status.Error(codes.Unauthenticated, "invalid authorization format")
+	}
+
+	claims, err := s.parseToken(parts[1], "access")
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "invalid token")
+	}
+
+	isAdmin := false
+	for _, role := range claims.Roles {
+		if role == "admin" {
+			isAdmin = true
+			break
+		}
+	}
+
+	if !isAdmin {
+		return nil, status.Error(codes.PermissionDenied, "admin role required")
+	}
+
+	return claims, nil
+}
+
+func getTokenFromContext(ctx context.Context) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ""
+	}
+	tokens := md.Get("authorization")
+	if len(tokens) == 0 {
+		return ""
+	}
+	parts := strings.SplitN(tokens[0], " ", 2)
+	if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+		return ""
+	}
+	return parts[1]
+}
+
+func containsRole(roles []string, role string) bool {
+	for _, r := range roles {
+		if r == role {
+			return true
+		}
+	}
+	return false
+}
+
 func toProtoUser(user *userDocument) *authv1.User {
 	return &authv1.User{
 		Id:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
 		Roles:    append([]string(nil), user.Roles...),
+		Blocked:  user.Blocked,
 	}
 }
 
-func normalizeRoles(roles []string) []string {
-	if len(roles) == 0 {
-		return []string{"user"}
+func validateAndNormalizeRoles(inputRoles []string) ([]string, error) {
+	if len(inputRoles) == 0 {
+		return []string{"tourist"}, nil
 	}
 
-	seen := make(map[string]struct{}, len(roles))
-	result := make([]string, 0, len(roles))
-	for _, role := range roles {
-		normalized := strings.ToLower(strings.TrimSpace(role))
+	seen := make(map[string]struct{})
+	var result []string
+
+	for _, r := range inputRoles {
+		normalized := strings.ToLower(strings.TrimSpace(r))
+
 		if normalized == "" {
 			continue
 		}
-		if _, ok := seen[normalized]; ok {
-			continue
+
+		if normalized != "tourist" && normalized != "author" {
+			return nil, fmt.Errorf("invalid role: %s (only 'tourist' or 'author' are allowed via registration)", normalized)
 		}
-		seen[normalized] = struct{}{}
-		result = append(result, normalized)
+
+		if _, ok := seen[normalized]; !ok {
+			seen[normalized] = struct{}{}
+			result = append(result, normalized)
+		}
 	}
+
 	if len(result) == 0 {
-		return []string{"user"}
+		return []string{"tourist"}, nil
 	}
-	return result
+
+	return result, nil
 }
