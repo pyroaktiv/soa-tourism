@@ -184,14 +184,16 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 		return nil, status.Error(codes.Unauthenticated, "refresh token expired or revoked")
 	}
 	var user userDocument
-	if user.Blocked {
-		return nil, status.Error(codes.PermissionDenied, "account is blocked")
-	}
+
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: session.UserID}}).Decode(&user); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, status.Error(codes.NotFound, "user not found")
 		}
 		return nil, status.Error(codes.Internal, "database error")
+	}
+
+	if user.Blocked {
+		return nil, status.Error(codes.PermissionDenied, "account is blocked")
 	}
 
 	return s.issueTokenPair(ctx, &user)
