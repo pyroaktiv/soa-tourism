@@ -18,7 +18,7 @@ _MONGO_DB = os.getenv("MONGO_DB", "stakeholdersdb")
 _GRPC_ADDR = os.getenv("GRPC_ADDR", "0.0.0.0:9090")
 
 
-def _doc_to_profile(doc: dict) -> stakeholders_pb2.Profile:
+def _doc_to_profile(doc: dict, username: str) -> stakeholders_pb2.Profile:
     return stakeholders_pb2.Profile(
         user_id=doc.get("_id", ""),
         name=doc.get("name", ""),
@@ -26,6 +26,7 @@ def _doc_to_profile(doc: dict) -> stakeholders_pb2.Profile:
         bio=doc.get("bio", ""),
         motto=doc.get("motto", ""),
         photo_url=doc.get("photo_url", ""),
+        username=username
     )
 
 
@@ -60,6 +61,14 @@ class StakeholderService(stakeholders_pb2_grpc.StakeholderServiceServicer):
         if not resp.valid:
             context.abort(grpc.StatusCode.UNAUTHENTICATED, "invalid or expired token")
         return resp.user
+    
+    def _fetch_username(self, user_id: str) -> str:
+        try:
+            resp = self._auth_stub.GetUsername(auth_pb2.GetUsernameRequest(user_id=user_id))
+            return resp.username
+        except grpc.RpcError as exc:
+            logging.warning("GetUsername failed for %s: %s", user_id, exc)
+            return "Unknown"
 
     # ------------------------------------------------------------------
     # RPC impl
@@ -69,13 +78,15 @@ class StakeholderService(stakeholders_pb2_grpc.StakeholderServiceServicer):
         user_id = request.user_id
         if not user_id:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, "user_id is required")
-
+        
+        username = self._fetch_username(user_id)
+        
         doc = self._profiles.find_one({"_id": user_id})
         if doc is None:
             # Return an empty profile rather than NOT_FOUND — profile is
             # auto-created on first UpdateProfile call.
-            return stakeholders_pb2.Profile(user_id=user_id)
-        return _doc_to_profile(doc)
+            return stakeholders_pb2.Profile(user_id=user_id, username=username)
+        return _doc_to_profile(doc, username)
 
     def UpdateProfile(self, request, context):
         user = self._require_auth(context)
@@ -88,6 +99,8 @@ class StakeholderService(stakeholders_pb2_grpc.StakeholderServiceServicer):
                 grpc.StatusCode.PERMISSION_DENIED,
                 "cannot update another user's profile",
             )
+        
+        username = self._fetch_username(user_id)
 
         # Build $set from only the optional fields that were explicitly provided.
         update_fields: dict = {}
@@ -112,7 +125,7 @@ class StakeholderService(stakeholders_pb2_grpc.StakeholderServiceServicer):
             upsert=True,
             return_document=ReturnDocument.AFTER,
         )
-        return _doc_to_profile(doc)
+        return _doc_to_profile(doc, username)
 
     def DeleteProfilePhoto(self, request, context):
         user = self._require_auth(context)
@@ -125,6 +138,8 @@ class StakeholderService(stakeholders_pb2_grpc.StakeholderServiceServicer):
                 grpc.StatusCode.PERMISSION_DENIED,
                 "cannot update another user's profile",
             )
+
+        username = self._fetch_username(user_id)
 
         doc = self._profiles.find_one({"_id": user_id})
         if doc and doc.get("photo_url"):
@@ -144,7 +159,7 @@ class StakeholderService(stakeholders_pb2_grpc.StakeholderServiceServicer):
         )
         if doc is None:
             return stakeholders_pb2.Profile(user_id=user_id)
-        return _doc_to_profile(doc)
+        return _doc_to_profile(doc, username)
 
 
 def serve() -> None:
