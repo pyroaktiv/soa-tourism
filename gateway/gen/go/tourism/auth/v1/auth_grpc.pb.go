@@ -24,6 +24,7 @@ const (
 	AuthService_Login_FullMethodName       = "/tourism.auth.v1.AuthService/Login"
 	AuthService_Refresh_FullMethodName     = "/tourism.auth.v1.AuthService/Refresh"
 	AuthService_Validate_FullMethodName    = "/tourism.auth.v1.AuthService/Validate"
+	AuthService_GetUsername_FullMethodName = "/tourism.auth.v1.AuthService/GetUsername"
 	AuthService_Logout_FullMethodName      = "/tourism.auth.v1.AuthService/Logout"
 	AuthService_ListUsers_FullMethodName   = "/tourism.auth.v1.AuthService/ListUsers"
 	AuthService_SearchUsers_FullMethodName = "/tourism.auth.v1.AuthService/SearchUsers"
@@ -43,6 +44,7 @@ type AuthServiceClient interface {
 	// Validate verifies an access token and returns the associated user.
 	// Called internally by other services — not exposed through the gateway.
 	Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
+	GetUsername(ctx context.Context, in *GetUsernameRequest, opts ...grpc.CallOption) (*GetUsernameResponse, error)
 	// Logout revokes the given refresh token.
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// ListUsers returns a paginated list of all users.
@@ -102,6 +104,16 @@ func (c *authServiceClient) Validate(ctx context.Context, in *ValidateRequest, o
 	return out, nil
 }
 
+func (c *authServiceClient) GetUsername(ctx context.Context, in *GetUsernameRequest, opts ...grpc.CallOption) (*GetUsernameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUsernameResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetUsername_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -155,6 +167,7 @@ type AuthServiceServer interface {
 	// Validate verifies an access token and returns the associated user.
 	// Called internally by other services — not exposed through the gateway.
 	Validate(context.Context, *ValidateRequest) (*ValidateResponse, error)
+	GetUsername(context.Context, *GetUsernameRequest) (*GetUsernameResponse, error)
 	// Logout revokes the given refresh token.
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	// ListUsers returns a paginated list of all users.
@@ -185,6 +198,9 @@ func (UnimplementedAuthServiceServer) Refresh(context.Context, *RefreshRequest) 
 }
 func (UnimplementedAuthServiceServer) Validate(context.Context, *ValidateRequest) (*ValidateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Validate not implemented")
+}
+func (UnimplementedAuthServiceServer) GetUsername(context.Context, *GetUsernameRequest) (*GetUsernameResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUsername not implemented")
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
@@ -291,6 +307,24 @@ func _AuthService_Validate_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUsernameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetUsername(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetUsername_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetUsername(ctx, req.(*GetUsernameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogoutRequest)
 	if err := dec(in); err != nil {
@@ -385,6 +419,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Validate",
 			Handler:    _AuthService_Validate_Handler,
+		},
+		{
+			MethodName: "GetUsername",
+			Handler:    _AuthService_GetUsername_Handler,
 		},
 		{
 			MethodName: "Logout",

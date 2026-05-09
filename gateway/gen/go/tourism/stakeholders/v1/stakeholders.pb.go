@@ -33,6 +33,7 @@ type Profile struct {
 	Motto   string                 `protobuf:"bytes,5,opt,name=motto,proto3" json:"motto,omitempty"`
 	// photo_url is empty when no photo has been uploaded.
 	PhotoUrl      string `protobuf:"bytes,6,opt,name=photo_url,json=photoUrl,proto3" json:"photo_url,omitempty"`
+	Username      string `protobuf:"bytes,7,opt,name=username,proto3" json:"username,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -105,6 +106,13 @@ func (x *Profile) GetMotto() string {
 func (x *Profile) GetPhotoUrl() string {
 	if x != nil {
 		return x.PhotoUrl
+	}
+	return ""
+}
+
+func (x *Profile) GetUsername() string {
+	if x != nil {
+		return x.Username
 	}
 	return ""
 }
@@ -288,14 +296,15 @@ var File_tourism_stakeholders_v1_stakeholders_proto protoreflect.FileDescriptor
 
 const file_tourism_stakeholders_v1_stakeholders_proto_rawDesc = "" +
 	"\n" +
-	"*tourism/stakeholders/v1/stakeholders.proto\x12\x17tourism.stakeholders.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\x95\x01\n" +
+	"*tourism/stakeholders/v1/stakeholders.proto\x12\x17tourism.stakeholders.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\xb1\x01\n" +
 	"\aProfile\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
 	"\asurname\x18\x03 \x01(\tR\asurname\x12\x10\n" +
 	"\x03bio\x18\x04 \x01(\tR\x03bio\x12\x14\n" +
 	"\x05motto\x18\x05 \x01(\tR\x05motto\x12\x1b\n" +
-	"\tphoto_url\x18\x06 \x01(\tR\bphotoUrl\",\n" +
+	"\tphoto_url\x18\x06 \x01(\tR\bphotoUrl\x12\x1a\n" +
+	"\busername\x18\a \x01(\tR\busername\",\n" +
 	"\x11GetProfileRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xf0\x01\n" +
 	"\x14UpdateProfileRequest\x12\x17\n" +

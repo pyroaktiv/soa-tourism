@@ -26,7 +26,7 @@ from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 from protoc_gen_openapiv2.options import annotations_pb2 as protoc__gen__openapiv2_dot_options_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n*tourism/stakeholders/v1/stakeholders.proto\x12\x17tourism.stakeholders.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\x95\x01\n\x07Profile\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n\x07surname\x18\x03 \x01(\tR\x07surname\x12\x10\n\x03\x62io\x18\x04 \x01(\tR\x03\x62io\x12\x14\n\x05motto\x18\x05 \x01(\tR\x05motto\x12\x1b\n\tphoto_url\x18\x06 \x01(\tR\x08photoUrl\",\n\x11GetProfileRequest\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\"\xf0\x01\n\x14UpdateProfileRequest\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x17\n\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12\x1d\n\x07surname\x18\x03 \x01(\tH\x01R\x07surname\x88\x01\x01\x12\x15\n\x03\x62io\x18\x04 \x01(\tH\x02R\x03\x62io\x88\x01\x01\x12\x19\n\x05motto\x18\x05 \x01(\tH\x03R\x05motto\x88\x01\x01\x12 \n\tphoto_url\x18\x06 \x01(\tH\x04R\x08photoUrl\x88\x01\x01\x42\x07\n\x05_nameB\n\n\x08_surnameB\x06\n\x04_bioB\x08\n\x06_mottoB\x0c\n\n_photo_url\"4\n\x19\x44\x65leteProfilePhotoRequest\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId2\xdd\x03\n\x12StakeholderService\x12\x8b\x01\n\nGetProfile\x12*.tourism.stakeholders.v1.GetProfileRequest\x1a .tourism.stakeholders.v1.Profile\"/\x82\xd3\xe4\x93\x02)\x12\'/api/v1/stakeholders/profiles/{user_id}\x12\x94\x01\n\rUpdateProfile\x12-.tourism.stakeholders.v1.UpdateProfileRequest\x1a .tourism.stakeholders.v1.Profile\"2\x82\xd3\xe4\x93\x02,\x1a\'/api/v1/stakeholders/profiles/{user_id}:\x01*\x12\xa1\x01\n\x12\x44\x65leteProfilePhoto\x12\x32.tourism.stakeholders.v1.DeleteProfilePhotoRequest\x1a .tourism.stakeholders.v1.Profile\"5\x82\xd3\xe4\x93\x02/*-/api/v1/stakeholders/profiles/{user_id}/photoB\xda\x01\n\x17tourism.stakeholders.v1P\x01ZVgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/stakeholders/v1;stakeholdersv1\x92\x41\x64\x12:\n\x10Stakeholders API\x12\x1fUser profile management service2\x05\x30.1.0*\x02\x01\x02\x32\x10\x61pplication/json:\x10\x61pplication/jsonb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n*tourism/stakeholders/v1/stakeholders.proto\x12\x17tourism.stakeholders.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\xb1\x01\n\x07Profile\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n\x07surname\x18\x03 \x01(\tR\x07surname\x12\x10\n\x03\x62io\x18\x04 \x01(\tR\x03\x62io\x12\x14\n\x05motto\x18\x05 \x01(\tR\x05motto\x12\x1b\n\tphoto_url\x18\x06 \x01(\tR\x08photoUrl\x12\x1a\n\x08username\x18\x07 \x01(\tR\x08username\",\n\x11GetProfileRequest\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\"\xf0\x01\n\x14UpdateProfileRequest\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x17\n\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12\x1d\n\x07surname\x18\x03 \x01(\tH\x01R\x07surname\x88\x01\x01\x12\x15\n\x03\x62io\x18\x04 \x01(\tH\x02R\x03\x62io\x88\x01\x01\x12\x19\n\x05motto\x18\x05 \x01(\tH\x03R\x05motto\x88\x01\x01\x12 \n\tphoto_url\x18\x06 \x01(\tH\x04R\x08photoUrl\x88\x01\x01\x42\x07\n\x05_nameB\n\n\x08_surnameB\x06\n\x04_bioB\x08\n\x06_mottoB\x0c\n\n_photo_url\"4\n\x19\x44\x65leteProfilePhotoRequest\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId2\xdd\x03\n\x12StakeholderService\x12\x8b\x01\n\nGetProfile\x12*.tourism.stakeholders.v1.GetProfileRequest\x1a .tourism.stakeholders.v1.Profile\"/\x82\xd3\xe4\x93\x02)\x12\'/api/v1/stakeholders/profiles/{user_id}\x12\x94\x01\n\rUpdateProfile\x12-.tourism.stakeholders.v1.UpdateProfileRequest\x1a .tourism.stakeholders.v1.Profile\"2\x82\xd3\xe4\x93\x02,\x1a\'/api/v1/stakeholders/profiles/{user_id}:\x01*\x12\xa1\x01\n\x12\x44\x65leteProfilePhoto\x12\x32.tourism.stakeholders.v1.DeleteProfilePhotoRequest\x1a .tourism.stakeholders.v1.Profile\"5\x82\xd3\xe4\x93\x02/*-/api/v1/stakeholders/profiles/{user_id}/photoB\xda\x01\n\x17tourism.stakeholders.v1P\x01ZVgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/stakeholders/v1;stakeholdersv1\x92\x41\x64\x12:\n\x10Stakeholders API\x12\x1fUser profile management service2\x05\x30.1.0*\x02\x01\x02\x32\x10\x61pplication/json:\x10\x61pplication/jsonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -41,13 +41,13 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_STAKEHOLDERSERVICE'].methods_by_name['DeleteProfilePhoto']._loaded_options = None
   _globals['_STAKEHOLDERSERVICE'].methods_by_name['DeleteProfilePhoto']._serialized_options = b'\202\323\344\223\002/*-/api/v1/stakeholders/profiles/{user_id}/photo'
   _globals['_PROFILE']._serialized_start=150
-  _globals['_PROFILE']._serialized_end=299
-  _globals['_GETPROFILEREQUEST']._serialized_start=301
-  _globals['_GETPROFILEREQUEST']._serialized_end=345
-  _globals['_UPDATEPROFILEREQUEST']._serialized_start=348
-  _globals['_UPDATEPROFILEREQUEST']._serialized_end=588
-  _globals['_DELETEPROFILEPHOTOREQUEST']._serialized_start=590
-  _globals['_DELETEPROFILEPHOTOREQUEST']._serialized_end=642
-  _globals['_STAKEHOLDERSERVICE']._serialized_start=645
-  _globals['_STAKEHOLDERSERVICE']._serialized_end=1122
+  _globals['_PROFILE']._serialized_end=327
+  _globals['_GETPROFILEREQUEST']._serialized_start=329
+  _globals['_GETPROFILEREQUEST']._serialized_end=373
+  _globals['_UPDATEPROFILEREQUEST']._serialized_start=376
+  _globals['_UPDATEPROFILEREQUEST']._serialized_end=616
+  _globals['_DELETEPROFILEPHOTOREQUEST']._serialized_start=618
+  _globals['_DELETEPROFILEPHOTOREQUEST']._serialized_end=670
+  _globals['_STAKEHOLDERSERVICE']._serialized_start=673
+  _globals['_STAKEHOLDERSERVICE']._serialized_end=1150
 # @@protoc_insertion_point(module_scope)

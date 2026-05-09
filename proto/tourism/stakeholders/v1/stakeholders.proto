@@ -58,6 +58,7 @@ message Profile {
   string motto     = 5;
   // photo_url is empty when no photo has been uploaded.
   string photo_url = 6;
+  string username = 7;
 }
 
 message GetProfileRequest {

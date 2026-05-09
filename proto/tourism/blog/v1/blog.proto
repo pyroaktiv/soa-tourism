@@ -36,7 +36,10 @@ service BlogService {
     };
   }
 
-  rpc GetBlog(GetBlogAuthorIdRequest) returns (GetBlogAuthorIdResponse) {
+  rpc GetBlog(GetBlogRequest) returns (Blog) {
+    option (google.api.http) = {
+      get: "/api/v1/blogs/{id}"
+    };
   }
 
   rpc AddComment(AddCommentRequest) returns (Blog) {
@@ -58,6 +61,7 @@ message Comment {
   string text = 2;
   string created_at = 3;
   string last_modified_at = 4;
+  string author_username = 5;
 }
 
 message Blog {
@@ -69,6 +73,8 @@ message Blog {
   repeated string images = 6;
   repeated Comment comments = 7;
   repeated string liked_by_user_ids = 8;
+  bool can_read = 9;
+  string author_username = 10;
 }
 
 message CreateBlogRequest {
@@ -85,11 +91,8 @@ message GetAllBlogsResponse {
   repeated Blog blogs = 1;
 }
 
-message GetBlogAuthorIdRequest {
-}
-
-message GetBlogAuthorIdResponse {
-  Blog blog = 1;
+message GetBlogRequest {
+  string id = 1;
 }
 
 message AddCommentRequest {

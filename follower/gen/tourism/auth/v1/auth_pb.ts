@@ -101,6 +101,14 @@ export interface BlockUserResponse {
   success: boolean;
 }
 
+export interface GetUsernameRequest {
+  userId: string;
+}
+
+export interface GetUsernameResponse {
+  username: string;
+}
+
 function createBaseUser(): User {
   return { id: "", username: "", email: "", roles: [], blocked: false };
 }
@@ -1281,6 +1289,128 @@ export const BlockUserResponse: MessageFns<BlockUserResponse> = {
   },
 };
 
+function createBaseGetUsernameRequest(): GetUsernameRequest {
+  return { userId: "" };
+}
+
+export const GetUsernameRequest: MessageFns<GetUsernameRequest> = {
+  encode(message: GetUsernameRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== "") {
+      writer.uint32(10).string(message.userId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUsernameRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUsernameRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetUsernameRequest {
+    return {
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+    };
+  },
+
+  toJSON(message: GetUsernameRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetUsernameRequest>, I>>(base?: I): GetUsernameRequest {
+    return GetUsernameRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetUsernameRequest>, I>>(object: I): GetUsernameRequest {
+    const message = createBaseGetUsernameRequest();
+    message.userId = object.userId ?? "";
+    return message;
+  },
+};
+
+function createBaseGetUsernameResponse(): GetUsernameResponse {
+  return { username: "" };
+}
+
+export const GetUsernameResponse: MessageFns<GetUsernameResponse> = {
+  encode(message: GetUsernameResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.username !== "") {
+      writer.uint32(10).string(message.username);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUsernameResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUsernameResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetUsernameResponse {
+    return { username: isSet(object.username) ? globalThis.String(object.username) : "" };
+  },
+
+  toJSON(message: GetUsernameResponse): unknown {
+    const obj: any = {};
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetUsernameResponse>, I>>(base?: I): GetUsernameResponse {
+    return GetUsernameResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetUsernameResponse>, I>>(object: I): GetUsernameResponse {
+    const message = createBaseGetUsernameResponse();
+    message.username = object.username ?? "";
+    return message;
+  },
+};
+
 export type AuthServiceService = typeof AuthServiceService;
 export const AuthServiceService = {
   /** Register creates a new user account and returns a token pair. */
@@ -1325,6 +1455,15 @@ export const AuthServiceService = {
     requestDeserialize: (value: Buffer): ValidateRequest => ValidateRequest.decode(value),
     responseSerialize: (value: ValidateResponse): Buffer => Buffer.from(ValidateResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): ValidateResponse => ValidateResponse.decode(value),
+  },
+  getUsername: {
+    path: "/tourism.auth.v1.AuthService/GetUsername" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: GetUsernameRequest): Buffer => Buffer.from(GetUsernameRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetUsernameRequest => GetUsernameRequest.decode(value),
+    responseSerialize: (value: GetUsernameResponse): Buffer => Buffer.from(GetUsernameResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetUsernameResponse => GetUsernameResponse.decode(value),
   },
   /** Logout revokes the given refresh token. */
   logout: {
@@ -1383,6 +1522,7 @@ export interface AuthServiceServer extends UntypedServiceImplementation {
    * Called internally by other services — not exposed through the gateway.
    */
   validate: handleUnaryCall<ValidateRequest, ValidateResponse>;
+  getUsername: handleUnaryCall<GetUsernameRequest, GetUsernameResponse>;
   /** Logout revokes the given refresh token. */
   logout: handleUnaryCall<LogoutRequest, Empty>;
   /** ListUsers returns a paginated list of all users. */
@@ -1460,6 +1600,21 @@ export interface AuthServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ValidateResponse) => void,
+  ): ClientUnaryCall;
+  getUsername(
+    request: GetUsernameRequest,
+    callback: (error: ServiceError | null, response: GetUsernameResponse) => void,
+  ): ClientUnaryCall;
+  getUsername(
+    request: GetUsernameRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetUsernameResponse) => void,
+  ): ClientUnaryCall;
+  getUsername(
+    request: GetUsernameRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetUsernameResponse) => void,
   ): ClientUnaryCall;
   /** Logout revokes the given refresh token. */
   logout(request: LogoutRequest, callback: (error: ServiceError | null, response: Empty) => void): ClientUnaryCall;

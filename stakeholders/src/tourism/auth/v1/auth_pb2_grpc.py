@@ -35,6 +35,11 @@ class AuthServiceStub(object):
                 request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ValidateRequest.SerializeToString,
                 response_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ValidateResponse.FromString,
                 _registered_method=True)
+        self.GetUsername = channel.unary_unary(
+                '/tourism.auth.v1.AuthService/GetUsername',
+                request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.GetUsernameRequest.SerializeToString,
+                response_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.GetUsernameResponse.FromString,
+                _registered_method=True)
         self.Logout = channel.unary_unary(
                 '/tourism.auth.v1.AuthService/Logout',
                 request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.LogoutRequest.SerializeToString,
@@ -85,6 +90,12 @@ class AuthServiceServicer(object):
         """Validate verifies an access token and returns the associated user.
         Called internally by other services — not exposed through the gateway.
         """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetUsername(self, request, context):
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -140,6 +151,11 @@ def add_AuthServiceServicer_to_server(servicer, server):
                     servicer.Validate,
                     request_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ValidateRequest.FromString,
                     response_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.ValidateResponse.SerializeToString,
+            ),
+            'GetUsername': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetUsername,
+                    request_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.GetUsernameRequest.FromString,
+                    response_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.GetUsernameResponse.SerializeToString,
             ),
             'Logout': grpc.unary_unary_rpc_method_handler(
                     servicer.Logout,
@@ -270,6 +286,33 @@ class AuthService(object):
             '/tourism.auth.v1.AuthService/Validate',
             tourism_dot_auth_dot_v1_dot_auth__pb2.ValidateRequest.SerializeToString,
             tourism_dot_auth_dot_v1_dot_auth__pb2.ValidateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetUsername(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.auth.v1.AuthService/GetUsername',
+            tourism_dot_auth_dot_v1_dot_auth__pb2.GetUsernameRequest.SerializeToString,
+            tourism_dot_auth_dot_v1_dot_auth__pb2.GetUsernameResponse.FromString,
             options,
             channel_credentials,
             insecure,
