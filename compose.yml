@@ -129,6 +129,17 @@ services:
       - follower
       - blog-service
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8080/api/v1"
+    depends_on:
+      - gateway
+
 volumes:
   mongo_data:
   seaweedfs_data:
