@@ -46,17 +46,13 @@ public class BlogService {
         return blogRepository.save(blog);
     }
 
-    public List<Blog> getAllBlogs(String requesterId) {
-        List<String> targetIds = new ArrayList<>(followerClient.getFollowedUserIds(requesterId).getUserIdsList());
-        targetIds.add(requesterId);
-        List<String> roles = AuthInterceptor.ROLES.get();
+    public List<Blog> getAllBlogs() {
+        return blogRepository.findAll();
+    }
 
-        if(roles.contains("author") || roles.contains("tourist")){
-            return blogRepository.findAllByAuthorIdIn(targetIds);
-        }
-        else {
-            return blogRepository.findAll();
-        }
+    public Blog getBlogById(String id) {
+        return blogRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Blog sa ID-jem " + id + " nije pronađen!"));
     }
 
     public String getBlogAuthorId(String blogId){

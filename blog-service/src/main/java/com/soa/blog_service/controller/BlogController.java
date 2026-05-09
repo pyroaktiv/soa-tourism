@@ -34,7 +34,7 @@ public class BlogController {
 
     @GetMapping
     public ResponseEntity<List<Blog>> getAllBlogs() {
-        return ResponseEntity.ok(blogService.getAllBlogs(Context.key("user_id").get().toString()));
+        return ResponseEntity.ok(blogService.getAllBlogs());
     }
     
     @PostMapping("/{blogId}/comments")
