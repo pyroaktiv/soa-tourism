@@ -6,9 +6,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import tourism.auth.v1.AuthServiceGrpc;
-import tourism.auth.v1.ValidateRequest;
-import tourism.auth.v1.ValidateResponse;
+import tourism.auth.v1.*;
 
 @Component
 public class AuthGrpcClient {
@@ -34,5 +32,14 @@ public class AuthGrpcClient {
 
     public ValidateResponse validateToken(String token) {
         return blockingStub.validate(ValidateRequest.newBuilder().setAccessToken(token).build());
+    }
+
+    public String getUsername(String userId) {
+        try {
+            GetUsernameResponse response = blockingStub.getUsername(GetUsernameRequest.newBuilder().setUserId(userId).build());
+            return response.getUsername();
+        } catch (Exception e) {
+            return "Unknown";
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.soa.blog_service.controller;
 
+import com.soa.blog_service.client.AuthGrpcClient;
 import com.soa.blog_service.client.FollowerGrpcClient;
 import com.soa.blog_service.model.Blog;
 import com.soa.blog_service.model.Comment;
@@ -18,10 +19,12 @@ public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
 
     private final BlogService blogService;
     private final FollowerGrpcClient followerGrpcClient;
+    private final AuthGrpcClient authGrpcClient;
 
-    public BlogGrpcController(BlogService blogService, FollowerGrpcClient followerGrpcClient) {
+    public BlogGrpcController(BlogService blogService, FollowerGrpcClient followerGrpcClient, AuthGrpcClient authGrpcClient) {
         this.blogService = blogService;
         this.followerGrpcClient = followerGrpcClient;
+        this.authGrpcClient = authGrpcClient;
     }
 
     @Override
@@ -109,6 +112,7 @@ public class BlogGrpcController extends BlogServiceGrpc.BlogServiceImplBase {
     private tourism.blog.v1.Comment mapToGrpcComment(Comment c) {
         return tourism.blog.v1.Comment.newBuilder()
                 .setAuthorId(c.getAuthorId() != null ? c.getAuthorId() : "")
+                .setAuthorUsername(authGrpcClient.getUsername(c.getAuthorId()))
                 .setText(c.getText() != null ? c.getText() : "")
                 .setCreatedAt(c.getCreatedAt() != null ? c.getCreatedAt().toString() : "")
                 .setLastModifiedAt(c.getLastModifiedAt() != null ? c.getLastModifiedAt().toString() : "")

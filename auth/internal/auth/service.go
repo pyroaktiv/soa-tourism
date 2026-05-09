@@ -509,3 +509,17 @@ func validateAndNormalizeRoles(inputRoles []string) ([]string, error) {
 
 	return result, nil
 }
+
+func (s *Service) GetUsername(ctx context.Context, req *authv1.GetUsernameRequest) (*authv1.GetUsernameResponse, error) {
+	var user userDocument
+	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: req.GetUserId()}}).Decode(&user); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		return nil, status.Error(codes.Internal, "database error")
+	}
+
+	return &authv1.GetUsernameResponse{
+		Username: user.Username,
+	}, nil
+}
