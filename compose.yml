@@ -110,6 +110,23 @@ services:
     depends_on:
       - mongo
 
+  tour:
+    build:
+      context: ./tour
+      dockerfile: Dockerfile
+    environment:
+      GRPC_ADDR: "0.0.0.0:9090"
+      MONGO_URI: "mongodb://mongo:27017"
+      MONGO_DB: "tourdb"
+      AUTH_SERVICE_ADDR: "auth-service:9090"
+      SEAWEEDFS_FILER_URL: "http://seaweedfs:8888"
+    expose:
+      - "9090"
+    depends_on:
+      - mongo
+      - auth-service
+      - seaweedfs
+
   gateway:
     build:
       context: ./gateway
@@ -122,12 +139,14 @@ services:
       STAKEHOLDERS_SERVICE_ADDR: "stakeholders:9090"
       FOLLOWER_SERVICE_ADDR: "follower:9090"
       BLOG_SERVICE_ADDR: "blog-service:9090"
+      TOUR_SERVICE_ADDR: "tour:9090"
       CORS_ALLOWED_ORIGINS: "*"
     depends_on:
       - auth-service
       - stakeholders
       - follower
       - blog-service
+      - tour
 
   frontend:
     build:
