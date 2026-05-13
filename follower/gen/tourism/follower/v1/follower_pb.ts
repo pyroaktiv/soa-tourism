@@ -86,6 +86,7 @@ export interface GetRecommendationsRequest {
 export interface Recommendation {
   userId: string;
   mutualFollows: number;
+  username: string;
 }
 
 export interface GetRecommendationsResponse {
@@ -1023,7 +1024,7 @@ export const GetRecommendationsRequest: MessageFns<GetRecommendationsRequest> = 
 };
 
 function createBaseRecommendation(): Recommendation {
-  return { userId: "", mutualFollows: 0 };
+  return { userId: "", mutualFollows: 0, username: "" };
 }
 
 export const Recommendation: MessageFns<Recommendation> = {
@@ -1033,6 +1034,9 @@ export const Recommendation: MessageFns<Recommendation> = {
     }
     if (message.mutualFollows !== 0) {
       writer.uint32(16).int32(message.mutualFollows);
+    }
+    if (message.username !== "") {
+      writer.uint32(26).string(message.username);
     }
     return writer;
   },
@@ -1060,6 +1064,14 @@ export const Recommendation: MessageFns<Recommendation> = {
           message.mutualFollows = reader.int32();
           continue;
         }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1081,6 +1093,7 @@ export const Recommendation: MessageFns<Recommendation> = {
         : isSet(object.mutual_follows)
         ? globalThis.Number(object.mutual_follows)
         : 0,
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
     };
   },
 
@@ -1092,6 +1105,9 @@ export const Recommendation: MessageFns<Recommendation> = {
     if (message.mutualFollows !== 0) {
       obj.mutualFollows = Math.round(message.mutualFollows);
     }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
     return obj;
   },
 
@@ -1102,6 +1118,7 @@ export const Recommendation: MessageFns<Recommendation> = {
     const message = createBaseRecommendation();
     message.userId = object.userId ?? "";
     message.mutualFollows = object.mutualFollows ?? 0;
+    message.username = object.username ?? "";
     return message;
   },
 };

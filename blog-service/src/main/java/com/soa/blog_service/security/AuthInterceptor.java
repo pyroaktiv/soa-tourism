@@ -14,6 +14,8 @@ import io.grpc.Status;
 import lombok.RequiredArgsConstructor;
 import tourism.auth.v1.ValidateResponse;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class AuthInterceptor implements ServerInterceptor {
@@ -21,16 +23,13 @@ public class AuthInterceptor implements ServerInterceptor {
     private final AuthGrpcClient authClient;
 
     public static final Context.Key<String> USER_ID_KEY = Context.key("user_id");
+    public static final Context.Key<List<String>> ROLES = Context.key("roles");
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
             ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
 
         String methodName = call.getMethodDescriptor().getFullMethodName();
-
-        if (methodName.endsWith("GetAllBlogs")) {
-            return Contexts.interceptCall(Context.current(), call, headers, next);
-        }
 
         String authHeader = headers.get(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER));
 
@@ -49,7 +48,7 @@ public class AuthInterceptor implements ServerInterceptor {
                 return new ServerCall.Listener<ReqT>() {};
             }
 
-            Context ctx = Context.current().withValue(USER_ID_KEY, response.getUser().getId());
+            Context ctx = Context.current().withValue(USER_ID_KEY, response.getUser().getId()).withValue(ROLES, response.getUser().getRolesList());
             return Contexts.interceptCall(ctx, call, headers, next);
 
         } catch (Exception e) {

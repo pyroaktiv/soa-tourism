@@ -29,6 +29,7 @@ type Comment struct {
 	Text           string                 `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
 	CreatedAt      string                 `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	LastModifiedAt string                 `protobuf:"bytes,4,opt,name=last_modified_at,json=lastModifiedAt,proto3" json:"last_modified_at,omitempty"`
+	AuthorUsername string                 `protobuf:"bytes,5,opt,name=author_username,json=authorUsername,proto3" json:"author_username,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -91,6 +92,13 @@ func (x *Comment) GetLastModifiedAt() string {
 	return ""
 }
 
+func (x *Comment) GetAuthorUsername() string {
+	if x != nil {
+		return x.AuthorUsername
+	}
+	return ""
+}
+
 type Blog struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -101,6 +109,8 @@ type Blog struct {
 	Images         []string               `protobuf:"bytes,6,rep,name=images,proto3" json:"images,omitempty"`
 	Comments       []*Comment             `protobuf:"bytes,7,rep,name=comments,proto3" json:"comments,omitempty"`
 	LikedByUserIds []string               `protobuf:"bytes,8,rep,name=liked_by_user_ids,json=likedByUserIds,proto3" json:"liked_by_user_ids,omitempty"`
+	CanRead        bool                   `protobuf:"varint,9,opt,name=can_read,json=canRead,proto3" json:"can_read,omitempty"`
+	AuthorUsername string                 `protobuf:"bytes,10,opt,name=author_username,json=authorUsername,proto3" json:"author_username,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -189,6 +199,20 @@ func (x *Blog) GetLikedByUserIds() []string {
 		return x.LikedByUserIds
 	}
 	return nil
+}
+
+func (x *Blog) GetCanRead() bool {
+	if x != nil {
+		return x.CanRead
+	}
+	return false
+}
+
+func (x *Blog) GetAuthorUsername() string {
+	if x != nil {
+		return x.AuthorUsername
+	}
+	return ""
 }
 
 type CreateBlogRequest struct {
@@ -339,17 +363,62 @@ func (x *GetAllBlogsResponse) GetBlogs() []*Blog {
 	return nil
 }
 
+type GetBlogRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBlogRequest) Reset() {
+	*x = GetBlogRequest{}
+	mi := &file_tourism_blog_v1_blog_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBlogRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBlogRequest) ProtoMessage() {}
+
+func (x *GetBlogRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_blog_v1_blog_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBlogRequest.ProtoReflect.Descriptor instead.
+func (*GetBlogRequest) Descriptor() ([]byte, []int) {
+	return file_tourism_blog_v1_blog_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetBlogRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 type AddCommentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	BlogId        string                 `protobuf:"bytes,1,opt,name=blog_id,json=blogId,proto3" json:"blog_id,omitempty"`
-	Comment       *Comment               `protobuf:"bytes,2,opt,name=comment,proto3" json:"comment,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	BlogId        string                 `protobuf:"bytes,2,opt,name=blog_id,json=blogId,proto3" json:"blog_id,omitempty"`
+	Comment       *Comment               `protobuf:"bytes,3,opt,name=comment,proto3" json:"comment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AddCommentRequest) Reset() {
 	*x = AddCommentRequest{}
-	mi := &file_tourism_blog_v1_blog_proto_msgTypes[5]
+	mi := &file_tourism_blog_v1_blog_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -361,7 +430,7 @@ func (x *AddCommentRequest) String() string {
 func (*AddCommentRequest) ProtoMessage() {}
 
 func (x *AddCommentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tourism_blog_v1_blog_proto_msgTypes[5]
+	mi := &file_tourism_blog_v1_blog_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -374,7 +443,14 @@ func (x *AddCommentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddCommentRequest.ProtoReflect.Descriptor instead.
 func (*AddCommentRequest) Descriptor() ([]byte, []int) {
-	return file_tourism_blog_v1_blog_proto_rawDescGZIP(), []int{5}
+	return file_tourism_blog_v1_blog_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *AddCommentRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
 }
 
 func (x *AddCommentRequest) GetBlogId() string {
@@ -401,7 +477,7 @@ type ToggleLikeRequest struct {
 
 func (x *ToggleLikeRequest) Reset() {
 	*x = ToggleLikeRequest{}
-	mi := &file_tourism_blog_v1_blog_proto_msgTypes[6]
+	mi := &file_tourism_blog_v1_blog_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -413,7 +489,7 @@ func (x *ToggleLikeRequest) String() string {
 func (*ToggleLikeRequest) ProtoMessage() {}
 
 func (x *ToggleLikeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tourism_blog_v1_blog_proto_msgTypes[6]
+	mi := &file_tourism_blog_v1_blog_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +502,7 @@ func (x *ToggleLikeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToggleLikeRequest.ProtoReflect.Descriptor instead.
 func (*ToggleLikeRequest) Descriptor() ([]byte, []int) {
-	return file_tourism_blog_v1_blog_proto_rawDescGZIP(), []int{6}
+	return file_tourism_blog_v1_blog_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ToggleLikeRequest) GetBlogId() string {
@@ -447,13 +523,14 @@ var File_tourism_blog_v1_blog_proto protoreflect.FileDescriptor
 
 const file_tourism_blog_v1_blog_proto_rawDesc = "" +
 	"\n" +
-	"\x1atourism/blog/v1/blog.proto\x12\x0ftourism.blog.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\x83\x01\n" +
+	"\x1atourism/blog/v1/blog.proto\x12\x0ftourism.blog.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\xac\x01\n" +
 	"\aComment\x12\x1b\n" +
 	"\tauthor_id\x18\x01 \x01(\tR\bauthorId\x12\x12\n" +
 	"\x04text\x18\x02 \x01(\tR\x04text\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\tR\tcreatedAt\x12(\n" +
-	"\x10last_modified_at\x18\x04 \x01(\tR\x0elastModifiedAt\"\x89\x02\n" +
+	"\x10last_modified_at\x18\x04 \x01(\tR\x0elastModifiedAt\x12'\n" +
+	"\x0fauthor_username\x18\x05 \x01(\tR\x0eauthorUsername\"\xcd\x02\n" +
 	"\x04Blog\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tauthor_id\x18\x02 \x01(\tR\bauthorId\x12\x14\n" +
@@ -462,7 +539,10 @@ const file_tourism_blog_v1_blog_proto_rawDesc = "" +
 	"\rcreation_date\x18\x05 \x01(\tR\fcreationDate\x12\x16\n" +
 	"\x06images\x18\x06 \x03(\tR\x06images\x124\n" +
 	"\bcomments\x18\a \x03(\v2\x18.tourism.blog.v1.CommentR\bcomments\x12)\n" +
-	"\x11liked_by_user_ids\x18\b \x03(\tR\x0elikedByUserIds\"\x80\x01\n" +
+	"\x11liked_by_user_ids\x18\b \x03(\tR\x0elikedByUserIds\x12\x19\n" +
+	"\bcan_read\x18\t \x01(\bR\acanRead\x12'\n" +
+	"\x0fauthor_username\x18\n" +
+	" \x01(\tR\x0eauthorUsername\"\x80\x01\n" +
 	"\x11CreateBlogRequest\x12\x1b\n" +
 	"\tauthor_id\x18\x01 \x01(\tR\bauthorId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -470,17 +550,21 @@ const file_tourism_blog_v1_blog_proto_rawDesc = "" +
 	"\x06images\x18\x04 \x03(\tR\x06images\"\x14\n" +
 	"\x12GetAllBlogsRequest\"B\n" +
 	"\x13GetAllBlogsResponse\x12+\n" +
-	"\x05blogs\x18\x01 \x03(\v2\x15.tourism.blog.v1.BlogR\x05blogs\"`\n" +
+	"\x05blogs\x18\x01 \x03(\v2\x15.tourism.blog.v1.BlogR\x05blogs\" \n" +
+	"\x0eGetBlogRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"y\n" +
 	"\x11AddCommentRequest\x12\x17\n" +
-	"\ablog_id\x18\x01 \x01(\tR\x06blogId\x122\n" +
-	"\acomment\x18\x02 \x01(\v2\x18.tourism.blog.v1.CommentR\acomment\"E\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x17\n" +
+	"\ablog_id\x18\x02 \x01(\tR\x06blogId\x122\n" +
+	"\acomment\x18\x03 \x01(\v2\x18.tourism.blog.v1.CommentR\acomment\"E\n" +
 	"\x11ToggleLikeRequest\x12\x17\n" +
 	"\ablog_id\x18\x01 \x01(\tR\x06blogId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId2\xd6\x03\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId2\xb5\x04\n" +
 	"\vBlogService\x12a\n" +
 	"\n" +
 	"CreateBlog\x12\".tourism.blog.v1.CreateBlogRequest\x1a\x15.tourism.blog.v1.Blog\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/blogs\x12o\n" +
-	"\vGetAllBlogs\x12#.tourism.blog.v1.GetAllBlogsRequest\x1a$.tourism.blog.v1.GetAllBlogsResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/blogs\x12z\n" +
+	"\vGetAllBlogs\x12#.tourism.blog.v1.GetAllBlogsRequest\x1a$.tourism.blog.v1.GetAllBlogsResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/blogs\x12]\n" +
+	"\aGetBlog\x12\x1f.tourism.blog.v1.GetBlogRequest\x1a\x15.tourism.blog.v1.Blog\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/blogs/{id}\x12z\n" +
 	"\n" +
 	"AddComment\x12\".tourism.blog.v1.AddCommentRequest\x1a\x15.tourism.blog.v1.Blog\"1\x82\xd3\xe4\x93\x02+:\acomment\" /api/v1/blogs/{blog_id}/comments\x12w\n" +
 	"\n" +
@@ -500,15 +584,16 @@ func file_tourism_blog_v1_blog_proto_rawDescGZIP() []byte {
 	return file_tourism_blog_v1_blog_proto_rawDescData
 }
 
-var file_tourism_blog_v1_blog_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_tourism_blog_v1_blog_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_tourism_blog_v1_blog_proto_goTypes = []any{
 	(*Comment)(nil),             // 0: tourism.blog.v1.Comment
 	(*Blog)(nil),                // 1: tourism.blog.v1.Blog
 	(*CreateBlogRequest)(nil),   // 2: tourism.blog.v1.CreateBlogRequest
 	(*GetAllBlogsRequest)(nil),  // 3: tourism.blog.v1.GetAllBlogsRequest
 	(*GetAllBlogsResponse)(nil), // 4: tourism.blog.v1.GetAllBlogsResponse
-	(*AddCommentRequest)(nil),   // 5: tourism.blog.v1.AddCommentRequest
-	(*ToggleLikeRequest)(nil),   // 6: tourism.blog.v1.ToggleLikeRequest
+	(*GetBlogRequest)(nil),      // 5: tourism.blog.v1.GetBlogRequest
+	(*AddCommentRequest)(nil),   // 6: tourism.blog.v1.AddCommentRequest
+	(*ToggleLikeRequest)(nil),   // 7: tourism.blog.v1.ToggleLikeRequest
 }
 var file_tourism_blog_v1_blog_proto_depIdxs = []int32{
 	0, // 0: tourism.blog.v1.Blog.comments:type_name -> tourism.blog.v1.Comment
@@ -516,14 +601,16 @@ var file_tourism_blog_v1_blog_proto_depIdxs = []int32{
 	0, // 2: tourism.blog.v1.AddCommentRequest.comment:type_name -> tourism.blog.v1.Comment
 	2, // 3: tourism.blog.v1.BlogService.CreateBlog:input_type -> tourism.blog.v1.CreateBlogRequest
 	3, // 4: tourism.blog.v1.BlogService.GetAllBlogs:input_type -> tourism.blog.v1.GetAllBlogsRequest
-	5, // 5: tourism.blog.v1.BlogService.AddComment:input_type -> tourism.blog.v1.AddCommentRequest
-	6, // 6: tourism.blog.v1.BlogService.ToggleLike:input_type -> tourism.blog.v1.ToggleLikeRequest
-	1, // 7: tourism.blog.v1.BlogService.CreateBlog:output_type -> tourism.blog.v1.Blog
-	4, // 8: tourism.blog.v1.BlogService.GetAllBlogs:output_type -> tourism.blog.v1.GetAllBlogsResponse
-	1, // 9: tourism.blog.v1.BlogService.AddComment:output_type -> tourism.blog.v1.Blog
-	1, // 10: tourism.blog.v1.BlogService.ToggleLike:output_type -> tourism.blog.v1.Blog
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
+	5, // 5: tourism.blog.v1.BlogService.GetBlog:input_type -> tourism.blog.v1.GetBlogRequest
+	6, // 6: tourism.blog.v1.BlogService.AddComment:input_type -> tourism.blog.v1.AddCommentRequest
+	7, // 7: tourism.blog.v1.BlogService.ToggleLike:input_type -> tourism.blog.v1.ToggleLikeRequest
+	1, // 8: tourism.blog.v1.BlogService.CreateBlog:output_type -> tourism.blog.v1.Blog
+	4, // 9: tourism.blog.v1.BlogService.GetAllBlogs:output_type -> tourism.blog.v1.GetAllBlogsResponse
+	1, // 10: tourism.blog.v1.BlogService.GetBlog:output_type -> tourism.blog.v1.Blog
+	1, // 11: tourism.blog.v1.BlogService.AddComment:output_type -> tourism.blog.v1.Blog
+	1, // 12: tourism.blog.v1.BlogService.ToggleLike:output_type -> tourism.blog.v1.Blog
+	8, // [8:13] is the sub-list for method output_type
+	3, // [3:8] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
 	3, // [3:3] is the sub-list for extension extendee
 	0, // [0:3] is the sub-list for field type_name
@@ -540,7 +627,7 @@ func file_tourism_blog_v1_blog_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tourism_blog_v1_blog_proto_rawDesc), len(file_tourism_blog_v1_blog_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -18,7 +18,7 @@ import type {
   GetRecommendationsResponse,
 } from "../gen/tourism/follower/v1/follower_pb";
 
-import { requireAuth } from "./auth-client";
+import { getUsername, requireAuth } from "./auth-client";
 import * as db from "./neo4j";
 
 const DEFAULT_PAGE_LIMIT = 20;
@@ -160,12 +160,21 @@ export const followerServiceImpl: FollowerServiceServer = {
 
     try {
       const rows = await db.getRecommendations(user.id, limit);
+      const recommendationsWithUsernames = await Promise.all(
+        rows.map(async (r) => {
+          const fetchedUsername = await getUsername(r.userId);
+          return {
+            userId: r.userId,
+            mutualFollows: r.mutualFollows,
+            username: fetchedUsername,
+          }
+        })
+      );
+
       callback(null, {
-        recommendations: rows.map((r) => ({
-          userId: r.userId,
-          mutualFollows: r.mutualFollows,
-        })),
+        recommendations: recommendationsWithUsernames,
       });
+
     } catch (err) {
       callback({ code: grpc.status.INTERNAL, message: String(err) });
     }

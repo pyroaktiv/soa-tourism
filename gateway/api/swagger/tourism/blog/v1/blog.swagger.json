@@ -104,6 +104,12 @@
             "schema": {
               "$ref": "#/definitions/v1Comment"
             }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -142,6 +148,36 @@
             "schema": {
               "$ref": "#/definitions/BlogServiceToggleLikeBody"
             }
+          }
+        ],
+        "tags": [
+          "BlogService"
+        ]
+      }
+    },
+    "/api/v1/blogs/{id}": {
+      "get": {
+        "operationId": "BlogService_GetBlog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Blog"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -223,6 +259,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "canRead": {
+          "type": "boolean"
+        },
+        "authorUsername": {
+          "type": "string"
         }
       }
     },
@@ -239,6 +281,9 @@
           "type": "string"
         },
         "lastModifiedAt": {
+          "type": "string"
+        },
+        "authorUsername": {
           "type": "string"
         }
       }

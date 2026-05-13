@@ -5,11 +5,14 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y maven
 
-COPY proto ./proto
-
 COPY blog-service/pom.xml ./blog-service/
-COPY blog-service/src ./blog-service/src
 
+WORKDIR /app/blog-service
+RUN mvn -B dependency:go-offline
+
+WORKDIR /app
+COPY proto ./proto
+COPY blog-service/src ./blog-service/src
 
 WORKDIR /app/blog-service
 RUN mvn -B -DskipTests clean package

@@ -658,6 +658,7 @@ type Recommendation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	MutualFollows int32                  `protobuf:"varint,2,opt,name=mutual_follows,json=mutualFollows,proto3" json:"mutual_follows,omitempty"`
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -704,6 +705,13 @@ func (x *Recommendation) GetMutualFollows() int32 {
 		return x.MutualFollows
 	}
 	return 0
+}
+
+func (x *Recommendation) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
 }
 
 type GetRecommendationsResponse struct {
@@ -791,10 +799,11 @@ const file_tourism_follower_v1_follower_proto_rawDesc = "" +
 	"\x1aGetFollowedUserIdsResponse\x12\x19\n" +
 	"\buser_ids\x18\x01 \x03(\tR\auserIds\"1\n" +
 	"\x19GetRecommendationsRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\"P\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\"l\n" +
 	"\x0eRecommendation\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12%\n" +
-	"\x0emutual_follows\x18\x02 \x01(\x05R\rmutualFollows\"k\n" +
+	"\x0emutual_follows\x18\x02 \x01(\x05R\rmutualFollows\x12\x1a\n" +
+	"\busername\x18\x03 \x01(\tR\busername\"k\n" +
 	"\x1aGetRecommendationsResponse\x12M\n" +
 	"\x0frecommendations\x18\x01 \x03(\v2#.tourism.follower.v1.RecommendationR\x0frecommendations2\x8c\b\n" +
 	"\x0fFollowerService\x12\x84\x01\n" +
@@ -804,8 +813,9 @@ const file_tourism_follower_v1_follower_proto_rawDesc = "" +
 	"\fGetFollowing\x12(.tourism.follower.v1.GetFollowingRequest\x1a).tourism.follower.v1.GetFollowingResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/followers/{user_id}/following\x12\xa1\x01\n" +
 	"\vIsFollowing\x12'.tourism.follower.v1.IsFollowingRequest\x1a(.tourism.follower.v1.IsFollowingResponse\"?\x82\xd3\xe4\x93\x029\x127/api/v1/followers/{follower_id}/following/{followee_id}\x12w\n" +
 	"\x12GetFollowedUserIds\x12..tourism.follower.v1.GetFollowedUserIdsRequest\x1a/.tourism.follower.v1.GetFollowedUserIdsResponse\"\x00\x12\xa0\x01\n" +
-	"\x12GetRecommendations\x12..tourism.follower.v1.GetRecommendationsRequest\x1a/.tourism.follower.v1.GetRecommendationsResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/followers/recommendationsB\xbc\x01\x92Ai\x12?\n" +
-	"\fFollower API\x12(Follow relationships and recommendations2\x050.1.0*\x02\x01\x022\x10application/json:\x10application/jsonZNgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/follower/v1;followerv1b\x06proto3"
+	"\x12GetRecommendations\x12..tourism.follower.v1.GetRecommendationsRequest\x1a/.tourism.follower.v1.GetRecommendationsResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/followers/recommendationsB\xd3\x01\x92Ai\x12?\n" +
+	"\fFollower API\x12(Follow relationships and recommendations2\x050.1.0*\x02\x01\x022\x10application/json:\x10application/json\n" +
+	"\x13tourism.follower.v1P\x01ZNgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/follower/v1;followerv1b\x06proto3"
 
 var (
 	file_tourism_follower_v1_follower_proto_rawDescOnce sync.Once

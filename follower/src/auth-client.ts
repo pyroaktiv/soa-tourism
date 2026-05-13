@@ -2,6 +2,7 @@ import * as grpc from "@grpc/grpc-js";
 import {
   AuthServiceClient,
   ValidateRequest,
+  GetUsernameRequest,
   type User,
 } from "../gen/tourism/auth/v1/auth_pb";
 
@@ -57,5 +58,15 @@ export function requireAuth(
         resolve(response.user);
       },
     );
+  });
+}
+
+export function getUsername(userId: string): Promise<string> {
+  return new Promise((resolve) => {
+    const req = GetUsernameRequest.create({ userId });
+    _authClient.getUsername(req, (err, res) => {
+      if (err || !res) resolve("Unknown");
+      else resolve(res.username);
+    });
   });
 }

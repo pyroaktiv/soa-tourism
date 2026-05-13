@@ -39,6 +39,8 @@ service AuthService {
   // Called internally by other services — not exposed through the gateway.
   rpc Validate(ValidateRequest) returns (ValidateResponse) {}
 
+  rpc GetUsername(GetUsernameRequest) returns (GetUsernameResponse) {}
+
   // Logout revokes the given refresh token.
   rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -147,4 +149,12 @@ message BlockUserRequest {
 
 message BlockUserResponse {
   bool success = 1;
+}
+
+message GetUsernameRequest {
+  string user_id = 1;
+}
+
+message GetUsernameResponse {
+  string username = 1;
 }

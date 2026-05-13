@@ -35,11 +35,11 @@ async function api(method, path, body, token) {
 }
 
 // Registers a fresh user and returns { userId, username, email, token, refreshToken }.
-async function register(label) {
+async function register(label, roles = ["tourist"]) {
   const username = `t_${label}_${RUN_ID}`;
   const email    = `${username}@test.example`;
   const res = await api("POST", "/api/v1/auth/register", {
-    username, email, password: PASSWORD, roles: ["tourist"],
+    username, email, password: PASSWORD, roles,
   });
   if (res.status !== 200) {
     throw new Error(`setup: register ${username} failed HTTP ${res.status}: ${JSON.stringify(res.data)}`);
@@ -84,9 +84,9 @@ async function test(name, fn) {
 
 suite("gateway");
 
-await test("health endpoint responds 200", async () => {
-  const { status } = await api("GET", "/api/v1/health");
-  assert.equal(status, 200, `gateway at ${GATEWAY_URL} is not responding`);
+await test("base endpoint responds 404", async () => {
+  const { status } = await api("GET", "/");
+  assert.equal(status, 404, `gateway at ${GATEWAY_URL} is not responding`);
 });
 
 // Abort early if the gateway is completely down - nothing else will work.
@@ -373,6 +373,283 @@ await test("unfollow is idempotent (second unfollow → 200)", async () => {
 await test("unfollow requires auth → 401", async () => {
   const { status } = await api("DELETE", `/api/v1/followers/${fBob.userId}/follow`);
   assert.equal(status, 401);
+});
+
+// ─── Tours ────────────────────────────────────────────────────────────────────
+
+suite("tours");
+
+let tAuthor = {}, tTourist = {}, tOther = {};
+tAuthor  = await register("tAuthor",  ["author"]);
+tTourist = await register("tTourist", ["tourist"]);
+tOther   = await register("tOtherA",  ["author"]);
+
+let tourId = null;
+
+// Auth guards on create
+await test("rejects unauthenticated create → 401", async () => {
+  const { status } = await api("POST", "/api/v1/tours", {
+    name: "T", description: "D", difficulty: 1, tags: ["x"],
+  });
+  assert.equal(status, 401);
+});
+
+await test("tourist cannot create tour → 403", async () => {
+  const { status } = await api("POST", "/api/v1/tours", {
+    name: "T", description: "D", difficulty: 1, tags: ["x"],
+  }, tTourist.token);
+  assert.equal(status, 403);
+});
+
+// Create
+await test("author creates tour → TOUR_STATUS_DRAFT, price 0, no keypoints", async () => {
+  const { status, data } = await api("POST", "/api/v1/tours", {
+    name: "Mountain Trek",
+    description: "A challenging hike",
+    difficulty: 3,
+    tags: ["hiking", "mountains"],
+  }, tAuthor.token);
+  assert.equal(status, 200);
+  assert.ok(data.id, "tour.id present");
+  assert.equal(data.status, "TOUR_STATUS_DRAFT");
+  assert.equal(data.authorId, tAuthor.userId);
+  assert.equal(data.price    ?? 0, 0, "initial price is 0");
+  assert.equal(data.lengthKm ?? 0, 0, "initial length is 0");
+  assert.equal((data.keypoints ?? []).length, 0, "no keypoints yet");
+  tourId = data.id;
+});
+
+// ListMyTours
+await test("ListMyTours returns the created tour", async () => {
+  const { status, data } = await api("GET", "/api/v1/tours/authored", undefined, tAuthor.token);
+  assert.equal(status, 200);
+  assert.ok((data.tours ?? []).some(t => t.id === tourId), "tour in author's list");
+});
+
+await test("ListMyTours requires auth → 401", async () => {
+  const { status } = await api("GET", "/api/v1/tours/authored");
+  assert.equal(status, 401);
+});
+
+// Draft visibility rules
+await test("draft tour not visible to tourist → 404", async () => {
+  const { status } = await api("GET", `/api/v1/tours/${tourId}`, undefined, tTourist.token);
+  assert.equal(status, 404);
+});
+
+await test("draft tour not visible to unauthenticated caller → 404", async () => {
+  const { status } = await api("GET", `/api/v1/tours/${tourId}`);
+  assert.equal(status, 404);
+});
+
+await test("draft tour absent from public listing", async () => {
+  const { status, data } = await api("GET", "/api/v1/tours");
+  assert.equal(status, 200);
+  assert.ok(!(data.tours ?? []).some(t => t.id === tourId), "draft absent from public list");
+});
+
+await test("author can see own draft tour", async () => {
+  const { status, data } = await api("GET", `/api/v1/tours/${tourId}`, undefined, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.status, "TOUR_STATUS_DRAFT");
+  assert.equal(data.name, "Mountain Trek");
+});
+
+// Update
+await test("author updates draft tour name", async () => {
+  const { status, data } = await api("PUT", `/api/v1/tours/${tourId}`, {
+    name: "Alpine Trek",
+  }, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.name, "Alpine Trek");
+  assert.equal(data.description, "A challenging hike", "other fields unchanged");
+});
+
+await test("other author cannot update tour → 403", async () => {
+  const { status } = await api("PUT", `/api/v1/tours/${tourId}`, { name: "Stolen" }, tOther.token);
+  assert.equal(status, 403);
+});
+
+// Publish validation — step-by-step
+await test("cannot publish with no keypoints → 400", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/publish`, {}, tAuthor.token);
+  assert.equal(status, 400);
+});
+
+await test("add first keypoint → length_km stays 0", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/keypoints`, {
+    name: "Trailhead", description: "Starting point",
+    latitude: 44.8176, longitude: 20.4633,
+  }, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.keypoints?.length, 1);
+  assert.equal(data.lengthKm ?? 0, 0, "no distance with a single keypoint");
+});
+
+await test("cannot publish with only one keypoint → 400", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/publish`, {}, tAuthor.token);
+  assert.equal(status, 400);
+});
+
+await test("add second keypoint → length_km > 0", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/keypoints`, {
+    name: "Summit", description: "Peak viewpoint",
+    latitude: 44.8696, longitude: 20.5233,
+  }, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.keypoints?.length, 2);
+  assert.ok((data.lengthKm ?? 0) > 0, `lengthKm should be > 0, got ${data.lengthKm}`);
+});
+
+await test("other author cannot add keypoint to someone else's tour → 403", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/keypoints`, {
+    name: "Stolen KP", description: "x", latitude: 44.0, longitude: 20.0,
+  }, tOther.token);
+  assert.equal(status, 403);
+});
+
+await test("cannot publish without a transport time → 400", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/publish`, {}, tAuthor.token);
+  assert.equal(status, 400);
+});
+
+await test("add transport time (foot, 120 min)", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/transport-times`, {
+    transport: "TRANSPORT_TYPE_FOOT", minutes: 120,
+  }, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.transportTimes?.length, 1);
+  assert.equal(data.transportTimes[0].minutes, 120);
+});
+
+await test("adding same transport type replaces existing entry", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/transport-times`, {
+    transport: "TRANSPORT_TYPE_FOOT", minutes: 90,
+  }, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.transportTimes?.length, 1, "no duplicate entries");
+  assert.equal(data.transportTimes[0].minutes, 90, "minutes updated");
+});
+
+// Publish
+await test("publish tour → TOUR_STATUS_PUBLISHED, publishedAt set", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/publish`, {}, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.status, "TOUR_STATUS_PUBLISHED");
+  assert.ok(data.publishedAt, "publishedAt is set");
+});
+
+// Published visibility rules
+await test("tourist sees published tour with first keypoint only", async () => {
+  const { status, data } = await api("GET", `/api/v1/tours/${tourId}`, undefined, tTourist.token);
+  assert.equal(status, 200);
+  assert.equal(data.keypoints?.length, 1, "tourist sees only first keypoint");
+  assert.equal(data.keypoints[0].name, "Trailhead", "correct first keypoint shown");
+});
+
+await test("unauthenticated caller sees published tour with first keypoint only", async () => {
+  const { status, data } = await api("GET", `/api/v1/tours/${tourId}`);
+  assert.equal(status, 200);
+  assert.equal(data.keypoints?.length, 1);
+});
+
+await test("author sees published tour with all keypoints", async () => {
+  const { status, data } = await api("GET", `/api/v1/tours/${tourId}`, undefined, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.keypoints?.length, 2, "author sees all keypoints");
+});
+
+await test("published tour in public listing with first keypoint only", async () => {
+  const { status, data } = await api("GET", "/api/v1/tours");
+  assert.equal(status, 200);
+  const t = (data.tours ?? []).find(t => t.id === tourId);
+  assert.ok(t, "published tour in public list");
+  assert.equal(t.keypoints?.length, 1, "listing shows first keypoint only");
+});
+
+await test("cannot update published tour → 400", async () => {
+  const { status } = await api("PUT", `/api/v1/tours/${tourId}`, { name: "Hijacked" }, tAuthor.token);
+  assert.equal(status, 400);
+});
+
+// Reviews (while tour is published)
+await test("author cannot add review → 403", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/reviews`, {
+    rating: 5, comment: "Self-review", visitDate: "2025-05-01",
+  }, tAuthor.token);
+  assert.equal(status, 403);
+});
+
+await test("rating 0 rejected → 400", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/reviews`, {
+    rating: 0, comment: "Bad", visitDate: "2025-05-01",
+  }, tTourist.token);
+  assert.equal(status, 400);
+});
+
+await test("rating 6 rejected → 400", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/reviews`, {
+    rating: 6, comment: "Too high", visitDate: "2025-05-01",
+  }, tTourist.token);
+  assert.equal(status, 400);
+});
+
+await test("tourist adds review → stored with correct fields", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/reviews`, {
+    rating: 4, comment: "Lovely hike!", visitDate: "2025-04-20", imageUrls: [],
+  }, tTourist.token);
+  assert.equal(status, 200);
+  const review = (data.reviews ?? []).find(r => r.touristId === tTourist.userId);
+  assert.ok(review, "review by tourist present");
+  assert.equal(review.rating,          4);
+  assert.equal(review.comment,         "Lovely hike!");
+  assert.equal(review.touristUsername.toLowerCase(), tTourist.username.toLowerCase());
+  assert.ok(review.createdAt, "createdAt is set");
+});
+
+// Archive
+await test("tourist cannot archive tour → 403", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/archive`, {}, tTourist.token);
+  assert.equal(status, 403);
+});
+
+await test("archive published tour → TOUR_STATUS_ARCHIVED, archivedAt set", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/archive`, {}, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.status, "TOUR_STATUS_ARCHIVED");
+  assert.ok(data.archivedAt, "archivedAt is set");
+});
+
+await test("archived tour not visible to tourist → 404", async () => {
+  const { status } = await api("GET", `/api/v1/tours/${tourId}`, undefined, tTourist.token);
+  assert.equal(status, 404);
+});
+
+await test("archived tour absent from public listing", async () => {
+  const { status, data } = await api("GET", "/api/v1/tours");
+  assert.equal(status, 200);
+  assert.ok(!(data.tours ?? []).some(t => t.id === tourId), "archived tour absent");
+});
+
+await test("cannot add review to archived tour → 400", async () => {
+  const { status } = await api("POST", `/api/v1/tours/${tourId}/reviews`, {
+    rating: 3, comment: "Late review", visitDate: "2025-05-01",
+  }, tTourist.token);
+  assert.equal(status, 400);
+});
+
+// Reactivate
+await test("reactivate archived tour → TOUR_STATUS_PUBLISHED, archivedAt cleared", async () => {
+  const { status, data } = await api("POST", `/api/v1/tours/${tourId}/reactivate`, {}, tAuthor.token);
+  assert.equal(status, 200);
+  assert.equal(data.status, "TOUR_STATUS_PUBLISHED");
+  assert.ok(!data.archivedAt, "archivedAt cleared after reactivation");
+});
+
+await test("reactivated tour is visible again in public listing", async () => {
+  const { status, data } = await api("GET", "/api/v1/tours");
+  assert.equal(status, 200);
+  assert.ok((data.tours ?? []).some(t => t.id === tourId), "reactivated tour back in public list");
 });
 
 // ─── Summary ─────────────────────────────────────────────────────────────────
