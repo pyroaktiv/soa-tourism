@@ -95,6 +95,38 @@
         ]
       }
     },
+    "/api/v1/tours/keypoints/images": {
+      "post": {
+        "operationId": "TourService_UploadKeypointImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadKeypointImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UploadKeypointImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
     "/api/v1/tours/reviews/images": {
       "post": {
         "operationId": "TourService_UploadReviewImage",
@@ -345,6 +377,86 @@
         ]
       }
     },
+    "/api/v1/tours/{tourId}/keypoints/{order}": {
+      "delete": {
+        "operationId": "TourService_DeleteKeypoint",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Tour"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tourId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      },
+      "put": {
+        "operationId": "TourService_UpdateKeypoint",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Tour"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tourId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TourServiceUpdateKeypointBody"
+            }
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
     "/api/v1/tours/{tourId}/reviews": {
       "post": {
         "operationId": "TourService_AddReview",
@@ -439,6 +551,9 @@
         "longitude": {
           "type": "number",
           "format": "double"
+        },
+        "imageUrl": {
+          "type": "string"
         }
       }
     },
@@ -483,6 +598,28 @@
     },
     "TourServiceReactivateTourBody": {
       "type": "object"
+    },
+    "TourServiceUpdateKeypointBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "imageUrl": {
+          "type": "string"
+        }
+      }
     },
     "TourServiceUpdateTourBody": {
       "type": "object",
@@ -578,6 +715,9 @@
         "order": {
           "type": "integer",
           "format": "int32"
+        },
+        "imageUrl": {
+          "type": "string"
         }
       }
     },
@@ -725,6 +865,26 @@
         "TRANSPORT_TYPE_CAR"
       ],
       "default": "TRANSPORT_TYPE_UNSPECIFIED"
+    },
+    "v1UploadKeypointImageRequest": {
+      "type": "object",
+      "properties": {
+        "imageData": {
+          "type": "string",
+          "format": "byte"
+        },
+        "contentType": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UploadKeypointImageResponse": {
+      "type": "object",
+      "properties": {
+        "imageUrl": {
+          "type": "string"
+        }
+      }
     },
     "v1UploadReviewImageRequest": {
       "type": "object",
