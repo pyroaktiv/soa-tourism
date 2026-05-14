@@ -484,7 +484,7 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
             context.abort(grpc.StatusCode.INTERNAL, "seaweedfs upload failed")
 
         return tour_pb2.UploadReviewImageResponse(
-            image_url=f"{self._seaweedfs_url}{path}"
+            image_url=path
         )
     
     def UploadKeypointImage(self, request, context):
@@ -511,7 +511,7 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
             context.abort(grpc.StatusCode.INTERNAL, "seaweedfs upload failed")
 
         return tour_pb2.UploadKeypointImageResponse(
-            image_url=f"{self._seaweedfs_url}{path}"
+            image_url=path
         )
 
 
