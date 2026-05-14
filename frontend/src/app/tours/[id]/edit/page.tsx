@@ -12,6 +12,7 @@ import {
   uploadKeypointImage,
 } from "@/lib/services/tourService";
 import RoleGuard from "@/components/auth/RoleGuard";
+import TourMap from "@/components/map/TourMap";
 
 const getImageUrl = (path: string) => {
   if (!path) return "";
@@ -38,6 +39,13 @@ export default function EditTourPage() {
 
   // Stanja za preview slike ključne tačke
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Stanja za klik na mapu
+  const [clickedLat, setClickedLat] = useState<number | null>(null);
+  const [clickedLng, setClickedLng] = useState<number | null>(null);
+
+  // Stanje za selektovanu poziciju na mapi (nakon klika)
+  const [selectedPosition, setSelectedPosition] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     getTour(id).then((data) => {
@@ -89,6 +97,11 @@ export default function EditTourPage() {
 
   const isPublished = tour.status === "PUBLISHED";
 
+  const handleMapClick = (latlng: { lat: number; lng: number }) => {
+    setClickedLat(latlng.lat);
+    setClickedLng(latlng.lng);
+    setSelectedPosition(latlng);
+  };
   return (
     <RoleGuard allowedRoles={["author", "admin"]}>
       <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 pb-20">
@@ -315,6 +328,8 @@ export default function EditTourPage() {
                   disabled={isPublished}
                   className="border p-2 rounded"
                   required
+                  value={clickedLat ?? ""}
+                  onChange={(e) => setClickedLat(Number(e.target.value) || null)}
                 />
                 <input
                   name="kpLng"
@@ -324,6 +339,8 @@ export default function EditTourPage() {
                   disabled={isPublished}
                   className="border p-2 rounded"
                   required
+                  value={clickedLng ?? ""}
+                  onChange={(e) => setClickedLng(Number(e.target.value) || null)}
                 />
               </div>
               <input
@@ -425,10 +442,16 @@ export default function EditTourPage() {
         </div>
 
         {/* DESNA KOLONA: MAPA */}
-        <div className="bg-gray-200 rounded-lg flex items-center justify-center min-h-[700px] border-2 border-dashed border-gray-400 sticky top-10">
-          <div className="text-center">
-            <p className="text-2xl mb-2">🗺️ MAPA</p>
-            <p className="text-gray-500 font-medium">(Tačka 13...)</p>
+        <div className="col-span-1">
+          <div className="sticky top-24">
+            <div className="bg-white p-4 rounded-lg shadow border">
+              <h2 className="text-xl font-bold mb-4">Mapa</h2>
+              <TourMap 
+                keypoints={tour.keypoints || []} 
+                onMapClick={handleMapClick} 
+                selectedPosition={selectedPosition}
+              />
+            </div>
           </div>
         </div>
       </div>
