@@ -44,6 +44,9 @@ class SimulatorService(simulator_pb2_grpc.SimulatorServiceServicer):
 
     def UpdatePosition(self, request, context):
         user = self._require_auth(context)
+
+        if "tourist" not in user.roles:
+            context.abort(grpc.StatusCode.PERMISSION_DENIED, "Samo turisti mogu koristiti simulator pozicije.")
         
         doc = self._positions.find_one_and_update(
             {"_id": user.id},

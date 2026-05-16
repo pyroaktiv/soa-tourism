@@ -54,9 +54,14 @@ export default function Navbar() {
 
           {/* Turistički linkovi - ubačeni samo oni za koje trenutno imamo back */}
           {isTourist && (
-            <Link href="/tours" className="hover:text-blue-200">
-              Ture
-            </Link>
+              <>
+                <Link href="/tours" className="hover:text-blue-200">
+                  Ture
+                </Link>
+                <Link href="/simulator" className="hover:text-blue-200">
+                  Simulator
+                </Link>
+              </>
           )}
 
           {user ? (
