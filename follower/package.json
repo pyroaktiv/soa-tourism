@@ -1,0 +1,22 @@
+{
+  "name": "follower-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Follower microservice",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "dev": "ts-node src/server.ts",
+    "generate": "buf generate"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.11.0",
+    "@grpc/grpc-js": "^1.13.4",
+    "neo4j-driver": "^5.28.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "ts-proto": "^2.7.0",
+    "typescript": "^5.8.3"
+  }
+}

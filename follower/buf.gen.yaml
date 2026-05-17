@@ -1,0 +1,14 @@
+version: v2
+inputs:
+  - proto_file: ../proto/tourism/follower/v1/follower.proto
+  - proto_file: ../proto/tourism/auth/v1/auth.proto
+plugins:
+  - local: ./node_modules/.bin/protoc-gen-ts_proto
+    out: gen
+    include_imports: true
+    opt:
+      - outputServices=grpc-js
+      - esModuleInterop=true
+      - fileSuffix=_pb
+      - env=node
+      - useOptionals=messages

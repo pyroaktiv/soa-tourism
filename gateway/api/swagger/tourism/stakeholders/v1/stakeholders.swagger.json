@@ -193,6 +193,9 @@
         "photoUrl": {
           "type": "string",
           "description": "photo_url is empty when no photo has been uploaded."
+        },
+        "username": {
+          "type": "string"
         }
       },
       "description": "Profile holds all public profile fields for a user."
