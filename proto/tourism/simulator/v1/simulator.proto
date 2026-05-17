@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package tourism.simulator.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option java_multiple_files = true;
+option java_package = "tourism.simulator.v1";
+option go_package = "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/simulator/v1;simulatorv1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Simulator API";
+    version: "0.1.0";
+    description: "Servis za belezenje i citanje trenutne GPS lokacije turiste";
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+service SimulatorService {
+  rpc UpdatePosition(UpdatePositionRequest) returns (Position) {
+    option (google.api.http) = {
+      put: "/api/v1/simulator/position"
+      body: "*"
+    };
+  }
+
+  rpc GetPosition(GetPositionRequest) returns (Position) {
+    option (google.api.http) = {
+      get: "/api/v1/simulator/position"
+    };
+  }
+}
+
+message Position {
+  string user_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  string updated_at = 4;
+}
+
+message UpdatePositionRequest {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message GetPositionRequest {
+}

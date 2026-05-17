@@ -39,6 +39,7 @@ message Keypoint {
   double latitude = 3;
   double longitude = 4;
   int32 order = 5;
+  string image_url = 6;
 }
 
 message TransportTime {
@@ -109,6 +110,7 @@ message AddKeypointRequest {
   string description = 3;
   double latitude = 4;
   double longitude = 5;
+  string image_url = 6;
 }
 
 message AddTransportTimeRequest {
@@ -144,6 +146,30 @@ message UploadReviewImageRequest {
 
 message UploadReviewImageResponse {
   string image_url = 1;
+}
+
+message UploadKeypointImageRequest {
+  bytes image_data = 1;
+  string content_type = 2;
+}
+
+message UploadKeypointImageResponse {
+  string image_url = 1;
+}
+
+message UpdateKeypointRequest {
+  string tour_id = 1;
+  int32 order = 2;
+  string name = 3;
+  string description = 4;
+  double latitude = 5;
+  double longitude = 6;
+  string image_url = 7;
+}
+
+message DeleteKeypointRequest {
+  string tour_id = 1;
+  int32 order = 2;
 }
 
 service TourService {
@@ -185,6 +211,19 @@ service TourService {
       body: "*"
     };
   }
+  
+  rpc UpdateKeypoint(UpdateKeypointRequest) returns (Tour) {
+    option (google.api.http) = {
+      put: "/api/v1/tours/{tour_id}/keypoints/{order}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteKeypoint(DeleteKeypointRequest) returns (Tour) {
+    option (google.api.http) = {
+      delete: "/api/v1/tours/{tour_id}/keypoints/{order}"
+    };
+  }
 
   rpc AddTransportTime(AddTransportTimeRequest) returns (Tour) {
     option (google.api.http) = {
@@ -224,6 +263,13 @@ service TourService {
   rpc UploadReviewImage(UploadReviewImageRequest) returns (UploadReviewImageResponse) {
     option (google.api.http) = {
       post: "/api/v1/tours/reviews/images"
+      body: "*"
+    };
+  }
+
+  rpc UploadKeypointImage(UploadKeypointImageRequest) returns (UploadKeypointImageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/tours/keypoints/images"
       body: "*"
     };
   }

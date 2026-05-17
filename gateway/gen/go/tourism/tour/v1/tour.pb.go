@@ -134,6 +134,7 @@ type Keypoint struct {
 	Latitude      float64                `protobuf:"fixed64,3,opt,name=latitude,proto3" json:"latitude,omitempty"`
 	Longitude     float64                `protobuf:"fixed64,4,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	Order         int32                  `protobuf:"varint,5,opt,name=order,proto3" json:"order,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,6,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -201,6 +202,13 @@ func (x *Keypoint) GetOrder() int32 {
 		return x.Order
 	}
 	return 0
+}
+
+func (x *Keypoint) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
 }
 
 type TransportTime struct {
@@ -830,6 +838,7 @@ type AddKeypointRequest struct {
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Latitude      float64                `protobuf:"fixed64,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
 	Longitude     float64                `protobuf:"fixed64,5,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,6,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -897,6 +906,13 @@ func (x *AddKeypointRequest) GetLongitude() float64 {
 		return x.Longitude
 	}
 	return 0
+}
+
+func (x *AddKeypointRequest) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
 }
 
 type AddTransportTimeRequest struct {
@@ -1263,17 +1279,258 @@ func (x *UploadReviewImageResponse) GetImageUrl() string {
 	return ""
 }
 
+type UploadKeypointImageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ImageData     []byte                 `protobuf:"bytes,1,opt,name=image_data,json=imageData,proto3" json:"image_data,omitempty"`
+	ContentType   string                 `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadKeypointImageRequest) Reset() {
+	*x = UploadKeypointImageRequest{}
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadKeypointImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadKeypointImageRequest) ProtoMessage() {}
+
+func (x *UploadKeypointImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadKeypointImageRequest.ProtoReflect.Descriptor instead.
+func (*UploadKeypointImageRequest) Descriptor() ([]byte, []int) {
+	return file_tourism_tour_v1_tour_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *UploadKeypointImageRequest) GetImageData() []byte {
+	if x != nil {
+		return x.ImageData
+	}
+	return nil
+}
+
+func (x *UploadKeypointImageRequest) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+type UploadKeypointImageResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ImageUrl      string                 `protobuf:"bytes,1,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadKeypointImageResponse) Reset() {
+	*x = UploadKeypointImageResponse{}
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadKeypointImageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadKeypointImageResponse) ProtoMessage() {}
+
+func (x *UploadKeypointImageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadKeypointImageResponse.ProtoReflect.Descriptor instead.
+func (*UploadKeypointImageResponse) Descriptor() ([]byte, []int) {
+	return file_tourism_tour_v1_tour_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UploadKeypointImageResponse) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
+}
+
+type UpdateKeypointRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        string                 `protobuf:"bytes,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	Order         int32                  `protobuf:"varint,2,opt,name=order,proto3" json:"order,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Latitude      float64                `protobuf:"fixed64,5,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,6,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,7,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateKeypointRequest) Reset() {
+	*x = UpdateKeypointRequest{}
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateKeypointRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateKeypointRequest) ProtoMessage() {}
+
+func (x *UpdateKeypointRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateKeypointRequest.ProtoReflect.Descriptor instead.
+func (*UpdateKeypointRequest) Descriptor() ([]byte, []int) {
+	return file_tourism_tour_v1_tour_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *UpdateKeypointRequest) GetTourId() string {
+	if x != nil {
+		return x.TourId
+	}
+	return ""
+}
+
+func (x *UpdateKeypointRequest) GetOrder() int32 {
+	if x != nil {
+		return x.Order
+	}
+	return 0
+}
+
+func (x *UpdateKeypointRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateKeypointRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateKeypointRequest) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *UpdateKeypointRequest) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
+}
+
+func (x *UpdateKeypointRequest) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
+}
+
+type DeleteKeypointRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        string                 `protobuf:"bytes,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	Order         int32                  `protobuf:"varint,2,opt,name=order,proto3" json:"order,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteKeypointRequest) Reset() {
+	*x = DeleteKeypointRequest{}
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteKeypointRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteKeypointRequest) ProtoMessage() {}
+
+func (x *DeleteKeypointRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_tour_v1_tour_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteKeypointRequest.ProtoReflect.Descriptor instead.
+func (*DeleteKeypointRequest) Descriptor() ([]byte, []int) {
+	return file_tourism_tour_v1_tour_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *DeleteKeypointRequest) GetTourId() string {
+	if x != nil {
+		return x.TourId
+	}
+	return ""
+}
+
+func (x *DeleteKeypointRequest) GetOrder() int32 {
+	if x != nil {
+		return x.Order
+	}
+	return 0
+}
+
 var File_tourism_tour_v1_tour_proto protoreflect.FileDescriptor
 
 const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\n" +
-	"\x1atourism/tour/v1/tour.proto\x12\x0ftourism.tour.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\x90\x01\n" +
+	"\x1atourism/tour/v1/tour.proto\x12\x0ftourism.tour.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\xad\x01\n" +
 	"\bKeypoint\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
 	"\blatitude\x18\x03 \x01(\x01R\blatitude\x12\x1c\n" +
 	"\tlongitude\x18\x04 \x01(\x01R\tlongitude\x12\x14\n" +
-	"\x05order\x18\x05 \x01(\x05R\x05order\"g\n" +
+	"\x05order\x18\x05 \x01(\x05R\x05order\x12\x1b\n" +
+	"\timage_url\x18\x06 \x01(\tR\bimageUrl\"g\n" +
 	"\rTransportTime\x12<\n" +
 	"\ttransport\x18\x01 \x01(\x0e2\x1e.tourism.tour.v1.TransportTypeR\ttransport\x12\x18\n" +
 	"\aminutes\x18\x02 \x01(\x05R\aminutes\"\xf1\x01\n" +
@@ -1336,13 +1593,14 @@ const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\x12ListMyToursRequest\"\x1b\n" +
 	"\x19ListPublishedToursRequest\"@\n" +
 	"\x11ListToursResponse\x12+\n" +
-	"\x05tours\x18\x01 \x03(\v2\x15.tourism.tour.v1.TourR\x05tours\"\x9d\x01\n" +
+	"\x05tours\x18\x01 \x03(\v2\x15.tourism.tour.v1.TourR\x05tours\"\xba\x01\n" +
 	"\x12AddKeypointRequest\x12\x17\n" +
 	"\atour_id\x18\x01 \x01(\tR\x06tourId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1a\n" +
 	"\blatitude\x18\x04 \x01(\x01R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\x05 \x01(\x01R\tlongitude\"\x8a\x01\n" +
+	"\tlongitude\x18\x05 \x01(\x01R\tlongitude\x12\x1b\n" +
+	"\timage_url\x18\x06 \x01(\tR\bimageUrl\"\x8a\x01\n" +
 	"\x17AddTransportTimeRequest\x12\x17\n" +
 	"\atour_id\x18\x01 \x01(\tR\x06tourId\x12<\n" +
 	"\ttransport\x18\x02 \x01(\x0e2\x1e.tourism.tour.v1.TransportTypeR\ttransport\x12\x18\n" +
@@ -1366,7 +1624,24 @@ const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"image_data\x18\x01 \x01(\fR\timageData\x12!\n" +
 	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\"8\n" +
 	"\x19UploadReviewImageResponse\x12\x1b\n" +
-	"\timage_url\x18\x01 \x01(\tR\bimageUrl*u\n" +
+	"\timage_url\x18\x01 \x01(\tR\bimageUrl\"^\n" +
+	"\x1aUploadKeypointImageRequest\x12\x1d\n" +
+	"\n" +
+	"image_data\x18\x01 \x01(\fR\timageData\x12!\n" +
+	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\":\n" +
+	"\x1bUploadKeypointImageResponse\x12\x1b\n" +
+	"\timage_url\x18\x01 \x01(\tR\bimageUrl\"\xd3\x01\n" +
+	"\x15UpdateKeypointRequest\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\tR\x06tourId\x12\x14\n" +
+	"\x05order\x18\x02 \x01(\x05R\x05order\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1a\n" +
+	"\blatitude\x18\x05 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x06 \x01(\x01R\tlongitude\x12\x1b\n" +
+	"\timage_url\x18\a \x01(\tR\bimageUrl\"F\n" +
+	"\x15DeleteKeypointRequest\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\tR\x06tourId\x12\x14\n" +
+	"\x05order\x18\x02 \x01(\x05R\x05order*u\n" +
 	"\n" +
 	"TourStatus\x12\x1b\n" +
 	"\x17TOUR_STATUS_UNSPECIFIED\x10\x00\x12\x15\n" +
@@ -1377,7 +1652,7 @@ const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\x1aTRANSPORT_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13TRANSPORT_TYPE_FOOT\x10\x01\x12\x1a\n" +
 	"\x16TRANSPORT_TYPE_BICYCLE\x10\x02\x12\x16\n" +
-	"\x12TRANSPORT_TYPE_CAR\x10\x032\x97\v\n" +
+	"\x12TRANSPORT_TYPE_CAR\x10\x032\xc2\x0e\n" +
 	"\vTourService\x12a\n" +
 	"\n" +
 	"CreateTour\x12\".tourism.tour.v1.CreateTourRequest\x1a\x15.tourism.tour.v1.Tour\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/tours\x12f\n" +
@@ -1386,13 +1661,16 @@ const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\aGetTour\x12\x1f.tourism.tour.v1.GetTourRequest\x1a\x15.tourism.tour.v1.Tour\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/tours/{id}\x12v\n" +
 	"\vListMyTours\x12#.tourism.tour.v1.ListMyToursRequest\x1a\".tourism.tour.v1.ListToursResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/tours/authored\x12{\n" +
 	"\x12ListPublishedTours\x12*.tourism.tour.v1.ListPublishedToursRequest\x1a\".tourism.tour.v1.ListToursResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/tours\x12w\n" +
-	"\vAddKeypoint\x12#.tourism.tour.v1.AddKeypointRequest\x1a\x15.tourism.tour.v1.Tour\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/tours/{tour_id}/keypoints\x12\x87\x01\n" +
+	"\vAddKeypoint\x12#.tourism.tour.v1.AddKeypointRequest\x1a\x15.tourism.tour.v1.Tour\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/tours/{tour_id}/keypoints\x12\x85\x01\n" +
+	"\x0eUpdateKeypoint\x12&.tourism.tour.v1.UpdateKeypointRequest\x1a\x15.tourism.tour.v1.Tour\"4\x82\xd3\xe4\x93\x02.:\x01*\x1a)/api/v1/tours/{tour_id}/keypoints/{order}\x12\x82\x01\n" +
+	"\x0eDeleteKeypoint\x12&.tourism.tour.v1.DeleteKeypointRequest\x1a\x15.tourism.tour.v1.Tour\"1\x82\xd3\xe4\x93\x02+*)/api/v1/tours/{tour_id}/keypoints/{order}\x12\x87\x01\n" +
 	"\x10AddTransportTime\x12(.tourism.tour.v1.AddTransportTimeRequest\x1a\x15.tourism.tour.v1.Tour\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/tours/{tour_id}/transport-times\x12p\n" +
 	"\vPublishTour\x12#.tourism.tour.v1.PublishTourRequest\x1a\x15.tourism.tour.v1.Tour\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/tours/{id}/publish\x12p\n" +
 	"\vArchiveTour\x12#.tourism.tour.v1.ArchiveTourRequest\x1a\x15.tourism.tour.v1.Tour\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/tours/{id}/archive\x12y\n" +
 	"\x0eReactivateTour\x12&.tourism.tour.v1.ReactivateTourRequest\x1a\x15.tourism.tour.v1.Tour\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/tours/{id}/reactivate\x12q\n" +
 	"\tAddReview\x12!.tourism.tour.v1.AddReviewRequest\x1a\x15.tourism.tour.v1.Tour\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/api/v1/tours/{tour_id}/reviews\x12\x93\x01\n" +
-	"\x11UploadReviewImage\x12).tourism.tour.v1.UploadReviewImageRequest\x1a*.tourism.tour.v1.UploadReviewImageResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/tours/reviews/imagesB\x9f\x01\x92AT\x12*\n" +
+	"\x11UploadReviewImage\x12).tourism.tour.v1.UploadReviewImageRequest\x1a*.tourism.tour.v1.UploadReviewImageResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/tours/reviews/images\x12\x9b\x01\n" +
+	"\x13UploadKeypointImage\x12+.tourism.tour.v1.UploadKeypointImageRequest\x1a,.tourism.tour.v1.UploadKeypointImageResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/tours/keypoints/imagesB\x9f\x01\x92AT\x12*\n" +
 	"\bTour API\x12\x17Tour management service2\x050.1.0*\x02\x01\x022\x10application/json:\x10application/jsonZFgithub.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/tour/v1;tourv1b\x06proto3"
 
 var (
@@ -1408,28 +1686,32 @@ func file_tourism_tour_v1_tour_proto_rawDescGZIP() []byte {
 }
 
 var file_tourism_tour_v1_tour_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_tourism_tour_v1_tour_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_tourism_tour_v1_tour_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_tourism_tour_v1_tour_proto_goTypes = []any{
-	(TourStatus)(0),                   // 0: tourism.tour.v1.TourStatus
-	(TransportType)(0),                // 1: tourism.tour.v1.TransportType
-	(*Keypoint)(nil),                  // 2: tourism.tour.v1.Keypoint
-	(*TransportTime)(nil),             // 3: tourism.tour.v1.TransportTime
-	(*Review)(nil),                    // 4: tourism.tour.v1.Review
-	(*Tour)(nil),                      // 5: tourism.tour.v1.Tour
-	(*CreateTourRequest)(nil),         // 6: tourism.tour.v1.CreateTourRequest
-	(*UpdateTourRequest)(nil),         // 7: tourism.tour.v1.UpdateTourRequest
-	(*GetTourRequest)(nil),            // 8: tourism.tour.v1.GetTourRequest
-	(*ListMyToursRequest)(nil),        // 9: tourism.tour.v1.ListMyToursRequest
-	(*ListPublishedToursRequest)(nil), // 10: tourism.tour.v1.ListPublishedToursRequest
-	(*ListToursResponse)(nil),         // 11: tourism.tour.v1.ListToursResponse
-	(*AddKeypointRequest)(nil),        // 12: tourism.tour.v1.AddKeypointRequest
-	(*AddTransportTimeRequest)(nil),   // 13: tourism.tour.v1.AddTransportTimeRequest
-	(*PublishTourRequest)(nil),        // 14: tourism.tour.v1.PublishTourRequest
-	(*ArchiveTourRequest)(nil),        // 15: tourism.tour.v1.ArchiveTourRequest
-	(*ReactivateTourRequest)(nil),     // 16: tourism.tour.v1.ReactivateTourRequest
-	(*AddReviewRequest)(nil),          // 17: tourism.tour.v1.AddReviewRequest
-	(*UploadReviewImageRequest)(nil),  // 18: tourism.tour.v1.UploadReviewImageRequest
-	(*UploadReviewImageResponse)(nil), // 19: tourism.tour.v1.UploadReviewImageResponse
+	(TourStatus)(0),                     // 0: tourism.tour.v1.TourStatus
+	(TransportType)(0),                  // 1: tourism.tour.v1.TransportType
+	(*Keypoint)(nil),                    // 2: tourism.tour.v1.Keypoint
+	(*TransportTime)(nil),               // 3: tourism.tour.v1.TransportTime
+	(*Review)(nil),                      // 4: tourism.tour.v1.Review
+	(*Tour)(nil),                        // 5: tourism.tour.v1.Tour
+	(*CreateTourRequest)(nil),           // 6: tourism.tour.v1.CreateTourRequest
+	(*UpdateTourRequest)(nil),           // 7: tourism.tour.v1.UpdateTourRequest
+	(*GetTourRequest)(nil),              // 8: tourism.tour.v1.GetTourRequest
+	(*ListMyToursRequest)(nil),          // 9: tourism.tour.v1.ListMyToursRequest
+	(*ListPublishedToursRequest)(nil),   // 10: tourism.tour.v1.ListPublishedToursRequest
+	(*ListToursResponse)(nil),           // 11: tourism.tour.v1.ListToursResponse
+	(*AddKeypointRequest)(nil),          // 12: tourism.tour.v1.AddKeypointRequest
+	(*AddTransportTimeRequest)(nil),     // 13: tourism.tour.v1.AddTransportTimeRequest
+	(*PublishTourRequest)(nil),          // 14: tourism.tour.v1.PublishTourRequest
+	(*ArchiveTourRequest)(nil),          // 15: tourism.tour.v1.ArchiveTourRequest
+	(*ReactivateTourRequest)(nil),       // 16: tourism.tour.v1.ReactivateTourRequest
+	(*AddReviewRequest)(nil),            // 17: tourism.tour.v1.AddReviewRequest
+	(*UploadReviewImageRequest)(nil),    // 18: tourism.tour.v1.UploadReviewImageRequest
+	(*UploadReviewImageResponse)(nil),   // 19: tourism.tour.v1.UploadReviewImageResponse
+	(*UploadKeypointImageRequest)(nil),  // 20: tourism.tour.v1.UploadKeypointImageRequest
+	(*UploadKeypointImageResponse)(nil), // 21: tourism.tour.v1.UploadKeypointImageResponse
+	(*UpdateKeypointRequest)(nil),       // 22: tourism.tour.v1.UpdateKeypointRequest
+	(*DeleteKeypointRequest)(nil),       // 23: tourism.tour.v1.DeleteKeypointRequest
 }
 var file_tourism_tour_v1_tour_proto_depIdxs = []int32{
 	1,  // 0: tourism.tour.v1.TransportTime.transport:type_name -> tourism.tour.v1.TransportType
@@ -1445,26 +1727,32 @@ var file_tourism_tour_v1_tour_proto_depIdxs = []int32{
 	9,  // 10: tourism.tour.v1.TourService.ListMyTours:input_type -> tourism.tour.v1.ListMyToursRequest
 	10, // 11: tourism.tour.v1.TourService.ListPublishedTours:input_type -> tourism.tour.v1.ListPublishedToursRequest
 	12, // 12: tourism.tour.v1.TourService.AddKeypoint:input_type -> tourism.tour.v1.AddKeypointRequest
-	13, // 13: tourism.tour.v1.TourService.AddTransportTime:input_type -> tourism.tour.v1.AddTransportTimeRequest
-	14, // 14: tourism.tour.v1.TourService.PublishTour:input_type -> tourism.tour.v1.PublishTourRequest
-	15, // 15: tourism.tour.v1.TourService.ArchiveTour:input_type -> tourism.tour.v1.ArchiveTourRequest
-	16, // 16: tourism.tour.v1.TourService.ReactivateTour:input_type -> tourism.tour.v1.ReactivateTourRequest
-	17, // 17: tourism.tour.v1.TourService.AddReview:input_type -> tourism.tour.v1.AddReviewRequest
-	18, // 18: tourism.tour.v1.TourService.UploadReviewImage:input_type -> tourism.tour.v1.UploadReviewImageRequest
-	5,  // 19: tourism.tour.v1.TourService.CreateTour:output_type -> tourism.tour.v1.Tour
-	5,  // 20: tourism.tour.v1.TourService.UpdateTour:output_type -> tourism.tour.v1.Tour
-	5,  // 21: tourism.tour.v1.TourService.GetTour:output_type -> tourism.tour.v1.Tour
-	11, // 22: tourism.tour.v1.TourService.ListMyTours:output_type -> tourism.tour.v1.ListToursResponse
-	11, // 23: tourism.tour.v1.TourService.ListPublishedTours:output_type -> tourism.tour.v1.ListToursResponse
-	5,  // 24: tourism.tour.v1.TourService.AddKeypoint:output_type -> tourism.tour.v1.Tour
-	5,  // 25: tourism.tour.v1.TourService.AddTransportTime:output_type -> tourism.tour.v1.Tour
-	5,  // 26: tourism.tour.v1.TourService.PublishTour:output_type -> tourism.tour.v1.Tour
-	5,  // 27: tourism.tour.v1.TourService.ArchiveTour:output_type -> tourism.tour.v1.Tour
-	5,  // 28: tourism.tour.v1.TourService.ReactivateTour:output_type -> tourism.tour.v1.Tour
-	5,  // 29: tourism.tour.v1.TourService.AddReview:output_type -> tourism.tour.v1.Tour
-	19, // 30: tourism.tour.v1.TourService.UploadReviewImage:output_type -> tourism.tour.v1.UploadReviewImageResponse
-	19, // [19:31] is the sub-list for method output_type
-	7,  // [7:19] is the sub-list for method input_type
+	22, // 13: tourism.tour.v1.TourService.UpdateKeypoint:input_type -> tourism.tour.v1.UpdateKeypointRequest
+	23, // 14: tourism.tour.v1.TourService.DeleteKeypoint:input_type -> tourism.tour.v1.DeleteKeypointRequest
+	13, // 15: tourism.tour.v1.TourService.AddTransportTime:input_type -> tourism.tour.v1.AddTransportTimeRequest
+	14, // 16: tourism.tour.v1.TourService.PublishTour:input_type -> tourism.tour.v1.PublishTourRequest
+	15, // 17: tourism.tour.v1.TourService.ArchiveTour:input_type -> tourism.tour.v1.ArchiveTourRequest
+	16, // 18: tourism.tour.v1.TourService.ReactivateTour:input_type -> tourism.tour.v1.ReactivateTourRequest
+	17, // 19: tourism.tour.v1.TourService.AddReview:input_type -> tourism.tour.v1.AddReviewRequest
+	18, // 20: tourism.tour.v1.TourService.UploadReviewImage:input_type -> tourism.tour.v1.UploadReviewImageRequest
+	20, // 21: tourism.tour.v1.TourService.UploadKeypointImage:input_type -> tourism.tour.v1.UploadKeypointImageRequest
+	5,  // 22: tourism.tour.v1.TourService.CreateTour:output_type -> tourism.tour.v1.Tour
+	5,  // 23: tourism.tour.v1.TourService.UpdateTour:output_type -> tourism.tour.v1.Tour
+	5,  // 24: tourism.tour.v1.TourService.GetTour:output_type -> tourism.tour.v1.Tour
+	11, // 25: tourism.tour.v1.TourService.ListMyTours:output_type -> tourism.tour.v1.ListToursResponse
+	11, // 26: tourism.tour.v1.TourService.ListPublishedTours:output_type -> tourism.tour.v1.ListToursResponse
+	5,  // 27: tourism.tour.v1.TourService.AddKeypoint:output_type -> tourism.tour.v1.Tour
+	5,  // 28: tourism.tour.v1.TourService.UpdateKeypoint:output_type -> tourism.tour.v1.Tour
+	5,  // 29: tourism.tour.v1.TourService.DeleteKeypoint:output_type -> tourism.tour.v1.Tour
+	5,  // 30: tourism.tour.v1.TourService.AddTransportTime:output_type -> tourism.tour.v1.Tour
+	5,  // 31: tourism.tour.v1.TourService.PublishTour:output_type -> tourism.tour.v1.Tour
+	5,  // 32: tourism.tour.v1.TourService.ArchiveTour:output_type -> tourism.tour.v1.Tour
+	5,  // 33: tourism.tour.v1.TourService.ReactivateTour:output_type -> tourism.tour.v1.Tour
+	5,  // 34: tourism.tour.v1.TourService.AddReview:output_type -> tourism.tour.v1.Tour
+	19, // 35: tourism.tour.v1.TourService.UploadReviewImage:output_type -> tourism.tour.v1.UploadReviewImageResponse
+	21, // 36: tourism.tour.v1.TourService.UploadKeypointImage:output_type -> tourism.tour.v1.UploadKeypointImageResponse
+	22, // [22:37] is the sub-list for method output_type
+	7,  // [7:22] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -1482,7 +1770,7 @@ func file_tourism_tour_v1_tour_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tourism_tour_v1_tour_proto_rawDesc), len(file_tourism_tour_v1_tour_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   18,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

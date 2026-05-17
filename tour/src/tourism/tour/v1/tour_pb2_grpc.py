@@ -44,6 +44,16 @@ class TourServiceStub(object):
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddKeypointRequest.SerializeToString,
                 response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
                 _registered_method=True)
+        self.UpdateKeypoint = channel.unary_unary(
+                '/tourism.tour.v1.TourService/UpdateKeypoint',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UpdateKeypointRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+                _registered_method=True)
+        self.DeleteKeypoint = channel.unary_unary(
+                '/tourism.tour.v1.TourService/DeleteKeypoint',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.DeleteKeypointRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+                _registered_method=True)
         self.AddTransportTime = channel.unary_unary(
                 '/tourism.tour.v1.TourService/AddTransportTime',
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddTransportTimeRequest.SerializeToString,
@@ -73,6 +83,11 @@ class TourServiceStub(object):
                 '/tourism.tour.v1.TourService/UploadReviewImage',
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageRequest.SerializeToString,
                 response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageResponse.FromString,
+                _registered_method=True)
+        self.UploadKeypointImage = channel.unary_unary(
+                '/tourism.tour.v1.TourService/UploadKeypointImage',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageResponse.FromString,
                 _registered_method=True)
 
 
@@ -115,6 +130,18 @@ class TourServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UpdateKeypoint(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteKeypoint(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def AddTransportTime(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -146,6 +173,12 @@ class TourServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def UploadReviewImage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UploadKeypointImage(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -184,6 +217,16 @@ def add_TourServiceServicer_to_server(servicer, server):
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddKeypointRequest.FromString,
                     response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
             ),
+            'UpdateKeypoint': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateKeypoint,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UpdateKeypointRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
+            ),
+            'DeleteKeypoint': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteKeypoint,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.DeleteKeypointRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
+            ),
             'AddTransportTime': grpc.unary_unary_rpc_method_handler(
                     servicer.AddTransportTime,
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddTransportTimeRequest.FromString,
@@ -213,6 +256,11 @@ def add_TourServiceServicer_to_server(servicer, server):
                     servicer.UploadReviewImage,
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageRequest.FromString,
                     response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageResponse.SerializeToString,
+            ),
+            'UploadKeypointImage': grpc.unary_unary_rpc_method_handler(
+                    servicer.UploadKeypointImage,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -388,6 +436,60 @@ class TourService(object):
             _registered_method=True)
 
     @staticmethod
+    def UpdateKeypoint(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/UpdateKeypoint',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.UpdateKeypointRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteKeypoint(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/DeleteKeypoint',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.DeleteKeypointRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def AddTransportTime(request,
             target,
             options=(),
@@ -539,6 +641,33 @@ class TourService(object):
             '/tourism.tour.v1.TourService/UploadReviewImage',
             tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageRequest.SerializeToString,
             tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UploadKeypointImage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/UploadKeypointImage',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageResponse.FromString,
             options,
             channel_credentials,
             insecure,

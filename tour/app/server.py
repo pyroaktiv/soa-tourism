@@ -109,6 +109,7 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
                 latitude=kp.get("latitude", 0.0),
                 longitude=kp.get("longitude", 0.0),
                 order=kp.get("order", 0),
+                image_url=kp.get("image_url", ""),
             )
             for kp in keypoints_raw
         ]
@@ -275,6 +276,7 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
             "latitude": request.latitude,
             "longitude": request.longitude,
             "order": len(keypoints),
+            "image_url": request.image_url
         }
         keypoints.append(new_kp)
         length_km = _tour_length_km(keypoints)
@@ -283,6 +285,60 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
             {"_id": request.tour_id},
             {"$set": {"keypoints": keypoints, "length_km": length_km}},
             return_document=ReturnDocument.AFTER,
+        )
+        return self._doc_to_tour(doc)
+    
+    def UpdateKeypoint(self, request, context):
+        user = self._require_auth(context)
+        self._require_role(user, "author", context)
+        doc = self._get_tour_or_abort(request.tour_id, context)
+        if doc["author_id"] != user.id:
+            context.abort(grpc.StatusCode.PERMISSION_DENIED, "not your tour")
+        if doc["status"] != "draft":
+            context.abort(grpc.StatusCode.FAILED_PRECONDITION, "only draft tours can be modified")
+
+        keypoints = doc.get("keypoints", [])
+        if request.order < 0 or request.order >= len(keypoints):
+            context.abort(grpc.StatusCode.OUT_OF_RANGE, "Invalid keypoint order")
+
+        keypoints[request.order].update({
+            "name": request.name,
+            "description": request.description,
+            "latitude": request.latitude,
+            "longitude": request.longitude,
+            "image_url": request.image_url
+        })
+
+        length_km = _tour_length_km(keypoints)
+        doc = self._tours.find_one_and_update(
+            {"_id": request.tour_id},
+            {"$set": {"keypoints": keypoints, "length_km": length_km}},
+            return_document=ReturnDocument.AFTER
+        )
+        return self._doc_to_tour(doc)
+
+    def DeleteKeypoint(self, request, context):
+        user = self._require_auth(context)
+        self._require_role(user, "author", context)
+        doc = self._get_tour_or_abort(request.tour_id, context)
+        if doc["author_id"] != user.id:
+            context.abort(grpc.StatusCode.PERMISSION_DENIED, "not your tour")
+        if doc["status"] != "draft":
+            context.abort(grpc.StatusCode.FAILED_PRECONDITION, "only draft tours can be modified")
+
+        keypoints = doc.get("keypoints", [])
+        if request.order < 0 or request.order >= len(keypoints):
+            context.abort(grpc.StatusCode.OUT_OF_RANGE, "Invalid keypoint order")
+
+        keypoints.pop(request.order)
+        for i, kp in enumerate(keypoints):
+            kp["order"] = i
+
+        length_km = _tour_length_km(keypoints)
+        doc = self._tours.find_one_and_update(
+            {"_id": request.tour_id},
+            {"$set": {"keypoints": keypoints, "length_km": length_km}},
+            return_document=ReturnDocument.AFTER
         )
         return self._doc_to_tour(doc)
 
@@ -428,7 +484,34 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
             context.abort(grpc.StatusCode.INTERNAL, "seaweedfs upload failed")
 
         return tour_pb2.UploadReviewImageResponse(
-            image_url=f"{self._seaweedfs_url}{path}"
+            image_url=path
+        )
+    
+    def UploadKeypointImage(self, request, context):
+        self._require_auth(context)
+
+        if not request.image_data:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "image_data is required")
+
+        content_type = request.content_type or "application/octet-stream"
+        path = f"/tours/keypoints/{uuid4()}" 
+        
+        try:
+            resp = requests.post(
+                f"{self._seaweedfs_url}{path}",
+                files={"file": ("image", request.image_data, content_type)},
+                timeout=10,
+            )
+        except Exception as exc:
+            logging.error("seaweedfs upload error: %s", exc)
+            context.abort(grpc.StatusCode.INTERNAL, "failed to upload image")
+
+        if resp.status_code not in (200, 201):
+            logging.error("seaweedfs returned %s: %s", resp.status_code, resp.text)
+            context.abort(grpc.StatusCode.INTERNAL, "seaweedfs upload failed")
+
+        return tour_pb2.UploadKeypointImageResponse(
+            image_url=path
         )
 
 

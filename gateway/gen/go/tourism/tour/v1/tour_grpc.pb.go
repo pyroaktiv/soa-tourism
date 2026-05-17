@@ -19,18 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TourService_CreateTour_FullMethodName         = "/tourism.tour.v1.TourService/CreateTour"
-	TourService_UpdateTour_FullMethodName         = "/tourism.tour.v1.TourService/UpdateTour"
-	TourService_GetTour_FullMethodName            = "/tourism.tour.v1.TourService/GetTour"
-	TourService_ListMyTours_FullMethodName        = "/tourism.tour.v1.TourService/ListMyTours"
-	TourService_ListPublishedTours_FullMethodName = "/tourism.tour.v1.TourService/ListPublishedTours"
-	TourService_AddKeypoint_FullMethodName        = "/tourism.tour.v1.TourService/AddKeypoint"
-	TourService_AddTransportTime_FullMethodName   = "/tourism.tour.v1.TourService/AddTransportTime"
-	TourService_PublishTour_FullMethodName        = "/tourism.tour.v1.TourService/PublishTour"
-	TourService_ArchiveTour_FullMethodName        = "/tourism.tour.v1.TourService/ArchiveTour"
-	TourService_ReactivateTour_FullMethodName     = "/tourism.tour.v1.TourService/ReactivateTour"
-	TourService_AddReview_FullMethodName          = "/tourism.tour.v1.TourService/AddReview"
-	TourService_UploadReviewImage_FullMethodName  = "/tourism.tour.v1.TourService/UploadReviewImage"
+	TourService_CreateTour_FullMethodName          = "/tourism.tour.v1.TourService/CreateTour"
+	TourService_UpdateTour_FullMethodName          = "/tourism.tour.v1.TourService/UpdateTour"
+	TourService_GetTour_FullMethodName             = "/tourism.tour.v1.TourService/GetTour"
+	TourService_ListMyTours_FullMethodName         = "/tourism.tour.v1.TourService/ListMyTours"
+	TourService_ListPublishedTours_FullMethodName  = "/tourism.tour.v1.TourService/ListPublishedTours"
+	TourService_AddKeypoint_FullMethodName         = "/tourism.tour.v1.TourService/AddKeypoint"
+	TourService_UpdateKeypoint_FullMethodName      = "/tourism.tour.v1.TourService/UpdateKeypoint"
+	TourService_DeleteKeypoint_FullMethodName      = "/tourism.tour.v1.TourService/DeleteKeypoint"
+	TourService_AddTransportTime_FullMethodName    = "/tourism.tour.v1.TourService/AddTransportTime"
+	TourService_PublishTour_FullMethodName         = "/tourism.tour.v1.TourService/PublishTour"
+	TourService_ArchiveTour_FullMethodName         = "/tourism.tour.v1.TourService/ArchiveTour"
+	TourService_ReactivateTour_FullMethodName      = "/tourism.tour.v1.TourService/ReactivateTour"
+	TourService_AddReview_FullMethodName           = "/tourism.tour.v1.TourService/AddReview"
+	TourService_UploadReviewImage_FullMethodName   = "/tourism.tour.v1.TourService/UploadReviewImage"
+	TourService_UploadKeypointImage_FullMethodName = "/tourism.tour.v1.TourService/UploadKeypointImage"
 )
 
 // TourServiceClient is the client API for TourService service.
@@ -43,12 +46,15 @@ type TourServiceClient interface {
 	ListMyTours(ctx context.Context, in *ListMyToursRequest, opts ...grpc.CallOption) (*ListToursResponse, error)
 	ListPublishedTours(ctx context.Context, in *ListPublishedToursRequest, opts ...grpc.CallOption) (*ListToursResponse, error)
 	AddKeypoint(ctx context.Context, in *AddKeypointRequest, opts ...grpc.CallOption) (*Tour, error)
+	UpdateKeypoint(ctx context.Context, in *UpdateKeypointRequest, opts ...grpc.CallOption) (*Tour, error)
+	DeleteKeypoint(ctx context.Context, in *DeleteKeypointRequest, opts ...grpc.CallOption) (*Tour, error)
 	AddTransportTime(ctx context.Context, in *AddTransportTimeRequest, opts ...grpc.CallOption) (*Tour, error)
 	PublishTour(ctx context.Context, in *PublishTourRequest, opts ...grpc.CallOption) (*Tour, error)
 	ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*Tour, error)
 	ReactivateTour(ctx context.Context, in *ReactivateTourRequest, opts ...grpc.CallOption) (*Tour, error)
 	AddReview(ctx context.Context, in *AddReviewRequest, opts ...grpc.CallOption) (*Tour, error)
 	UploadReviewImage(ctx context.Context, in *UploadReviewImageRequest, opts ...grpc.CallOption) (*UploadReviewImageResponse, error)
+	UploadKeypointImage(ctx context.Context, in *UploadKeypointImageRequest, opts ...grpc.CallOption) (*UploadKeypointImageResponse, error)
 }
 
 type tourServiceClient struct {
@@ -119,6 +125,26 @@ func (c *tourServiceClient) AddKeypoint(ctx context.Context, in *AddKeypointRequ
 	return out, nil
 }
 
+func (c *tourServiceClient) UpdateKeypoint(ctx context.Context, in *UpdateKeypointRequest, opts ...grpc.CallOption) (*Tour, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Tour)
+	err := c.cc.Invoke(ctx, TourService_UpdateKeypoint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tourServiceClient) DeleteKeypoint(ctx context.Context, in *DeleteKeypointRequest, opts ...grpc.CallOption) (*Tour, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Tour)
+	err := c.cc.Invoke(ctx, TourService_DeleteKeypoint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *tourServiceClient) AddTransportTime(ctx context.Context, in *AddTransportTimeRequest, opts ...grpc.CallOption) (*Tour, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Tour)
@@ -179,6 +205,16 @@ func (c *tourServiceClient) UploadReviewImage(ctx context.Context, in *UploadRev
 	return out, nil
 }
 
+func (c *tourServiceClient) UploadKeypointImage(ctx context.Context, in *UploadKeypointImageRequest, opts ...grpc.CallOption) (*UploadKeypointImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UploadKeypointImageResponse)
+	err := c.cc.Invoke(ctx, TourService_UploadKeypointImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TourServiceServer is the server API for TourService service.
 // All implementations must embed UnimplementedTourServiceServer
 // for forward compatibility.
@@ -189,12 +225,15 @@ type TourServiceServer interface {
 	ListMyTours(context.Context, *ListMyToursRequest) (*ListToursResponse, error)
 	ListPublishedTours(context.Context, *ListPublishedToursRequest) (*ListToursResponse, error)
 	AddKeypoint(context.Context, *AddKeypointRequest) (*Tour, error)
+	UpdateKeypoint(context.Context, *UpdateKeypointRequest) (*Tour, error)
+	DeleteKeypoint(context.Context, *DeleteKeypointRequest) (*Tour, error)
 	AddTransportTime(context.Context, *AddTransportTimeRequest) (*Tour, error)
 	PublishTour(context.Context, *PublishTourRequest) (*Tour, error)
 	ArchiveTour(context.Context, *ArchiveTourRequest) (*Tour, error)
 	ReactivateTour(context.Context, *ReactivateTourRequest) (*Tour, error)
 	AddReview(context.Context, *AddReviewRequest) (*Tour, error)
 	UploadReviewImage(context.Context, *UploadReviewImageRequest) (*UploadReviewImageResponse, error)
+	UploadKeypointImage(context.Context, *UploadKeypointImageRequest) (*UploadKeypointImageResponse, error)
 	mustEmbedUnimplementedTourServiceServer()
 }
 
@@ -223,6 +262,12 @@ func (UnimplementedTourServiceServer) ListPublishedTours(context.Context, *ListP
 func (UnimplementedTourServiceServer) AddKeypoint(context.Context, *AddKeypointRequest) (*Tour, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddKeypoint not implemented")
 }
+func (UnimplementedTourServiceServer) UpdateKeypoint(context.Context, *UpdateKeypointRequest) (*Tour, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateKeypoint not implemented")
+}
+func (UnimplementedTourServiceServer) DeleteKeypoint(context.Context, *DeleteKeypointRequest) (*Tour, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteKeypoint not implemented")
+}
 func (UnimplementedTourServiceServer) AddTransportTime(context.Context, *AddTransportTimeRequest) (*Tour, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddTransportTime not implemented")
 }
@@ -240,6 +285,9 @@ func (UnimplementedTourServiceServer) AddReview(context.Context, *AddReviewReque
 }
 func (UnimplementedTourServiceServer) UploadReviewImage(context.Context, *UploadReviewImageRequest) (*UploadReviewImageResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UploadReviewImage not implemented")
+}
+func (UnimplementedTourServiceServer) UploadKeypointImage(context.Context, *UploadKeypointImageRequest) (*UploadKeypointImageResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UploadKeypointImage not implemented")
 }
 func (UnimplementedTourServiceServer) mustEmbedUnimplementedTourServiceServer() {}
 func (UnimplementedTourServiceServer) testEmbeddedByValue()                     {}
@@ -370,6 +418,42 @@ func _TourService_AddKeypoint_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TourService_UpdateKeypoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateKeypointRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).UpdateKeypoint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_UpdateKeypoint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).UpdateKeypoint(ctx, req.(*UpdateKeypointRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TourService_DeleteKeypoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteKeypointRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).DeleteKeypoint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_DeleteKeypoint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).DeleteKeypoint(ctx, req.(*DeleteKeypointRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _TourService_AddTransportTime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddTransportTimeRequest)
 	if err := dec(in); err != nil {
@@ -478,6 +562,24 @@ func _TourService_UploadReviewImage_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TourService_UploadKeypointImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadKeypointImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).UploadKeypointImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_UploadKeypointImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).UploadKeypointImage(ctx, req.(*UploadKeypointImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TourService_ServiceDesc is the grpc.ServiceDesc for TourService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -510,6 +612,14 @@ var TourService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TourService_AddKeypoint_Handler,
 		},
 		{
+			MethodName: "UpdateKeypoint",
+			Handler:    _TourService_UpdateKeypoint_Handler,
+		},
+		{
+			MethodName: "DeleteKeypoint",
+			Handler:    _TourService_DeleteKeypoint_Handler,
+		},
+		{
 			MethodName: "AddTransportTime",
 			Handler:    _TourService_AddTransportTime_Handler,
 		},
@@ -532,6 +642,10 @@ var TourService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadReviewImage",
 			Handler:    _TourService_UploadReviewImage_Handler,
+		},
+		{
+			MethodName: "UploadKeypointImage",
+			Handler:    _TourService_UploadKeypointImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
