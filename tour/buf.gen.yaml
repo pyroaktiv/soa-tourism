@@ -2,6 +2,7 @@ version: v2
 inputs:
   - proto_file: ../proto/tourism/tour/v1/tour.proto
   - proto_file: ../proto/tourism/auth/v1/auth.proto
+  - proto_file: ../proto/tourism/payment/v1/payment.proto
 plugins:
   - remote: buf.build/protocolbuffers/python
     out: src

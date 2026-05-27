@@ -11,6 +11,7 @@ from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
 
 from tourism.auth.v1 import auth_pb2_grpc, auth_pb2
+from tourism.payment.v1 import payment_pb2, payment_pb2_grpc
 from tourism.tour.v1 import tour_pb2, tour_pb2_grpc
 
 logging.basicConfig(level=logging.INFO)
@@ -19,6 +20,7 @@ _GRPC_ADDR = os.environ.get("GRPC_ADDR", "0.0.0.0:9090")
 _MONGO_URI = os.environ.get("MONGO_URI", "mongodb://mongo:27017")
 _MONGO_DB = os.environ.get("MONGO_DB", "tourdb")
 _AUTH_SERVICE_ADDR = os.environ.get("AUTH_SERVICE_ADDR", "auth-service:9090")
+_PAYMENT_SERVICE_ADDR = os.environ.get("PAYMENT_SERVICE_ADDR", "payment:9090")
 _SEAWEEDFS_FILER_URL = os.environ.get("SEAWEEDFS_FILER_URL", "http://seaweedfs:8888")
 
 _STATUS_MAP = {
@@ -68,9 +70,10 @@ def _now_iso():
 
 
 class TourService(tour_pb2_grpc.TourServiceServicer):
-    def __init__(self, db, auth_channel: grpc.Channel, seaweedfs_url: str) -> None:
+    def __init__(self, db, auth_channel: grpc.Channel, payment_channel: grpc.Channel, seaweedfs_url: str) -> None:
         self._tours = db.get_collection("tours")
         self._auth_stub = auth_pb2_grpc.AuthServiceStub(auth_channel)
+        self._payment_stub = payment_pb2_grpc.PaymentServiceStub(payment_channel)
         self._seaweedfs_url = seaweedfs_url
 
     def _require_auth(self, context):
@@ -220,9 +223,9 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
     def GetTour(self, request, context):
         doc = self._get_tour_or_abort(request.id, context)
 
-        # Try to identify caller's role to filter response for non-authors. 
-        # Only authors can see full details of their own tours, others see 
-        # limited info and only if published.
+        # Identify caller. Author who owns this tour sees full details.
+        # A tourist who has purchased it (via payment service) also sees all
+        # keypoints — per spec 16: "Ture koje su kupljene otkrivaju sve ključne tačke."
         meta = dict(context.invocation_metadata())
         auth_header = meta.get("authorization", "")
         full = False
@@ -236,6 +239,16 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
                     is_author = "author" in resp.user.roles
                     owns_tour = resp.user.id == doc["author_id"]
                     full = is_author and owns_tour
+                    if not full and "tourist" in resp.user.roles:
+                        try:
+                            has = self._payment_stub.HasToken(
+                                payment_pb2.HasTokenRequest(tour_id=request.id),
+                                metadata=(("authorization", auth_header),),
+                            )
+                            if has.has_token:
+                                full = True
+                        except grpc.RpcError as exc:
+                            logging.warning("payment HasToken failed: %s", exc)
             except grpc.RpcError:
                 pass
 
@@ -518,10 +531,11 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
 def serve():
     db = MongoClient(_MONGO_URI)[_MONGO_DB]
     auth_channel = grpc.insecure_channel(_AUTH_SERVICE_ADDR)
+    payment_channel = grpc.insecure_channel(_PAYMENT_SERVICE_ADDR)
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     tour_pb2_grpc.add_TourServiceServicer_to_server(
-        TourService(db, auth_channel, _SEAWEEDFS_FILER_URL), server
+        TourService(db, auth_channel, payment_channel, _SEAWEEDFS_FILER_URL), server
     )
     server.add_insecure_port(_GRPC_ADDR)
     server.start()

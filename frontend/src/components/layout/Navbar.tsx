@@ -58,6 +58,12 @@ export default function Navbar() {
                 <Link href="/tours" className="hover:text-blue-200">
                   Ture
                 </Link>
+                <Link href="/cart" className="hover:text-blue-200">
+                  Korpa
+                </Link>
+                <Link href="/purchases" className="hover:text-blue-200">
+                  Kupljene ture
+                </Link>
                 <Link href="/simulator" className="hover:text-blue-200">
                   Simulator
                 </Link>
