@@ -9,6 +9,29 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  nats:
+    image: nats:alpine
+    ports:
+      - "4222:4222"
+    expose:
+      - "4222"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8222/varz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  saga-orchestrator:
+    build:
+      context: ./saga-orchestrator
+      dockerfile: Dockerfile
+    environment:
+      NATS_URL: "nats://nats:4222"
+    depends_on:
+      nats:
+        condition: service_started
+
   auth-service:
     build:
       context: ./auth
@@ -20,10 +43,12 @@ services:
       REFRESH_TOKEN_DURATION: "168h"
       MONGO_URI: "mongodb://mongo:27017"
       MONGO_DB: "authdb"
+      NATS_URL: "nats://nats:4222"
     expose:
       - "9090"
     depends_on:
       - mongo
+      - nats
 
   seaweedfs:
     image: chrislusf/seaweedfs:latest
@@ -121,12 +146,14 @@ services:
       AUTH_SERVICE_ADDR: "auth-service:9090"
       PAYMENT_SERVICE_ADDR: "payment:9090"
       SEAWEEDFS_FILER_URL: "http://seaweedfs:8888"
+      NATS_URL: "nats://nats:4222"
     expose:
       - "9090"
     depends_on:
       - mongo
       - auth-service
       - seaweedfs
+      - nats
 
   simulator:
     build:
@@ -170,6 +197,7 @@ services:
       POSTGRES_URI: "postgres://payment:payment@payment-db:5432/paymentdb?sslmode=disable"
       AUTH_SERVICE_ADDR: "auth-service:9090"
       TOUR_SERVICE_ADDR: "tour:9090"
+      NATS_URL: "nats://nats:4222"
     expose:
       - "9090"
     depends_on:
@@ -178,6 +206,8 @@ services:
       auth-service:
         condition: service_started
       tour:
+        condition: service_started
+      nats:
         condition: service_started
 
   gateway:

@@ -5,16 +5,25 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 
+	"github.com/nats-io/nats.go"
 	authv1 "github.com/pyroaktiv/soa-tourism/payment-service/gen/go/tourism/auth/v1"
 	paymentv1 "github.com/pyroaktiv/soa-tourism/payment-service/gen/go/tourism/payment/v1"
+	sagav1 "github.com/pyroaktiv/soa-tourism/payment-service/gen/go/tourism/saga/v1"
 	tourv1 "github.com/pyroaktiv/soa-tourism/payment-service/gen/go/tourism/tour/v1"
 	"github.com/pyroaktiv/soa-tourism/payment-service/internal/clients"
 	"github.com/pyroaktiv/soa-tourism/payment-service/internal/repository"
+)
+
+const (
+	SubjectPaymentRemoveCommand = "saga.block_author.payment.remove_command"
+	SubjectPaymentRemoveResult  = "saga.block_author.payment.remove_result"
 )
 
 type Service struct {
@@ -25,7 +34,16 @@ type Service struct {
 }
 
 func NewService(repo *repository.Repository, c *clients.Clients) *Service {
-	return &Service{repo: repo, clients: c}
+	s := &Service{
+		repo:    repo,
+		clients: c,
+	}
+
+	if s.clients.NatsConn != nil {
+		go s.startSagaSubscriber()
+	}
+
+	return s
 }
 
 func (s *Service) GetCart(ctx context.Context, _ *paymentv1.GetCartRequest) (*paymentv1.ShoppingCart, error) {
@@ -237,5 +255,46 @@ func toProtoToken(t *repository.PurchaseToken) *paymentv1.TourPurchaseToken {
 		TourName:    t.TourName,
 		Price:       t.Price,
 		PurchasedAt: t.PurchasedAt.UTC().Format("2006-01-02T15:04:05Z07:00"),
+	}
+}
+
+func (s *Service) startSagaSubscriber() {
+	_, err := s.clients.NatsConn.Subscribe(SubjectPaymentRemoveCommand, func(msg *nats.Msg) {
+		var cmd sagav1.RemoveToursFromCartCommand
+		if err := proto.Unmarshal(msg.Data, &cmd); err != nil {
+			log.Printf("[Payment Saga] Error unmarshalling remove command: %v", err)
+			return
+		}
+
+		log.Printf("[Payment Saga] Received command to evict %d tours for blocked author %s", len(cmd.TourIds), cmd.UserId)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		// Fizički izbacujemo ture iz svih korpi u bazi
+		err := s.repo.RemoveToursFromAllCarts(ctx, cmd.TourIds)
+
+		// Formiramo događaj o rezultatu
+		result := &sagav1.RemoveToursFromCartResultEvent{
+			UserId:  cmd.UserId,
+			Success: err == nil,
+		}
+
+		if err != nil {
+			result.ErrorMessage = err.Error()
+			log.Printf("[Payment Saga] Failed to evict tours from cart: %v", err)
+		} else {
+			log.Printf("[Payment Saga] Successfully evicted tours. Sending success to Orchestrator.")
+		}
+
+		// Objavljujemo rezultat nazad Orkestratoru
+		resultData, _ := proto.Marshal(result)
+		if pubErr := s.clients.NatsConn.Publish(SubjectPaymentRemoveResult, resultData); pubErr != nil {
+			log.Printf("[Payment Saga] Failed to publish result: %v", pubErr)
+		}
+	})
+
+	if err != nil {
+		log.Fatalf("Failed to subscribe to Payment remove command: %v", err)
 	}
 }

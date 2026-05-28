@@ -176,6 +176,31 @@ func (r *Repository) RemoveItem(ctx context.Context, userID, tourID string) (*Ca
 	return cart, nil
 }
 
+func (r *Repository) RemoveToursFromAllCarts(ctx context.Context, tourIDs []string) error {
+	if len(tourIDs) == 0 {
+		return nil
+	}
+
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx,
+		`DELETE FROM cart_items WHERE tour_id = ANY($1)`,
+		tourIDs,
+	); err != nil {
+		return fmt.Errorf("failed to delete tours from carts: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}
+
 // Checkout moves every cart_item of the user into purchase_tokens atomically.
 // Returns the newly minted tokens.
 func (r *Repository) Checkout(ctx context.Context, userID string) ([]PurchaseToken, error) {

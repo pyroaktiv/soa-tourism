@@ -26,10 +26,11 @@ const (
 type TourStatus int32
 
 const (
-	TourStatus_TOUR_STATUS_UNSPECIFIED TourStatus = 0
-	TourStatus_TOUR_STATUS_DRAFT       TourStatus = 1
-	TourStatus_TOUR_STATUS_PUBLISHED   TourStatus = 2
-	TourStatus_TOUR_STATUS_ARCHIVED    TourStatus = 3
+	TourStatus_TOUR_STATUS_UNSPECIFIED     TourStatus = 0
+	TourStatus_TOUR_STATUS_DRAFT           TourStatus = 1
+	TourStatus_TOUR_STATUS_PUBLISHED       TourStatus = 2
+	TourStatus_TOUR_STATUS_ARCHIVE_PENDING TourStatus = 3
+	TourStatus_TOUR_STATUS_ARCHIVED        TourStatus = 4
 )
 
 // Enum value maps for TourStatus.
@@ -38,13 +39,15 @@ var (
 		0: "TOUR_STATUS_UNSPECIFIED",
 		1: "TOUR_STATUS_DRAFT",
 		2: "TOUR_STATUS_PUBLISHED",
-		3: "TOUR_STATUS_ARCHIVED",
+		3: "TOUR_STATUS_ARCHIVE_PENDING",
+		4: "TOUR_STATUS_ARCHIVED",
 	}
 	TourStatus_value = map[string]int32{
-		"TOUR_STATUS_UNSPECIFIED": 0,
-		"TOUR_STATUS_DRAFT":       1,
-		"TOUR_STATUS_PUBLISHED":   2,
-		"TOUR_STATUS_ARCHIVED":    3,
+		"TOUR_STATUS_UNSPECIFIED":     0,
+		"TOUR_STATUS_DRAFT":           1,
+		"TOUR_STATUS_PUBLISHED":       2,
+		"TOUR_STATUS_ARCHIVE_PENDING": 3,
+		"TOUR_STATUS_ARCHIVED":        4,
 	}
 )
 
@@ -1641,13 +1644,14 @@ const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\timage_url\x18\a \x01(\tR\bimageUrl\"F\n" +
 	"\x15DeleteKeypointRequest\x12\x17\n" +
 	"\atour_id\x18\x01 \x01(\tR\x06tourId\x12\x14\n" +
-	"\x05order\x18\x02 \x01(\x05R\x05order*u\n" +
+	"\x05order\x18\x02 \x01(\x05R\x05order*\x96\x01\n" +
 	"\n" +
 	"TourStatus\x12\x1b\n" +
 	"\x17TOUR_STATUS_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11TOUR_STATUS_DRAFT\x10\x01\x12\x19\n" +
-	"\x15TOUR_STATUS_PUBLISHED\x10\x02\x12\x18\n" +
-	"\x14TOUR_STATUS_ARCHIVED\x10\x03*|\n" +
+	"\x15TOUR_STATUS_PUBLISHED\x10\x02\x12\x1f\n" +
+	"\x1bTOUR_STATUS_ARCHIVE_PENDING\x10\x03\x12\x18\n" +
+	"\x14TOUR_STATUS_ARCHIVED\x10\x04*|\n" +
 	"\rTransportType\x12\x1e\n" +
 	"\x1aTRANSPORT_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13TRANSPORT_TYPE_FOOT\x10\x01\x12\x1a\n" +

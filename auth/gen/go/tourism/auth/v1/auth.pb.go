@@ -23,13 +23,65 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type AccountState int32
+
+const (
+	AccountState_ACCOUNT_STATE_UNSPECIFIED   AccountState = 0
+	AccountState_ACCOUNT_STATE_ACTIVE        AccountState = 1
+	AccountState_ACCOUNT_STATE_BLOCK_PENDING AccountState = 2
+	AccountState_ACCOUNT_STATE_BLOCKED       AccountState = 3
+)
+
+// Enum value maps for AccountState.
+var (
+	AccountState_name = map[int32]string{
+		0: "ACCOUNT_STATE_UNSPECIFIED",
+		1: "ACCOUNT_STATE_ACTIVE",
+		2: "ACCOUNT_STATE_BLOCK_PENDING",
+		3: "ACCOUNT_STATE_BLOCKED",
+	}
+	AccountState_value = map[string]int32{
+		"ACCOUNT_STATE_UNSPECIFIED":   0,
+		"ACCOUNT_STATE_ACTIVE":        1,
+		"ACCOUNT_STATE_BLOCK_PENDING": 2,
+		"ACCOUNT_STATE_BLOCKED":       3,
+	}
+)
+
+func (x AccountState) Enum() *AccountState {
+	p := new(AccountState)
+	*p = x
+	return p
+}
+
+func (x AccountState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AccountState) Descriptor() protoreflect.EnumDescriptor {
+	return file_tourism_auth_v1_auth_proto_enumTypes[0].Descriptor()
+}
+
+func (AccountState) Type() protoreflect.EnumType {
+	return &file_tourism_auth_v1_auth_proto_enumTypes[0]
+}
+
+func (x AccountState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AccountState.Descriptor instead.
+func (AccountState) EnumDescriptor() ([]byte, []int) {
+	return file_tourism_auth_v1_auth_proto_rawDescGZIP(), []int{0}
+}
+
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	Roles         []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
-	Blocked       bool                   `protobuf:"varint,5,opt,name=blocked,proto3" json:"blocked,omitempty"`
+	State         AccountState           `protobuf:"varint,5,opt,name=state,proto3,enum=tourism.auth.v1.AccountState" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -92,11 +144,11 @@ func (x *User) GetRoles() []string {
 	return nil
 }
 
-func (x *User) GetBlocked() bool {
+func (x *User) GetState() AccountState {
 	if x != nil {
-		return x.Blocked
+		return x.State
 	}
-	return false
+	return AccountState_ACCOUNT_STATE_UNSPECIFIED
 }
 
 type TokenPair struct {
@@ -898,13 +950,13 @@ var File_tourism_auth_v1_auth_proto protoreflect.FileDescriptor
 
 const file_tourism_auth_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x1atourism/auth/v1/auth.proto\x12\x0ftourism.auth.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"x\n" +
+	"\x1atourism/auth/v1/auth.proto\x12\x0ftourism.auth.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x93\x01\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x14\n" +
-	"\x05roles\x18\x04 \x03(\tR\x05roles\x12\x18\n" +
-	"\ablocked\x18\x05 \x01(\bR\ablocked\"\xc3\x01\n" +
+	"\x05roles\x18\x04 \x03(\tR\x05roles\x123\n" +
+	"\x05state\x18\x05 \x01(\x0e2\x1d.tourism.auth.v1.AccountStateR\x05state\"\xc3\x01\n" +
 	"\tTokenPair\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x125\n" +
 	"\x17access_token_expires_at\x18\x02 \x01(\x03R\x14accessTokenExpiresAt\x12#\n" +
@@ -951,7 +1003,12 @@ const file_tourism_auth_v1_auth_proto_rawDesc = "" +
 	"\x12GetUsernameRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"1\n" +
 	"\x13GetUsernameResponse\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername2\xbc\a\n" +
+	"\busername\x18\x01 \x01(\tR\busername*\x83\x01\n" +
+	"\fAccountState\x12\x1d\n" +
+	"\x19ACCOUNT_STATE_UNSPECIFIED\x10\x00\x12\x18\n" +
+	"\x14ACCOUNT_STATE_ACTIVE\x10\x01\x12\x1f\n" +
+	"\x1bACCOUNT_STATE_BLOCK_PENDING\x10\x02\x12\x19\n" +
+	"\x15ACCOUNT_STATE_BLOCKED\x10\x032\xb0\a\n" +
 	"\vAuthService\x12m\n" +
 	"\bRegister\x12 .tourism.auth.v1.RegisterRequest\x1a\x1d.tourism.auth.v1.AuthResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/auth/register\x12d\n" +
 	"\x05Login\x12\x1d.tourism.auth.v1.LoginRequest\x1a\x1d.tourism.auth.v1.AuthResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/login\x12g\n" +
@@ -960,8 +1017,8 @@ const file_tourism_auth_v1_auth_proto_rawDesc = "" +
 	"\vGetUsername\x12#.tourism.auth.v1.GetUsernameRequest\x1a$.tourism.auth.v1.GetUsernameResponse\"\x00\x12`\n" +
 	"\x06Logout\x12\x1e.tourism.auth.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/logout\x12n\n" +
 	"\tListUsers\x12!.tourism.auth.v1.ListUsersRequest\x1a\".tourism.auth.v1.ListUsersResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/auth/users\x12{\n" +
-	"\vSearchUsers\x12#.tourism.auth.v1.SearchUsersRequest\x1a$.tourism.auth.v1.SearchUsersResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/auth/users/search\x12q\n" +
-	"\tBlockUser\x12!.tourism.auth.v1.BlockUserRequest\x1a\".tourism.auth.v1.BlockUserResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/blockB`\n" +
+	"\vSearchUsers\x12#.tourism.auth.v1.SearchUsersRequest\x1a$.tourism.auth.v1.SearchUsersResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/auth/users/search\x12e\n" +
+	"\tBlockUser\x12!.tourism.auth.v1.BlockUserRequest\x1a\x16.google.protobuf.Empty\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/blockB`\n" +
 	"\x0ftourism.auth.v1P\x01ZKgithub.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1;authv1b\x06proto3"
 
 var (
@@ -976,56 +1033,59 @@ func file_tourism_auth_v1_auth_proto_rawDescGZIP() []byte {
 	return file_tourism_auth_v1_auth_proto_rawDescData
 }
 
+var file_tourism_auth_v1_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_tourism_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_tourism_auth_v1_auth_proto_goTypes = []any{
-	(*User)(nil),                // 0: tourism.auth.v1.User
-	(*TokenPair)(nil),           // 1: tourism.auth.v1.TokenPair
-	(*AuthResponse)(nil),        // 2: tourism.auth.v1.AuthResponse
-	(*RegisterRequest)(nil),     // 3: tourism.auth.v1.RegisterRequest
-	(*LoginRequest)(nil),        // 4: tourism.auth.v1.LoginRequest
-	(*RefreshRequest)(nil),      // 5: tourism.auth.v1.RefreshRequest
-	(*ValidateRequest)(nil),     // 6: tourism.auth.v1.ValidateRequest
-	(*ValidateResponse)(nil),    // 7: tourism.auth.v1.ValidateResponse
-	(*LogoutRequest)(nil),       // 8: tourism.auth.v1.LogoutRequest
-	(*ListUsersRequest)(nil),    // 9: tourism.auth.v1.ListUsersRequest
-	(*ListUsersResponse)(nil),   // 10: tourism.auth.v1.ListUsersResponse
-	(*SearchUsersRequest)(nil),  // 11: tourism.auth.v1.SearchUsersRequest
-	(*SearchUsersResponse)(nil), // 12: tourism.auth.v1.SearchUsersResponse
-	(*BlockUserRequest)(nil),    // 13: tourism.auth.v1.BlockUserRequest
-	(*BlockUserResponse)(nil),   // 14: tourism.auth.v1.BlockUserResponse
-	(*GetUsernameRequest)(nil),  // 15: tourism.auth.v1.GetUsernameRequest
-	(*GetUsernameResponse)(nil), // 16: tourism.auth.v1.GetUsernameResponse
-	(*emptypb.Empty)(nil),       // 17: google.protobuf.Empty
+	(AccountState)(0),           // 0: tourism.auth.v1.AccountState
+	(*User)(nil),                // 1: tourism.auth.v1.User
+	(*TokenPair)(nil),           // 2: tourism.auth.v1.TokenPair
+	(*AuthResponse)(nil),        // 3: tourism.auth.v1.AuthResponse
+	(*RegisterRequest)(nil),     // 4: tourism.auth.v1.RegisterRequest
+	(*LoginRequest)(nil),        // 5: tourism.auth.v1.LoginRequest
+	(*RefreshRequest)(nil),      // 6: tourism.auth.v1.RefreshRequest
+	(*ValidateRequest)(nil),     // 7: tourism.auth.v1.ValidateRequest
+	(*ValidateResponse)(nil),    // 8: tourism.auth.v1.ValidateResponse
+	(*LogoutRequest)(nil),       // 9: tourism.auth.v1.LogoutRequest
+	(*ListUsersRequest)(nil),    // 10: tourism.auth.v1.ListUsersRequest
+	(*ListUsersResponse)(nil),   // 11: tourism.auth.v1.ListUsersResponse
+	(*SearchUsersRequest)(nil),  // 12: tourism.auth.v1.SearchUsersRequest
+	(*SearchUsersResponse)(nil), // 13: tourism.auth.v1.SearchUsersResponse
+	(*BlockUserRequest)(nil),    // 14: tourism.auth.v1.BlockUserRequest
+	(*BlockUserResponse)(nil),   // 15: tourism.auth.v1.BlockUserResponse
+	(*GetUsernameRequest)(nil),  // 16: tourism.auth.v1.GetUsernameRequest
+	(*GetUsernameResponse)(nil), // 17: tourism.auth.v1.GetUsernameResponse
+	(*emptypb.Empty)(nil),       // 18: google.protobuf.Empty
 }
 var file_tourism_auth_v1_auth_proto_depIdxs = []int32{
-	0,  // 0: tourism.auth.v1.AuthResponse.user:type_name -> tourism.auth.v1.User
-	1,  // 1: tourism.auth.v1.AuthResponse.tokens:type_name -> tourism.auth.v1.TokenPair
-	0,  // 2: tourism.auth.v1.ValidateResponse.user:type_name -> tourism.auth.v1.User
-	0,  // 3: tourism.auth.v1.ListUsersResponse.users:type_name -> tourism.auth.v1.User
-	0,  // 4: tourism.auth.v1.SearchUsersResponse.users:type_name -> tourism.auth.v1.User
-	3,  // 5: tourism.auth.v1.AuthService.Register:input_type -> tourism.auth.v1.RegisterRequest
-	4,  // 6: tourism.auth.v1.AuthService.Login:input_type -> tourism.auth.v1.LoginRequest
-	5,  // 7: tourism.auth.v1.AuthService.Refresh:input_type -> tourism.auth.v1.RefreshRequest
-	6,  // 8: tourism.auth.v1.AuthService.Validate:input_type -> tourism.auth.v1.ValidateRequest
-	15, // 9: tourism.auth.v1.AuthService.GetUsername:input_type -> tourism.auth.v1.GetUsernameRequest
-	8,  // 10: tourism.auth.v1.AuthService.Logout:input_type -> tourism.auth.v1.LogoutRequest
-	9,  // 11: tourism.auth.v1.AuthService.ListUsers:input_type -> tourism.auth.v1.ListUsersRequest
-	11, // 12: tourism.auth.v1.AuthService.SearchUsers:input_type -> tourism.auth.v1.SearchUsersRequest
-	13, // 13: tourism.auth.v1.AuthService.BlockUser:input_type -> tourism.auth.v1.BlockUserRequest
-	2,  // 14: tourism.auth.v1.AuthService.Register:output_type -> tourism.auth.v1.AuthResponse
-	2,  // 15: tourism.auth.v1.AuthService.Login:output_type -> tourism.auth.v1.AuthResponse
-	1,  // 16: tourism.auth.v1.AuthService.Refresh:output_type -> tourism.auth.v1.TokenPair
-	7,  // 17: tourism.auth.v1.AuthService.Validate:output_type -> tourism.auth.v1.ValidateResponse
-	16, // 18: tourism.auth.v1.AuthService.GetUsername:output_type -> tourism.auth.v1.GetUsernameResponse
-	17, // 19: tourism.auth.v1.AuthService.Logout:output_type -> google.protobuf.Empty
-	10, // 20: tourism.auth.v1.AuthService.ListUsers:output_type -> tourism.auth.v1.ListUsersResponse
-	12, // 21: tourism.auth.v1.AuthService.SearchUsers:output_type -> tourism.auth.v1.SearchUsersResponse
-	14, // 22: tourism.auth.v1.AuthService.BlockUser:output_type -> tourism.auth.v1.BlockUserResponse
-	14, // [14:23] is the sub-list for method output_type
-	5,  // [5:14] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	0,  // 0: tourism.auth.v1.User.state:type_name -> tourism.auth.v1.AccountState
+	1,  // 1: tourism.auth.v1.AuthResponse.user:type_name -> tourism.auth.v1.User
+	2,  // 2: tourism.auth.v1.AuthResponse.tokens:type_name -> tourism.auth.v1.TokenPair
+	1,  // 3: tourism.auth.v1.ValidateResponse.user:type_name -> tourism.auth.v1.User
+	1,  // 4: tourism.auth.v1.ListUsersResponse.users:type_name -> tourism.auth.v1.User
+	1,  // 5: tourism.auth.v1.SearchUsersResponse.users:type_name -> tourism.auth.v1.User
+	4,  // 6: tourism.auth.v1.AuthService.Register:input_type -> tourism.auth.v1.RegisterRequest
+	5,  // 7: tourism.auth.v1.AuthService.Login:input_type -> tourism.auth.v1.LoginRequest
+	6,  // 8: tourism.auth.v1.AuthService.Refresh:input_type -> tourism.auth.v1.RefreshRequest
+	7,  // 9: tourism.auth.v1.AuthService.Validate:input_type -> tourism.auth.v1.ValidateRequest
+	16, // 10: tourism.auth.v1.AuthService.GetUsername:input_type -> tourism.auth.v1.GetUsernameRequest
+	9,  // 11: tourism.auth.v1.AuthService.Logout:input_type -> tourism.auth.v1.LogoutRequest
+	10, // 12: tourism.auth.v1.AuthService.ListUsers:input_type -> tourism.auth.v1.ListUsersRequest
+	12, // 13: tourism.auth.v1.AuthService.SearchUsers:input_type -> tourism.auth.v1.SearchUsersRequest
+	14, // 14: tourism.auth.v1.AuthService.BlockUser:input_type -> tourism.auth.v1.BlockUserRequest
+	3,  // 15: tourism.auth.v1.AuthService.Register:output_type -> tourism.auth.v1.AuthResponse
+	3,  // 16: tourism.auth.v1.AuthService.Login:output_type -> tourism.auth.v1.AuthResponse
+	2,  // 17: tourism.auth.v1.AuthService.Refresh:output_type -> tourism.auth.v1.TokenPair
+	8,  // 18: tourism.auth.v1.AuthService.Validate:output_type -> tourism.auth.v1.ValidateResponse
+	17, // 19: tourism.auth.v1.AuthService.GetUsername:output_type -> tourism.auth.v1.GetUsernameResponse
+	18, // 20: tourism.auth.v1.AuthService.Logout:output_type -> google.protobuf.Empty
+	11, // 21: tourism.auth.v1.AuthService.ListUsers:output_type -> tourism.auth.v1.ListUsersResponse
+	13, // 22: tourism.auth.v1.AuthService.SearchUsers:output_type -> tourism.auth.v1.SearchUsersResponse
+	18, // 23: tourism.auth.v1.AuthService.BlockUser:output_type -> google.protobuf.Empty
+	15, // [15:24] is the sub-list for method output_type
+	6,  // [6:15] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_tourism_auth_v1_auth_proto_init() }
@@ -1038,13 +1098,14 @@ func file_tourism_auth_v1_auth_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tourism_auth_v1_auth_proto_rawDesc), len(file_tourism_auth_v1_auth_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_tourism_auth_v1_auth_proto_goTypes,
 		DependencyIndexes: file_tourism_auth_v1_auth_proto_depIdxs,
+		EnumInfos:         file_tourism_auth_v1_auth_proto_enumTypes,
 		MessageInfos:      file_tourism_auth_v1_auth_proto_msgTypes,
 	}.Build()
 	File_tourism_auth_v1_auth_proto = out.File

@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package tourism.saga.v1;
+
+option go_package = "github.com/pyroaktiv/soa-tourism/saga-orchestrator/gen/go/tourism/saga/v1;sagav1";
+
+// 1. Auth -> Orchestrator: Započinjanje sage
+message StartBlockAuthorEvent {
+  string user_id = 1; // Ovo služi i kao ID sage
+}
+
+// 2. Orchestrator -> Tour: Komanda za arhiviranje tura
+message ArchiveToursCommand {
+  string user_id = 1;
+}
+
+// 3. Tour -> Orchestrator: Rezultat arhiviranja tura
+message ArchiveToursResultEvent {
+  string user_id = 1;
+  bool success = 2;
+  repeated string tour_ids = 3; // Popunjeno samo ako je success = true
+  string error_message = 4;     // Opciono, zbog logovanja
+}
+
+// 4. Orchestrator -> Payment: Komanda za izbacivanje iz korpi
+message RemoveToursFromCartCommand {
+  string user_id = 1;
+  repeated string tour_ids = 2;
+}
+
+// 5. Payment -> Orchestrator: Rezultat izbacivanja iz korpi
+message RemoveToursFromCartResultEvent {
+  string user_id = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+// Status koji označava da li se operacije potvrđuju (Commit) ili poništavaju (Rollback)
+enum SagaStatus {
+  SAGA_STATUS_UNSPECIFIED = 0;
+  SAGA_STATUS_SUCCESS = 1;
+  SAGA_STATUS_ROLLBACK = 2;
+}
+
+// 6. Orchestrator -> Auth & Tour: Finalna komanda (Confirm ili Rollback)
+message FinalizeBlockAuthorCommand {
+  string user_id = 1;
+  SagaStatus status = 2;
+}

@@ -4,9 +4,11 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 
+	"github.com/nats-io/nats.go"
 	paymentv1 "github.com/pyroaktiv/soa-tourism/payment-service/gen/go/tourism/payment/v1"
 	"github.com/pyroaktiv/soa-tourism/payment-service/internal/clients"
 	"github.com/pyroaktiv/soa-tourism/payment-service/internal/config"
@@ -26,7 +28,12 @@ func main() {
 	}
 	defer repo.Close()
 
-	conns, err := clients.Dial(cfg.AuthServiceAddr, cfg.TourServiceAddr)
+	natsURL := os.Getenv("NATS_URL")
+	if natsURL == "" {
+		natsURL = nats.DefaultURL
+	}
+
+	conns, err := clients.Dial(cfg.AuthServiceAddr, cfg.TourServiceAddr, natsURL)
 	if err != nil {
 		log.Fatalf("dial dependencies: %v", err)
 	}
