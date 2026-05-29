@@ -18,6 +18,8 @@ from tourism.payment.v1 import payment_pb2, payment_pb2_grpc
 from tourism.tour.v1 import tour_pb2, tour_pb2_grpc
 from tourism.saga.v1 import saga_pb2
 
+from google.protobuf import empty_pb2
+
 logging.basicConfig(level=logging.INFO)
 
 _GRPC_ADDR = os.environ.get("GRPC_ADDR", "0.0.0.0:9090")
@@ -99,6 +101,7 @@ class TourSagaHandler:
         # Slušamo komande od orkestratora
         await self._nc.subscribe("saga.block_author.tour.archive_command", cb=self._handle_archive_command)
         await self._nc.subscribe("saga.block_author.tour.finalize_command", cb=self._handle_finalize_command)
+        await self._nc.subscribe("saga.archive_tour.tour.finalize_command", cb=self._handle_finalize_single_command)
 
     async def _handle_archive_command(self, msg):
         user_id = ""
@@ -167,13 +170,33 @@ class TourSagaHandler:
         except Exception as exc:
             logging.error("[Tour Saga] Error processing finalize command: %s", exc)
 
+    async def _handle_finalize_single_command(self, msg):
+        try:
+            cmd = saga_pb2.FinalizeArchiveTourCommand()
+            cmd.ParseFromString(msg.data)
+            logging.info("[Archive Tour Saga] Finalize command for tour %s, status: %s", cmd.tour_id, cmd.status)
+
+            if cmd.status == saga_pb2.SAGA_STATUS_SUCCESS:
+                self._tours.update_one(
+                    {"_id": cmd.tour_id, "status": "archive_pending"},
+                    {"$set": {"status": "archived", "archived_at": _now_iso()}, "$unset": {"previous_status": ""}}
+                )
+            elif cmd.status == saga_pb2.SAGA_STATUS_ROLLBACK:
+                self._tours.update_one(
+                    {"_id": cmd.tour_id, "status": "archive_pending"},
+                    [{"$set": {"status": {"$ifNull": ["$previous_status", "published"]}}}, {"$unset": "previous_status"}]
+                )
+        except Exception as exc:
+            logging.error("[Archive Tour Saga] Error: %s", exc)
+
 
 class TourService(tour_pb2_grpc.TourServiceServicer):
-    def __init__(self, db, auth_channel: grpc.Channel, payment_channel: grpc.Channel, seaweedfs_url: str) -> None:
+    def __init__(self, db, auth_channel: grpc.Channel, payment_channel: grpc.Channel, seaweedfs_url: str, saga_handler: TourSagaHandler) -> None:
         self._tours = db.get_collection("tours")
         self._auth_stub = auth_pb2_grpc.AuthServiceStub(auth_channel)
         self._payment_stub = payment_pb2_grpc.PaymentServiceStub(payment_channel)
         self._seaweedfs_url = seaweedfs_url
+        self._saga_handler = saga_handler
 
     def _require_auth(self, context):
         meta = dict(context.invocation_metadata())
@@ -517,13 +540,19 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
             context.abort(grpc.StatusCode.PERMISSION_DENIED, "not your tour")
         if doc["status"] != "published":
             context.abort(grpc.StatusCode.FAILED_PRECONDITION, "only published tours can be archived")
-
-        doc = self._tours.find_one_and_update(
+        
+        self._tours.update_one(
             {"_id": request.id},
-            {"$set": {"status": "archived", "archived_at": _now_iso()}},
-            return_document=ReturnDocument.AFTER,
+            {"$set": {"previous_status": doc["status"], "status": "archive_pending"}}
         )
-        return self._doc_to_tour(doc)
+
+        event = saga_pb2.StartArchiveTourEvent(tour_id=request.id)
+        asyncio.run_coroutine_threadsafe(
+            self._saga_handler._nc.publish("saga.archive_tour.tour.started", event.SerializeToString()),
+            self._saga_handler._loop
+        )
+        
+        return empty_pb2.Empty()
 
     def ReactivateTour(self, request, context):
         user = self._require_auth(context)
@@ -637,7 +666,7 @@ def serve():
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     tour_pb2_grpc.add_TourServiceServicer_to_server(
-        TourService(db, auth_channel, payment_channel, _SEAWEEDFS_FILER_URL), server
+        TourService(db, auth_channel, payment_channel, _SEAWEEDFS_FILER_URL, saga_handler), server
     )
     server.add_insecure_port(_GRPC_ADDR)
     server.start()

@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { listUsers, blockUser } from "@/lib/services/authService";
 import RoleGuard from "@/components/auth/RoleGuard";
-import { type User } from "@/types/tourism/auth/v1/auth";
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const pageSize = 10;
@@ -43,7 +42,7 @@ export default function AdminUsersPage() {
 
     try {
       await blockUser(userId);
-      setUsers((prevUsers: User[]) =>
+      setUsers((prevUsers: any[]) =>
         prevUsers.map((u) =>
           u.id === userId ? { ...u, state: "ACCOUNT_STATE_BLOCK_PENDING" } : u,
         ),
@@ -115,7 +114,7 @@ export default function AdminUsersPage() {
                     <td className="px-6 py-4 font-bold">{user.username}</td>
                     <td className="px-6 py-4">{user.email}</td>
                     <td className="px-6 py-4">
-                      {user.roles?.map((role) => (
+                      {user.roles?.map((role: string) => (
                         <span
                           key={role}
                           className="inline-block bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full mr-1"

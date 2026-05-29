@@ -4,6 +4,7 @@ package tourism.tour.v1;
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/tour/v1;tourv1";
 
@@ -240,7 +241,7 @@ service TourService {
     };
   }
 
-  rpc ArchiveTour(ArchiveTourRequest) returns (Tour) {
+  rpc ArchiveTour(ArchiveTourRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/tours/{id}/archive"
       body: "*"

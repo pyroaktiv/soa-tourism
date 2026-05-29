@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -50,7 +51,7 @@ type TourServiceClient interface {
 	DeleteKeypoint(ctx context.Context, in *DeleteKeypointRequest, opts ...grpc.CallOption) (*Tour, error)
 	AddTransportTime(ctx context.Context, in *AddTransportTimeRequest, opts ...grpc.CallOption) (*Tour, error)
 	PublishTour(ctx context.Context, in *PublishTourRequest, opts ...grpc.CallOption) (*Tour, error)
-	ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*Tour, error)
+	ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ReactivateTour(ctx context.Context, in *ReactivateTourRequest, opts ...grpc.CallOption) (*Tour, error)
 	AddReview(ctx context.Context, in *AddReviewRequest, opts ...grpc.CallOption) (*Tour, error)
 	UploadReviewImage(ctx context.Context, in *UploadReviewImageRequest, opts ...grpc.CallOption) (*UploadReviewImageResponse, error)
@@ -165,9 +166,9 @@ func (c *tourServiceClient) PublishTour(ctx context.Context, in *PublishTourRequ
 	return out, nil
 }
 
-func (c *tourServiceClient) ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*Tour, error) {
+func (c *tourServiceClient) ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Tour)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, TourService_ArchiveTour_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -229,7 +230,7 @@ type TourServiceServer interface {
 	DeleteKeypoint(context.Context, *DeleteKeypointRequest) (*Tour, error)
 	AddTransportTime(context.Context, *AddTransportTimeRequest) (*Tour, error)
 	PublishTour(context.Context, *PublishTourRequest) (*Tour, error)
-	ArchiveTour(context.Context, *ArchiveTourRequest) (*Tour, error)
+	ArchiveTour(context.Context, *ArchiveTourRequest) (*emptypb.Empty, error)
 	ReactivateTour(context.Context, *ReactivateTourRequest) (*Tour, error)
 	AddReview(context.Context, *AddReviewRequest) (*Tour, error)
 	UploadReviewImage(context.Context, *UploadReviewImageRequest) (*UploadReviewImageResponse, error)
@@ -274,7 +275,7 @@ func (UnimplementedTourServiceServer) AddTransportTime(context.Context, *AddTran
 func (UnimplementedTourServiceServer) PublishTour(context.Context, *PublishTourRequest) (*Tour, error) {
 	return nil, status.Error(codes.Unimplemented, "method PublishTour not implemented")
 }
-func (UnimplementedTourServiceServer) ArchiveTour(context.Context, *ArchiveTourRequest) (*Tour, error) {
+func (UnimplementedTourServiceServer) ArchiveTour(context.Context, *ArchiveTourRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method ArchiveTour not implemented")
 }
 func (UnimplementedTourServiceServer) ReactivateTour(context.Context, *ReactivateTourRequest) (*Tour, error) {

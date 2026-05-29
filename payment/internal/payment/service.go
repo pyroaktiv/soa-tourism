@@ -24,6 +24,9 @@ import (
 const (
 	SubjectPaymentRemoveCommand = "saga.block_author.payment.remove_command"
 	SubjectPaymentRemoveResult  = "saga.block_author.payment.remove_result"
+
+	SubjectPaymentEvictSingleCmd    = "saga.archive_tour.payment.evict_command"
+	SubjectPaymentEvictSingleResult = "saga.archive_tour.payment.evict_result"
 )
 
 type Service struct {
@@ -296,5 +299,35 @@ func (s *Service) startSagaSubscriber() {
 
 	if err != nil {
 		log.Fatalf("Failed to subscribe to Payment remove command: %v", err)
+	}
+
+	_, err2 := s.clients.NatsConn.Subscribe(SubjectPaymentEvictSingleCmd, func(msg *nats.Msg) {
+		var cmd sagav1.EvictSingleTourFromCartCommand
+		if err := proto.Unmarshal(msg.Data, &cmd); err != nil {
+			log.Printf("[Payment Saga 2] Error unmarshalling command: %v", err)
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		err := s.repo.RemoveToursFromAllCarts(ctx, []string{cmd.TourId})
+
+		result := &sagav1.EvictSingleTourFromCartResultEvent{
+			TourId:  cmd.TourId,
+			Success: err == nil,
+		}
+
+		if err != nil {
+			result.ErrorMessage = err.Error()
+			log.Printf("[Payment Saga 2] Failed to evict tour %s: %v", cmd.TourId, err)
+		}
+
+		resultData, _ := proto.Marshal(result)
+		s.clients.NatsConn.Publish(SubjectPaymentEvictSingleResult, resultData)
+	})
+
+	if err2 != nil {
+		log.Fatalf("Failed to subscribe to second Payment saga: %v", err2)
 	}
 }

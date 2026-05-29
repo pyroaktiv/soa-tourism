@@ -55,3 +55,26 @@ export interface FinalizeBlockAuthorCommand {
   userId: string;
   status: SagaStatus;
 }
+
+/** 1. Tour -> Orchestrator: Započinjanje sage (nakon što je tura stavljena u pending) */
+export interface StartArchiveTourEvent {
+  tourId: string;
+}
+
+/** 2. Orchestrator -> Payment: Komanda za izbacivanje jedne specifične ture */
+export interface EvictSingleTourFromCartCommand {
+  tourId: string;
+}
+
+/** 3. Payment -> Orchestrator: Rezultat izbacivanja */
+export interface EvictSingleTourFromCartResultEvent {
+  tourId: string;
+  success: boolean;
+  errorMessage: string;
+}
+
+/** 4. Orchestrator -> Tour: Finalna komanda (Commit = arhiviraj trajno, Rollback = vrati na staro) */
+export interface FinalizeArchiveTourCommand {
+  tourId: string;
+  status: SagaStatus;
+}

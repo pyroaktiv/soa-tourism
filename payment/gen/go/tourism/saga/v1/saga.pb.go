@@ -397,6 +397,210 @@ func (x *FinalizeBlockAuthorCommand) GetStatus() SagaStatus {
 	return SagaStatus_SAGA_STATUS_UNSPECIFIED
 }
 
+// 1. Tour -> Orchestrator: Započinjanje sage (nakon što je tura stavljena u pending)
+type StartArchiveTourEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        string                 `protobuf:"bytes,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartArchiveTourEvent) Reset() {
+	*x = StartArchiveTourEvent{}
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartArchiveTourEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartArchiveTourEvent) ProtoMessage() {}
+
+func (x *StartArchiveTourEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartArchiveTourEvent.ProtoReflect.Descriptor instead.
+func (*StartArchiveTourEvent) Descriptor() ([]byte, []int) {
+	return file_tourism_saga_v1_saga_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *StartArchiveTourEvent) GetTourId() string {
+	if x != nil {
+		return x.TourId
+	}
+	return ""
+}
+
+// 2. Orchestrator -> Payment: Komanda za izbacivanje jedne specifične ture
+type EvictSingleTourFromCartCommand struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        string                 `protobuf:"bytes,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EvictSingleTourFromCartCommand) Reset() {
+	*x = EvictSingleTourFromCartCommand{}
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EvictSingleTourFromCartCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EvictSingleTourFromCartCommand) ProtoMessage() {}
+
+func (x *EvictSingleTourFromCartCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EvictSingleTourFromCartCommand.ProtoReflect.Descriptor instead.
+func (*EvictSingleTourFromCartCommand) Descriptor() ([]byte, []int) {
+	return file_tourism_saga_v1_saga_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *EvictSingleTourFromCartCommand) GetTourId() string {
+	if x != nil {
+		return x.TourId
+	}
+	return ""
+}
+
+// 3. Payment -> Orchestrator: Rezultat izbacivanja
+type EvictSingleTourFromCartResultEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        string                 `protobuf:"bytes,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,3,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EvictSingleTourFromCartResultEvent) Reset() {
+	*x = EvictSingleTourFromCartResultEvent{}
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EvictSingleTourFromCartResultEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EvictSingleTourFromCartResultEvent) ProtoMessage() {}
+
+func (x *EvictSingleTourFromCartResultEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EvictSingleTourFromCartResultEvent.ProtoReflect.Descriptor instead.
+func (*EvictSingleTourFromCartResultEvent) Descriptor() ([]byte, []int) {
+	return file_tourism_saga_v1_saga_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *EvictSingleTourFromCartResultEvent) GetTourId() string {
+	if x != nil {
+		return x.TourId
+	}
+	return ""
+}
+
+func (x *EvictSingleTourFromCartResultEvent) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *EvictSingleTourFromCartResultEvent) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+// 4. Orchestrator -> Tour: Finalna komanda (Commit = arhiviraj trajno, Rollback = vrati na staro)
+type FinalizeArchiveTourCommand struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        string                 `protobuf:"bytes,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	Status        SagaStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=tourism.saga.v1.SagaStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FinalizeArchiveTourCommand) Reset() {
+	*x = FinalizeArchiveTourCommand{}
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FinalizeArchiveTourCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FinalizeArchiveTourCommand) ProtoMessage() {}
+
+func (x *FinalizeArchiveTourCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_tourism_saga_v1_saga_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FinalizeArchiveTourCommand.ProtoReflect.Descriptor instead.
+func (*FinalizeArchiveTourCommand) Descriptor() ([]byte, []int) {
+	return file_tourism_saga_v1_saga_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *FinalizeArchiveTourCommand) GetTourId() string {
+	if x != nil {
+		return x.TourId
+	}
+	return ""
+}
+
+func (x *FinalizeArchiveTourCommand) GetStatus() SagaStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SagaStatus_SAGA_STATUS_UNSPECIFIED
+}
+
 var File_tourism_saga_v1_saga_proto protoreflect.FileDescriptor
 
 const file_tourism_saga_v1_saga_proto_rawDesc = "" +
@@ -420,6 +624,17 @@ const file_tourism_saga_v1_saga_proto_rawDesc = "" +
 	"\rerror_message\x18\x03 \x01(\tR\ferrorMessage\"j\n" +
 	"\x1aFinalizeBlockAuthorCommand\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x123\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1b.tourism.saga.v1.SagaStatusR\x06status\"0\n" +
+	"\x15StartArchiveTourEvent\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\tR\x06tourId\"9\n" +
+	"\x1eEvictSingleTourFromCartCommand\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\tR\x06tourId\"|\n" +
+	"\"EvictSingleTourFromCartResultEvent\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\tR\x06tourId\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12#\n" +
+	"\rerror_message\x18\x03 \x01(\tR\ferrorMessage\"j\n" +
+	"\x1aFinalizeArchiveTourCommand\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\tR\x06tourId\x123\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x1b.tourism.saga.v1.SagaStatusR\x06status*\\\n" +
 	"\n" +
 	"SagaStatus\x12\x1b\n" +
@@ -440,23 +655,28 @@ func file_tourism_saga_v1_saga_proto_rawDescGZIP() []byte {
 }
 
 var file_tourism_saga_v1_saga_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_tourism_saga_v1_saga_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_tourism_saga_v1_saga_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_tourism_saga_v1_saga_proto_goTypes = []any{
-	(SagaStatus)(0),                        // 0: tourism.saga.v1.SagaStatus
-	(*StartBlockAuthorEvent)(nil),          // 1: tourism.saga.v1.StartBlockAuthorEvent
-	(*ArchiveToursCommand)(nil),            // 2: tourism.saga.v1.ArchiveToursCommand
-	(*ArchiveToursResultEvent)(nil),        // 3: tourism.saga.v1.ArchiveToursResultEvent
-	(*RemoveToursFromCartCommand)(nil),     // 4: tourism.saga.v1.RemoveToursFromCartCommand
-	(*RemoveToursFromCartResultEvent)(nil), // 5: tourism.saga.v1.RemoveToursFromCartResultEvent
-	(*FinalizeBlockAuthorCommand)(nil),     // 6: tourism.saga.v1.FinalizeBlockAuthorCommand
+	(SagaStatus)(0),                            // 0: tourism.saga.v1.SagaStatus
+	(*StartBlockAuthorEvent)(nil),              // 1: tourism.saga.v1.StartBlockAuthorEvent
+	(*ArchiveToursCommand)(nil),                // 2: tourism.saga.v1.ArchiveToursCommand
+	(*ArchiveToursResultEvent)(nil),            // 3: tourism.saga.v1.ArchiveToursResultEvent
+	(*RemoveToursFromCartCommand)(nil),         // 4: tourism.saga.v1.RemoveToursFromCartCommand
+	(*RemoveToursFromCartResultEvent)(nil),     // 5: tourism.saga.v1.RemoveToursFromCartResultEvent
+	(*FinalizeBlockAuthorCommand)(nil),         // 6: tourism.saga.v1.FinalizeBlockAuthorCommand
+	(*StartArchiveTourEvent)(nil),              // 7: tourism.saga.v1.StartArchiveTourEvent
+	(*EvictSingleTourFromCartCommand)(nil),     // 8: tourism.saga.v1.EvictSingleTourFromCartCommand
+	(*EvictSingleTourFromCartResultEvent)(nil), // 9: tourism.saga.v1.EvictSingleTourFromCartResultEvent
+	(*FinalizeArchiveTourCommand)(nil),         // 10: tourism.saga.v1.FinalizeArchiveTourCommand
 }
 var file_tourism_saga_v1_saga_proto_depIdxs = []int32{
 	0, // 0: tourism.saga.v1.FinalizeBlockAuthorCommand.status:type_name -> tourism.saga.v1.SagaStatus
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // 1: tourism.saga.v1.FinalizeArchiveTourCommand.status:type_name -> tourism.saga.v1.SagaStatus
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_tourism_saga_v1_saga_proto_init() }
@@ -470,7 +690,7 @@ func file_tourism_saga_v1_saga_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tourism_saga_v1_saga_proto_rawDesc), len(file_tourism_saga_v1_saga_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   6,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

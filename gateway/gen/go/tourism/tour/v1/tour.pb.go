@@ -11,6 +11,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -1526,7 +1527,7 @@ var File_tourism_tour_v1_tour_proto protoreflect.FileDescriptor
 
 const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\n" +
-	"\x1atourism/tour/v1/tour.proto\x12\x0ftourism.tour.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\xad\x01\n" +
+	"\x1atourism/tour/v1/tour.proto\x12\x0ftourism.tour.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xad\x01\n" +
 	"\bKeypoint\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
@@ -1656,7 +1657,7 @@ const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\x1aTRANSPORT_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13TRANSPORT_TYPE_FOOT\x10\x01\x12\x1a\n" +
 	"\x16TRANSPORT_TYPE_BICYCLE\x10\x02\x12\x16\n" +
-	"\x12TRANSPORT_TYPE_CAR\x10\x032\xc2\x0e\n" +
+	"\x12TRANSPORT_TYPE_CAR\x10\x032\xc3\x0e\n" +
 	"\vTourService\x12a\n" +
 	"\n" +
 	"CreateTour\x12\".tourism.tour.v1.CreateTourRequest\x1a\x15.tourism.tour.v1.Tour\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/tours\x12f\n" +
@@ -1669,8 +1670,8 @@ const file_tourism_tour_v1_tour_proto_rawDesc = "" +
 	"\x0eUpdateKeypoint\x12&.tourism.tour.v1.UpdateKeypointRequest\x1a\x15.tourism.tour.v1.Tour\"4\x82\xd3\xe4\x93\x02.:\x01*\x1a)/api/v1/tours/{tour_id}/keypoints/{order}\x12\x82\x01\n" +
 	"\x0eDeleteKeypoint\x12&.tourism.tour.v1.DeleteKeypointRequest\x1a\x15.tourism.tour.v1.Tour\"1\x82\xd3\xe4\x93\x02+*)/api/v1/tours/{tour_id}/keypoints/{order}\x12\x87\x01\n" +
 	"\x10AddTransportTime\x12(.tourism.tour.v1.AddTransportTimeRequest\x1a\x15.tourism.tour.v1.Tour\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/tours/{tour_id}/transport-times\x12p\n" +
-	"\vPublishTour\x12#.tourism.tour.v1.PublishTourRequest\x1a\x15.tourism.tour.v1.Tour\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/tours/{id}/publish\x12p\n" +
-	"\vArchiveTour\x12#.tourism.tour.v1.ArchiveTourRequest\x1a\x15.tourism.tour.v1.Tour\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/tours/{id}/archive\x12y\n" +
+	"\vPublishTour\x12#.tourism.tour.v1.PublishTourRequest\x1a\x15.tourism.tour.v1.Tour\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/tours/{id}/publish\x12q\n" +
+	"\vArchiveTour\x12#.tourism.tour.v1.ArchiveTourRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/tours/{id}/archive\x12y\n" +
 	"\x0eReactivateTour\x12&.tourism.tour.v1.ReactivateTourRequest\x1a\x15.tourism.tour.v1.Tour\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/tours/{id}/reactivate\x12q\n" +
 	"\tAddReview\x12!.tourism.tour.v1.AddReviewRequest\x1a\x15.tourism.tour.v1.Tour\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/api/v1/tours/{tour_id}/reviews\x12\x93\x01\n" +
 	"\x11UploadReviewImage\x12).tourism.tour.v1.UploadReviewImageRequest\x1a*.tourism.tour.v1.UploadReviewImageResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/api/v1/tours/reviews/images\x12\x9b\x01\n" +
@@ -1716,6 +1717,7 @@ var file_tourism_tour_v1_tour_proto_goTypes = []any{
 	(*UploadKeypointImageResponse)(nil), // 21: tourism.tour.v1.UploadKeypointImageResponse
 	(*UpdateKeypointRequest)(nil),       // 22: tourism.tour.v1.UpdateKeypointRequest
 	(*DeleteKeypointRequest)(nil),       // 23: tourism.tour.v1.DeleteKeypointRequest
+	(*emptypb.Empty)(nil),               // 24: google.protobuf.Empty
 }
 var file_tourism_tour_v1_tour_proto_depIdxs = []int32{
 	1,  // 0: tourism.tour.v1.TransportTime.transport:type_name -> tourism.tour.v1.TransportType
@@ -1750,7 +1752,7 @@ var file_tourism_tour_v1_tour_proto_depIdxs = []int32{
 	5,  // 29: tourism.tour.v1.TourService.DeleteKeypoint:output_type -> tourism.tour.v1.Tour
 	5,  // 30: tourism.tour.v1.TourService.AddTransportTime:output_type -> tourism.tour.v1.Tour
 	5,  // 31: tourism.tour.v1.TourService.PublishTour:output_type -> tourism.tour.v1.Tour
-	5,  // 32: tourism.tour.v1.TourService.ArchiveTour:output_type -> tourism.tour.v1.Tour
+	24, // 32: tourism.tour.v1.TourService.ArchiveTour:output_type -> google.protobuf.Empty
 	5,  // 33: tourism.tour.v1.TourService.ReactivateTour:output_type -> tourism.tour.v1.Tour
 	5,  // 34: tourism.tour.v1.TourService.AddReview:output_type -> tourism.tour.v1.Tour
 	19, // 35: tourism.tour.v1.TourService.UploadReviewImage:output_type -> tourism.tour.v1.UploadReviewImageResponse

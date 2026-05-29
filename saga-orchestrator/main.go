@@ -28,10 +28,15 @@ func main() {
 	// Inicijalizacija orkestratora za proces blokiranja autora
 	blockAuthorOrchestrator := orchestrator.NewBlockAuthorOrchestrator(nc)
 	if err := blockAuthorOrchestrator.Start(); err != nil {
-		log.Fatalf("Failed to start orchestrator: %v", err)
+		log.Fatalf("Failed to start block author orchestrator: %v", err)
 	}
 
-	log.Println("Orchestrator is running. Waiting for events...")
+	archiveTourOrchestrator := orchestrator.NewArchiveTourOrchestrator(nc)
+	if err := archiveTourOrchestrator.Start(); err != nil {
+		log.Fatalf("Failed to start archive tour orchestrator: %v", err)
+	}
+
+	log.Println("All Orchestrators are running. Waiting for events...")
 
 	// Graceful shutdown
 	quit := make(chan os.Signal, 1)

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1atourism/saga/v1/saga.proto\x12\x0ftourism.saga.v1\"0\n\x15StartBlockAuthorEvent\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\".\n\x13\x41rchiveToursCommand\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\"\x8c\x01\n\x17\x41rchiveToursResultEvent\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x18\n\x07success\x18\x02 \x01(\x08R\x07success\x12\x19\n\x08tour_ids\x18\x03 \x03(\tR\x07tourIds\x12#\n\rerror_message\x18\x04 \x01(\tR\x0c\x65rrorMessage\"P\n\x1aRemoveToursFromCartCommand\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x19\n\x08tour_ids\x18\x02 \x03(\tR\x07tourIds\"x\n\x1eRemoveToursFromCartResultEvent\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x18\n\x07success\x18\x02 \x01(\x08R\x07success\x12#\n\rerror_message\x18\x03 \x01(\tR\x0c\x65rrorMessage\"j\n\x1a\x46inalizeBlockAuthorCommand\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x33\n\x06status\x18\x02 \x01(\x0e\x32\x1b.tourism.saga.v1.SagaStatusR\x06status*\\\n\nSagaStatus\x12\x1b\n\x17SAGA_STATUS_UNSPECIFIED\x10\x00\x12\x17\n\x13SAGA_STATUS_SUCCESS\x10\x01\x12\x18\n\x14SAGA_STATUS_ROLLBACK\x10\x02\x42RZPgithub.com/pyroaktiv/soa-tourism/saga-orchestrator/gen/go/tourism/saga/v1;sagav1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1atourism/saga/v1/saga.proto\x12\x0ftourism.saga.v1\"0\n\x15StartBlockAuthorEvent\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\".\n\x13\x41rchiveToursCommand\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\"\x8c\x01\n\x17\x41rchiveToursResultEvent\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x18\n\x07success\x18\x02 \x01(\x08R\x07success\x12\x19\n\x08tour_ids\x18\x03 \x03(\tR\x07tourIds\x12#\n\rerror_message\x18\x04 \x01(\tR\x0c\x65rrorMessage\"P\n\x1aRemoveToursFromCartCommand\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x19\n\x08tour_ids\x18\x02 \x03(\tR\x07tourIds\"x\n\x1eRemoveToursFromCartResultEvent\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x18\n\x07success\x18\x02 \x01(\x08R\x07success\x12#\n\rerror_message\x18\x03 \x01(\tR\x0c\x65rrorMessage\"j\n\x1a\x46inalizeBlockAuthorCommand\x12\x17\n\x07user_id\x18\x01 \x01(\tR\x06userId\x12\x33\n\x06status\x18\x02 \x01(\x0e\x32\x1b.tourism.saga.v1.SagaStatusR\x06status\"0\n\x15StartArchiveTourEvent\x12\x17\n\x07tour_id\x18\x01 \x01(\tR\x06tourId\"9\n\x1e\x45victSingleTourFromCartCommand\x12\x17\n\x07tour_id\x18\x01 \x01(\tR\x06tourId\"|\n\"EvictSingleTourFromCartResultEvent\x12\x17\n\x07tour_id\x18\x01 \x01(\tR\x06tourId\x12\x18\n\x07success\x18\x02 \x01(\x08R\x07success\x12#\n\rerror_message\x18\x03 \x01(\tR\x0c\x65rrorMessage\"j\n\x1a\x46inalizeArchiveTourCommand\x12\x17\n\x07tour_id\x18\x01 \x01(\tR\x06tourId\x12\x33\n\x06status\x18\x02 \x01(\x0e\x32\x1b.tourism.saga.v1.SagaStatusR\x06status*\\\n\nSagaStatus\x12\x1b\n\x17SAGA_STATUS_UNSPECIFIED\x10\x00\x12\x17\n\x13SAGA_STATUS_SUCCESS\x10\x01\x12\x18\n\x14SAGA_STATUS_ROLLBACK\x10\x02\x42RZPgithub.com/pyroaktiv/soa-tourism/saga-orchestrator/gen/go/tourism/saga/v1;sagav1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,8 +32,8 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'tourism.saga.v1.saga_pb2', 
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'ZPgithub.com/pyroaktiv/soa-tourism/saga-orchestrator/gen/go/tourism/saga/v1;sagav1'
-  _globals['_SAGASTATUS']._serialized_start=600
-  _globals['_SAGASTATUS']._serialized_end=692
+  _globals['_SAGASTATUS']._serialized_start=943
+  _globals['_SAGASTATUS']._serialized_end=1035
   _globals['_STARTBLOCKAUTHOREVENT']._serialized_start=47
   _globals['_STARTBLOCKAUTHOREVENT']._serialized_end=95
   _globals['_ARCHIVETOURSCOMMAND']._serialized_start=97
@@ -46,4 +46,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_REMOVETOURSFROMCARTRESULTEVENT']._serialized_end=490
   _globals['_FINALIZEBLOCKAUTHORCOMMAND']._serialized_start=492
   _globals['_FINALIZEBLOCKAUTHORCOMMAND']._serialized_end=598
+  _globals['_STARTARCHIVETOUREVENT']._serialized_start=600
+  _globals['_STARTARCHIVETOUREVENT']._serialized_end=648
+  _globals['_EVICTSINGLETOURFROMCARTCOMMAND']._serialized_start=650
+  _globals['_EVICTSINGLETOURFROMCARTCOMMAND']._serialized_end=707
+  _globals['_EVICTSINGLETOURFROMCARTRESULTEVENT']._serialized_start=709
+  _globals['_EVICTSINGLETOURFROMCARTRESULTEVENT']._serialized_end=833
+  _globals['_FINALIZEARCHIVETOURCOMMAND']._serialized_start=835
+  _globals['_FINALIZEARCHIVETOURCOMMAND']._serialized_end=941
 # @@protoc_insertion_point(module_scope)
