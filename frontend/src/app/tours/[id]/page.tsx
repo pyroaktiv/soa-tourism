@@ -1,6 +1,7 @@
 // src/app/tours/[id]/page.tsx
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -123,9 +124,17 @@ export default function TouristTourPage() {
                 )}
               </div>
               {purchased ? (
-                <span className="bg-green-100 text-green-800 font-bold px-4 py-2 rounded">
-                  Kupljena ✓
-                </span>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <span className="bg-green-100 text-green-800 font-bold px-4 py-2 rounded">
+                    Kupljena ✓
+                  </span>
+                  <Link
+                    href={`/tours/${id}/execute`}
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Pokreni izvršenje
+                  </Link>
+                </div>
               ) : (
                 <button
                   onClick={handleAddToCart}

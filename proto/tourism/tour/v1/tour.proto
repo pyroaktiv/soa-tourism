@@ -174,6 +174,48 @@ message DeleteKeypointRequest {
   int32 order = 2;
 }
 
+message StartExecutionRequest {
+  string tour_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message ExecutionKeypoint {
+  int32 order = 1;
+  string name = 2;
+  double latitude = 3;
+  double longitude = 4;
+  string visited_at = 5;
+}
+
+message TourExecution {
+  string id = 1;
+  string tour_id = 2;
+  string user_id = 3;
+  string status = 4;
+  string started_at = 5;
+  string last_activity_at = 6;
+  string completed_at = 7;
+  string abandoned_at = 8;
+  repeated ExecutionKeypoint visited_keypoints = 9;
+}
+
+message HeartbeatRequest {
+  string execution_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message HeartbeatResponse {
+  TourExecution execution = 1;
+  bool newlyVisited = 2;
+  int32 visitedOrder = 3;
+}
+
+message AbandonExecutionRequest { string execution_id = 1; }
+message AbandonExecutionResponse { TourExecution execution = 1; }
+
+
 service TourService {
   rpc CreateTour(CreateTourRequest) returns (Tour) {
     option (google.api.http) = {
@@ -274,5 +316,20 @@ service TourService {
       post: "/api/v1/tours/keypoints/images"
       body: "*"
     };
+  }
+  rpc StartExecution(StartExecutionRequest) returns (TourExecution) {
+    option (google.api.http) = { post: "/api/v1/tours/{tour_id}/executions:start" body:"*" };
+  }
+  rpc HeartbeatExecution(HeartbeatRequest) returns (HeartbeatResponse) {
+    option (google.api.http) = { post: "/api/v1/tours/executions/heartbeat" body:"*" };
+  }
+  rpc AbandonExecution(AbandonExecutionRequest) returns (AbandonExecutionResponse) {
+    option (google.api.http) = { post: "/api/v1/tours/executions/{execution_id}/abandon" body:"*" };
+  }
+  rpc GetExecution(GetTourRequest) returns (TourExecution) {
+    option (google.api.http) = { get: "/api/v1/tours/executions/{id}" };
+  }
+  rpc ListMyExecutions(ListMyToursRequest) returns (ListToursResponse) {
+    option (google.api.http) = { get: "/api/v1/tours/executions" };
   }
 }

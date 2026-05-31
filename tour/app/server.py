@@ -193,10 +193,12 @@ class TourSagaHandler:
 class TourService(tour_pb2_grpc.TourServiceServicer):
     def __init__(self, db, auth_channel: grpc.Channel, payment_channel: grpc.Channel, seaweedfs_url: str, saga_handler: TourSagaHandler) -> None:
         self._tours = db.get_collection("tours")
+        self._executions = db.get_collection("tour_executions")
         self._auth_stub = auth_pb2_grpc.AuthServiceStub(auth_channel)
         self._payment_stub = payment_pb2_grpc.PaymentServiceStub(payment_channel)
         self._seaweedfs_url = seaweedfs_url
         self._saga_handler = saga_handler
+        
 
     def _require_auth(self, context):
         meta = dict(context.invocation_metadata())
@@ -654,7 +656,147 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
         return tour_pb2.UploadKeypointImageResponse(
             image_url=path
         )
+    def _get_execution_or_abort(self, execution_id, context):
+        doc = self._executions.find_one({"_id": execution_id})
+        if doc is None:
+            context.abort(grpc.StatusCode.NOT_FOUND, "execution not found")
+        return doc
 
+    def _doc_to_execution(self, doc):
+        return tour_pb2.TourExecution(
+            id=str(doc["_id"]),
+            tour_id=doc.get("tour_id", ""),
+            user_id=doc.get("user_id", ""),
+            status=doc.get("status", ""),
+            started_at=doc.get("started_at", ""),
+            last_activity_at=doc.get("last_activity_at", ""),
+            completed_at=doc.get("completed_at", ""),
+            abandoned_at=doc.get("abandoned_at", ""),
+            visited_keypoints=[
+                tour_pb2.ExecutionKeypoint(
+                    order=kp.get("order", 0),
+                    name=kp.get("name", ""),
+                    latitude=kp.get("latitude", 0.0),
+                    longitude=kp.get("longitude", 0.0),
+                    visited_at=kp.get("visited_at", ""),
+                )
+                for kp in doc.get("visited_keypoints", [])
+            ],
+        )
+    def StartExecution(self, request, context):
+        user = self._require_auth(context)
+        self._require_role(user, "tourist", context)
+
+        tour_doc = self._get_tour_or_abort(request.tour_id, context)
+        if tour_doc.get("status") != "published":
+            context.abort(grpc.StatusCode.FAILED_PRECONDITION, "tour is not published")
+
+        execution_id = str(uuid4())
+        doc = {
+            "_id": execution_id,
+            "tour_id": request.tour_id,
+            "user_id": user.id,
+            "status": "started",
+            "started_at": _now_iso(),
+            "last_activity_at": _now_iso(),
+            "completed_at": "",
+            "abandoned_at": "",
+            "visited_keypoints": [],
+        }
+        self._executions.insert_one(doc)
+        return self._doc_to_execution(doc)
+
+    def HeartbeatExecution(self, request, context):
+        user = self._require_auth(context)
+        self._require_role(user, "tourist", context)
+
+        exec_doc = self._get_execution_or_abort(request.execution_id, context)
+        if exec_doc["user_id"] != user.id:
+            context.abort(grpc.StatusCode.PERMISSION_DENIED, "not your execution")
+        if exec_doc["status"] in ("completed", "abandoned"):
+            context.abort(grpc.StatusCode.FAILED_PRECONDITION, "execution is no longer active")
+
+        tour_doc = self._get_tour_or_abort(exec_doc["tour_id"], context)
+        visited_orders = {kp.get("order") for kp in exec_doc.get("visited_keypoints", [])}
+
+        remaining_keypoints = [
+            kp for kp in tour_doc.get("keypoints", [])
+            if kp.get("order") not in visited_orders
+        ]
+        remaining_keypoints.sort(key=lambda kp: kp.get("order", 0))
+        next_keypoint = remaining_keypoints[0] if remaining_keypoints else None
+
+        updates = {"last_activity_at": _now_iso()}
+        newly_visited = False
+        visited_order = -1
+
+        if next_keypoint is not None:
+            dist = _haversine_km(
+                request.latitude,
+                request.longitude,
+                next_keypoint.get("latitude", 0.0),
+                next_keypoint.get("longitude", 0.0),
+            )
+            if dist <= 0.05:
+                visited = exec_doc.get("visited_keypoints", [])
+                visited.append({
+                    "order": next_keypoint["order"],
+                    "name": next_keypoint.get("name", ""),
+                    "latitude": next_keypoint.get("latitude", 0.0),
+                    "longitude": next_keypoint.get("longitude", 0.0),
+                    "visited_at": _now_iso(),
+                })
+                updates["visited_keypoints"] = visited
+                newly_visited = True
+                visited_order = next_keypoint["order"]
+
+                if len(visited) >= len(tour_doc.get("keypoints", [])):
+                    updates["status"] = "completed"
+                    updates["completed_at"] = _now_iso()
+
+        updated = self._executions.find_one_and_update(
+            {"_id": request.execution_id},
+            {"$set": updates},
+            return_document=ReturnDocument.AFTER,
+        )
+
+        return tour_pb2.HeartbeatResponse(
+            execution=self._doc_to_execution(updated),
+            newlyVisited=newly_visited,
+            visitedOrder=visited_order,
+        )
+
+    def AbandonExecution(self, request, context):
+        user = self._require_auth(context)
+        self._require_role(user, "tourist", context)
+
+        exec_doc = self._get_execution_or_abort(request.execution_id, context)
+        if exec_doc["user_id"] != user.id:
+            context.abort(grpc.StatusCode.PERMISSION_DENIED, "not your execution")
+        if exec_doc["status"] in ("completed", "abandoned"):
+            context.abort(grpc.StatusCode.FAILED_PRECONDITION, "execution is no longer active")
+
+        doc = self._executions.find_one_and_update(
+            {"_id": request.execution_id},
+            {"$set": {
+                "status": "abandoned",
+                "abandoned_at": _now_iso(),
+                "last_activity_at": _now_iso(),
+            }},
+            return_document=ReturnDocument.AFTER,
+        )
+        return tour_pb2.AbandonExecutionResponse(
+            execution=self._doc_to_execution(doc)
+        )
+
+    def GetExecution(self, request, context):
+        user = self._require_auth(context)
+        self._require_role(user, "tourist", context)
+
+        exec_doc = self._get_execution_or_abort(request.id, context)
+        if exec_doc["user_id"] != user.id:
+            context.abort(grpc.StatusCode.PERMISSION_DENIED, "not your execution")
+        return self._doc_to_execution(exec_doc)
 
 def serve():
     db = MongoClient(_MONGO_URI)[_MONGO_DB]
