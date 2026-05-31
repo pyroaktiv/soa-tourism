@@ -26,8 +26,22 @@ export default function MyToursPage() {
 
   const handleArchive = async (id: string) => {
     if (confirm("Da li ste sigurni da želite da arhivirate ovu turu?")) {
-      await archiveTour(id);
-      fetchTours();
+      try {
+        await archiveTour(id);
+
+        setTours((prevTours) =>
+          prevTours.map((t) =>
+            t.id === id ? { ...t, status: "archive_pending" } : t,
+          ),
+        );
+
+        setTimeout(() => {
+          fetchTours();
+        }, 1500);
+      } catch (err) {
+        console.error(err);
+        alert("Došlo je do greške prilikom arhiviranja.");
+      }
     }
   };
 
@@ -77,6 +91,12 @@ export default function MyToursPage() {
                   >
                     Arhiviraj
                   </button>
+                )}
+
+                {status === "archive_pending" && (
+                  <span className="text-yellow-600 font-bold px-4 py-2">
+                    Arhiviranje u toku...
+                  </span>
                 )}
 
                 {status === "archived" && (

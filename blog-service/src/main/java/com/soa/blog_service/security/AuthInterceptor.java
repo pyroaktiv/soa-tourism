@@ -13,6 +13,7 @@ import io.grpc.ServerInterceptor;
 import io.grpc.Status;
 import lombok.RequiredArgsConstructor;
 import tourism.auth.v1.ValidateResponse;
+import tourism.auth.v1.AccountState;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class AuthInterceptor implements ServerInterceptor {
         try {
             ValidateResponse response = authClient.validateToken(token);
 
-            if (!response.getValid() || response.getUser().getBlocked()) {
+            if (!response.getValid() || response.getUser().getState() == AccountState.ACCOUNT_STATE_BLOCKED) {
                 call.close(Status.UNAUTHENTICATED.withDescription("Token je istekao ili je korisnik blokiran!"), headers);
                 return new ServerCall.Listener<ReqT>() {};
             }

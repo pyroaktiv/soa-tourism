@@ -1,6 +1,7 @@
 version: v2
 inputs:
   - proto_file: ../proto/tourism/auth/v1/auth.proto
+  - proto_file: ../proto/tourism/saga/v1/saga.proto
 plugins:
   # Generates *.pb.go — message and enum types
   - local: protoc-gen-go

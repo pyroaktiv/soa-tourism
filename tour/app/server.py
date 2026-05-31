@@ -1,6 +1,8 @@
 import logging
 import math
 import os
+import asyncio
+import threading
 from concurrent import futures
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -9,21 +11,29 @@ import grpc
 import requests
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
+from nats.aio.client import Client as NATS
 
 from tourism.auth.v1 import auth_pb2_grpc, auth_pb2
+from tourism.payment.v1 import payment_pb2, payment_pb2_grpc
 from tourism.tour.v1 import tour_pb2, tour_pb2_grpc
+from tourism.saga.v1 import saga_pb2
+
+from google.protobuf import empty_pb2
 
 logging.basicConfig(level=logging.INFO)
 
 _GRPC_ADDR = os.environ.get("GRPC_ADDR", "0.0.0.0:9090")
 _MONGO_URI = os.environ.get("MONGO_URI", "mongodb://mongo:27017")
 _MONGO_DB = os.environ.get("MONGO_DB", "tourdb")
+_NATS_URL = os.environ.get("NATS_URL", "nats://nats:4222")
 _AUTH_SERVICE_ADDR = os.environ.get("AUTH_SERVICE_ADDR", "auth-service:9090")
+_PAYMENT_SERVICE_ADDR = os.environ.get("PAYMENT_SERVICE_ADDR", "payment:9090")
 _SEAWEEDFS_FILER_URL = os.environ.get("SEAWEEDFS_FILER_URL", "http://seaweedfs:8888")
 
 _STATUS_MAP = {
     "draft": tour_pb2.TOUR_STATUS_DRAFT,
     "published": tour_pb2.TOUR_STATUS_PUBLISHED,
+    "archive_pending": tour_pb2.TOUR_STATUS_ARCHIVE_PENDING,
     "archived": tour_pb2.TOUR_STATUS_ARCHIVED,
 }
 
@@ -67,11 +77,126 @@ def _now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 
+class TourSagaHandler:
+    def __init__(self, db, nats_url):
+        self._tours = db.get_collection("tours")
+        self._nats_url = nats_url
+        self._nc = NATS()
+        self._loop = asyncio.new_event_loop()
+
+    def start(self):
+        """Pokreće NATS osluškivač u posebnoj pozadinskoj niti."""
+        t = threading.Thread(target=self._run_loop, daemon=True)
+        t.start()
+
+    def _run_loop(self):
+        asyncio.set_event_loop(self._loop)
+        self._loop.run_until_complete(self._connect_and_subscribe())
+        self._loop.run_forever()
+
+    async def _connect_and_subscribe(self):
+        await self._nc.connect(self._nats_url)
+        logging.info("Tour Saga Handler connected to NATS at %s", self._nats_url)
+        
+        # Slušamo komande od orkestratora
+        await self._nc.subscribe("saga.block_author.tour.archive_command", cb=self._handle_archive_command)
+        await self._nc.subscribe("saga.block_author.tour.finalize_command", cb=self._handle_finalize_command)
+        await self._nc.subscribe("saga.archive_tour.tour.finalize_command", cb=self._handle_finalize_single_command)
+
+    async def _handle_archive_command(self, msg):
+        user_id = ""
+        try:
+            cmd = saga_pb2.ArchiveToursCommand()
+            cmd.ParseFromString(msg.data)
+            user_id = cmd.user_id
+            logging.info("[Tour Saga] Received archive command for author: %s", user_id)
+
+            # Koristimo Mongo pipeline update da sačuvamo trenutno stanje u 'previous_status' 
+            # i prebacimo sve ture tog autora koje nisu arhivirane u 'archive_pending'
+            self._tours.update_many(
+                {"author_id": user_id, "status": {"$in": ["draft", "published"]}},
+                [{"$set": {"previous_status": "$status", "status": "archive_pending"}}]
+            )
+
+            # Pokupimo ID-jeve svih tura koje su sada uspešno prebačene u pending
+            cursor = self._tours.find({"author_id": user_id, "status": "archive_pending"}, ["_id"])
+            tour_ids = [str(doc["_id"]) for doc in cursor]
+
+            # Šaljemo uspeh nazad orkestratoru sa listom ID-jeva tura
+            event = saga_pb2.ArchiveToursResultEvent(
+                user_id=user_id,
+                success=True,
+                tour_ids=tour_ids
+            )
+            await self._nc.publish("saga.block_author.tour.archive_result", event.SerializeToString())
+            logging.info("[Tour Saga] Successfully processed archive. Found %d tours for author %s", len(tour_ids), user_id)
+
+        except Exception as exc:
+            logging.error("[Tour Saga] Error processing archive command: %s", exc)
+            try:
+                event = saga_pb2.ArchiveToursResultEvent(
+                    user_id=user_id,
+                    success=False,
+                    error_message=str(exc)
+                )
+                await self._nc.publish("saga.block_author.tour.archive_result", event.SerializeToString())
+            except Exception as publish_exc:
+                logging.error("[Tour Saga] Failed to publish error event: %s", publish_exc)
+
+    async def _handle_finalize_command(self, msg):
+        try:
+            cmd = saga_pb2.FinalizeBlockAuthorCommand()
+            cmd.ParseFromString(msg.data)
+            user_id = cmd.user_id
+            status = cmd.status
+            logging.info("[Tour Saga] Received finalize command for user %s with status %s", user_id, status)
+
+            if status == saga_pb2.SAGA_STATUS_SUCCESS:
+                # COMMIT: Prebaci u trajno arhivirano stanje i obriši privremeni 'previous_status'
+                self._tours.update_many(
+                    {"author_id": user_id, "status": "archive_pending"},
+                    {"$set": {"status": "archived", "archived_at": _now_iso()}, "$unset": {"previous_status": ""}}
+                )
+                logging.info("[Tour Saga] COMMIT COMPLETE: All pending tours for author %s are now permanently archived.", user_id)
+            
+            elif status == saga_pb2.SAGA_STATUS_ROLLBACK:
+                # ROLLBACK: Vrati status na ono što je pisalo u 'previous_status' (ako nema, stavi published)
+                self._tours.update_many(
+                    {"author_id": user_id, "status": "archive_pending"},
+                    [{"$set": {"status": {"$ifNull": ["$previous_status", "published"]}}}, {"$unset": "previous_status"}]
+                )
+                logging.info("[Tour Saga] ROLLBACK COMPLETE: All pending tours for author %s reverted to their original state.", user_id)
+
+        except Exception as exc:
+            logging.error("[Tour Saga] Error processing finalize command: %s", exc)
+
+    async def _handle_finalize_single_command(self, msg):
+        try:
+            cmd = saga_pb2.FinalizeArchiveTourCommand()
+            cmd.ParseFromString(msg.data)
+            logging.info("[Archive Tour Saga] Finalize command for tour %s, status: %s", cmd.tour_id, cmd.status)
+
+            if cmd.status == saga_pb2.SAGA_STATUS_SUCCESS:
+                self._tours.update_one(
+                    {"_id": cmd.tour_id, "status": "archive_pending"},
+                    {"$set": {"status": "archived", "archived_at": _now_iso()}, "$unset": {"previous_status": ""}}
+                )
+            elif cmd.status == saga_pb2.SAGA_STATUS_ROLLBACK:
+                self._tours.update_one(
+                    {"_id": cmd.tour_id, "status": "archive_pending"},
+                    [{"$set": {"status": {"$ifNull": ["$previous_status", "published"]}}}, {"$unset": "previous_status"}]
+                )
+        except Exception as exc:
+            logging.error("[Archive Tour Saga] Error: %s", exc)
+
+
 class TourService(tour_pb2_grpc.TourServiceServicer):
-    def __init__(self, db, auth_channel: grpc.Channel, seaweedfs_url: str) -> None:
+    def __init__(self, db, auth_channel: grpc.Channel, payment_channel: grpc.Channel, seaweedfs_url: str, saga_handler: TourSagaHandler) -> None:
         self._tours = db.get_collection("tours")
         self._auth_stub = auth_pb2_grpc.AuthServiceStub(auth_channel)
+        self._payment_stub = payment_pb2_grpc.PaymentServiceStub(payment_channel)
         self._seaweedfs_url = seaweedfs_url
+        self._saga_handler = saga_handler
 
     def _require_auth(self, context):
         meta = dict(context.invocation_metadata())
@@ -220,9 +345,9 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
     def GetTour(self, request, context):
         doc = self._get_tour_or_abort(request.id, context)
 
-        # Try to identify caller's role to filter response for non-authors. 
-        # Only authors can see full details of their own tours, others see 
-        # limited info and only if published.
+        # Identify caller. Author who owns this tour sees full details.
+        # A tourist who has purchased it (via payment service) also sees all
+        # keypoints — per spec 16: "Ture koje su kupljene otkrivaju sve ključne tačke."
         meta = dict(context.invocation_metadata())
         auth_header = meta.get("authorization", "")
         full = False
@@ -236,6 +361,16 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
                     is_author = "author" in resp.user.roles
                     owns_tour = resp.user.id == doc["author_id"]
                     full = is_author and owns_tour
+                    if not full and "tourist" in resp.user.roles:
+                        try:
+                            has = self._payment_stub.HasToken(
+                                payment_pb2.HasTokenRequest(tour_id=request.id),
+                                metadata=(("authorization", auth_header),),
+                            )
+                            if has.has_token:
+                                full = True
+                        except grpc.RpcError as exc:
+                            logging.warning("payment HasToken failed: %s", exc)
             except grpc.RpcError:
                 pass
 
@@ -405,13 +540,19 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
             context.abort(grpc.StatusCode.PERMISSION_DENIED, "not your tour")
         if doc["status"] != "published":
             context.abort(grpc.StatusCode.FAILED_PRECONDITION, "only published tours can be archived")
-
-        doc = self._tours.find_one_and_update(
+        
+        self._tours.update_one(
             {"_id": request.id},
-            {"$set": {"status": "archived", "archived_at": _now_iso()}},
-            return_document=ReturnDocument.AFTER,
+            {"$set": {"previous_status": doc["status"], "status": "archive_pending"}}
         )
-        return self._doc_to_tour(doc)
+
+        event = saga_pb2.StartArchiveTourEvent(tour_id=request.id)
+        asyncio.run_coroutine_threadsafe(
+            self._saga_handler._nc.publish("saga.archive_tour.tour.started", event.SerializeToString()),
+            self._saga_handler._loop
+        )
+        
+        return empty_pb2.Empty()
 
     def ReactivateTour(self, request, context):
         user = self._require_auth(context)
@@ -518,10 +659,14 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
 def serve():
     db = MongoClient(_MONGO_URI)[_MONGO_DB]
     auth_channel = grpc.insecure_channel(_AUTH_SERVICE_ADDR)
+    payment_channel = grpc.insecure_channel(_PAYMENT_SERVICE_ADDR)
+
+    saga_handler = TourSagaHandler(db, _NATS_URL)
+    saga_handler.start()
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     tour_pb2_grpc.add_TourServiceServicer_to_server(
-        TourService(db, auth_channel, _SEAWEEDFS_FILER_URL), server
+        TourService(db, auth_channel, payment_channel, _SEAWEEDFS_FILER_URL, saga_handler), server
     )
     server.add_insecure_port(_GRPC_ADDR)
     server.start()

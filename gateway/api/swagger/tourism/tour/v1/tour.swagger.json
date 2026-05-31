@@ -232,7 +232,8 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Tour"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -840,6 +841,7 @@
         "TOUR_STATUS_UNSPECIFIED",
         "TOUR_STATUS_DRAFT",
         "TOUR_STATUS_PUBLISHED",
+        "TOUR_STATUS_ARCHIVE_PENDING",
         "TOUR_STATUS_ARCHIVED"
       ],
       "default": "TOUR_STATUS_UNSPECIFIED"

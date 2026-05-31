@@ -2,6 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from tourism.tour.v1 import tour_pb2 as tourism_dot_tour_dot_v1_dot_tour__pb2
 
 
@@ -67,7 +68,7 @@ class TourServiceStub(object):
         self.ArchiveTour = channel.unary_unary(
                 '/tourism.tour.v1.TourService/ArchiveTour',
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ArchiveTourRequest.SerializeToString,
-                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.ReactivateTour = channel.unary_unary(
                 '/tourism.tour.v1.TourService/ReactivateTour',
@@ -240,7 +241,7 @@ def add_TourServiceServicer_to_server(servicer, server):
             'ArchiveTour': grpc.unary_unary_rpc_method_handler(
                     servicer.ArchiveTour,
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ArchiveTourRequest.FromString,
-                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
             'ReactivateTour': grpc.unary_unary_rpc_method_handler(
                     servicer.ReactivateTour,
@@ -559,7 +560,7 @@ class TourService(object):
             target,
             '/tourism.tour.v1.TourService/ArchiveTour',
             tourism_dot_tour_dot_v1_dot_tour__pb2.ArchiveTourRequest.SerializeToString,
-            tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

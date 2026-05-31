@@ -22,12 +22,57 @@ import { Empty } from "../../../google/protobuf/empty_pb";
 
 export const protobufPackage = "tourism.auth.v1";
 
+export enum AccountState {
+  ACCOUNT_STATE_UNSPECIFIED = 0,
+  ACCOUNT_STATE_ACTIVE = 1,
+  ACCOUNT_STATE_BLOCK_PENDING = 2,
+  ACCOUNT_STATE_BLOCKED = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function accountStateFromJSON(object: any): AccountState {
+  switch (object) {
+    case 0:
+    case "ACCOUNT_STATE_UNSPECIFIED":
+      return AccountState.ACCOUNT_STATE_UNSPECIFIED;
+    case 1:
+    case "ACCOUNT_STATE_ACTIVE":
+      return AccountState.ACCOUNT_STATE_ACTIVE;
+    case 2:
+    case "ACCOUNT_STATE_BLOCK_PENDING":
+      return AccountState.ACCOUNT_STATE_BLOCK_PENDING;
+    case 3:
+    case "ACCOUNT_STATE_BLOCKED":
+      return AccountState.ACCOUNT_STATE_BLOCKED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AccountState.UNRECOGNIZED;
+  }
+}
+
+export function accountStateToJSON(object: AccountState): string {
+  switch (object) {
+    case AccountState.ACCOUNT_STATE_UNSPECIFIED:
+      return "ACCOUNT_STATE_UNSPECIFIED";
+    case AccountState.ACCOUNT_STATE_ACTIVE:
+      return "ACCOUNT_STATE_ACTIVE";
+    case AccountState.ACCOUNT_STATE_BLOCK_PENDING:
+      return "ACCOUNT_STATE_BLOCK_PENDING";
+    case AccountState.ACCOUNT_STATE_BLOCKED:
+      return "ACCOUNT_STATE_BLOCKED";
+    case AccountState.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface User {
   id: string;
   username: string;
   email: string;
   roles: string[];
-  blocked: boolean;
+  state: AccountState;
 }
 
 export interface TokenPair {
@@ -110,7 +155,7 @@ export interface GetUsernameResponse {
 }
 
 function createBaseUser(): User {
-  return { id: "", username: "", email: "", roles: [], blocked: false };
+  return { id: "", username: "", email: "", roles: [], state: 0 };
 }
 
 export const User: MessageFns<User> = {
@@ -127,8 +172,8 @@ export const User: MessageFns<User> = {
     for (const v of message.roles) {
       writer.uint32(34).string(v!);
     }
-    if (message.blocked !== false) {
-      writer.uint32(40).bool(message.blocked);
+    if (message.state !== 0) {
+      writer.uint32(40).int32(message.state);
     }
     return writer;
   },
@@ -177,7 +222,7 @@ export const User: MessageFns<User> = {
             break;
           }
 
-          message.blocked = reader.bool();
+          message.state = reader.int32() as any;
           continue;
         }
       }
@@ -195,7 +240,7 @@ export const User: MessageFns<User> = {
       username: isSet(object.username) ? globalThis.String(object.username) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       roles: globalThis.Array.isArray(object?.roles) ? object.roles.map((e: any) => globalThis.String(e)) : [],
-      blocked: isSet(object.blocked) ? globalThis.Boolean(object.blocked) : false,
+      state: isSet(object.state) ? accountStateFromJSON(object.state) : 0,
     };
   },
 
@@ -213,8 +258,8 @@ export const User: MessageFns<User> = {
     if (message.roles?.length) {
       obj.roles = message.roles;
     }
-    if (message.blocked !== false) {
-      obj.blocked = message.blocked;
+    if (message.state !== 0) {
+      obj.state = accountStateToJSON(message.state);
     }
     return obj;
   },
@@ -228,7 +273,7 @@ export const User: MessageFns<User> = {
     message.username = object.username ?? "";
     message.email = object.email ?? "";
     message.roles = object.roles?.map((e) => e) || [];
-    message.blocked = object.blocked ?? false;
+    message.state = object.state ?? 0;
     return message;
   },
 };
@@ -1505,8 +1550,8 @@ export const AuthServiceService = {
     responseStream: false as const,
     requestSerialize: (value: BlockUserRequest): Buffer => Buffer.from(BlockUserRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer): BlockUserRequest => BlockUserRequest.decode(value),
-    responseSerialize: (value: BlockUserResponse): Buffer => Buffer.from(BlockUserResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): BlockUserResponse => BlockUserResponse.decode(value),
+    responseSerialize: (value: Empty): Buffer => Buffer.from(Empty.encode(value).finish()),
+    responseDeserialize: (value: Buffer): Empty => Empty.decode(value),
   },
 } as const;
 
@@ -1533,7 +1578,7 @@ export interface AuthServiceServer extends UntypedServiceImplementation {
    * BlockUser blocks a user account, preventing login and token usage.
    * Requires admin role.
    */
-  blockUser: handleUnaryCall<BlockUserRequest, BlockUserResponse>;
+  blockUser: handleUnaryCall<BlockUserRequest, Empty>;
 }
 
 export interface AuthServiceClient extends Client {
@@ -1667,18 +1712,18 @@ export interface AuthServiceClient extends Client {
    */
   blockUser(
     request: BlockUserRequest,
-    callback: (error: ServiceError | null, response: BlockUserResponse) => void,
+    callback: (error: ServiceError | null, response: Empty) => void,
   ): ClientUnaryCall;
   blockUser(
     request: BlockUserRequest,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: BlockUserResponse) => void,
+    callback: (error: ServiceError | null, response: Empty) => void,
   ): ClientUnaryCall;
   blockUser(
     request: BlockUserRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: BlockUserResponse) => void,
+    callback: (error: ServiceError | null, response: Empty) => void,
   ): ClientUnaryCall;
 }
 

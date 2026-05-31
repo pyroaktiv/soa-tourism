@@ -58,7 +58,7 @@ class AuthServiceStub(object):
         self.BlockUser = channel.unary_unary(
                 '/tourism.auth.v1.AuthService/BlockUser',
                 request_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserRequest.SerializeToString,
-                response_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserResponse.FromString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
 
 
@@ -175,7 +175,7 @@ def add_AuthServiceServicer_to_server(servicer, server):
             'BlockUser': grpc.unary_unary_rpc_method_handler(
                     servicer.BlockUser,
                     request_deserializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserRequest.FromString,
-                    response_serializer=tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserResponse.SerializeToString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -420,7 +420,7 @@ class AuthService(object):
             target,
             '/tourism.auth.v1.AuthService/BlockUser',
             tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserRequest.SerializeToString,
-            tourism_dot_auth_dot_v1_dot_auth__pb2.BlockUserResponse.FromString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,
