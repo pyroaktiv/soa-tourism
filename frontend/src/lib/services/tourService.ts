@@ -94,3 +94,42 @@ export async function uploadReviewImage(file: File): Promise<string> {
     };
   });
 }
+
+export async function startExecution(
+  tourId: string,
+  latitude: number,
+  longitude: number
+) {
+  const response = await apiClient.post(`/tours/${tourId}/executions:start`, {
+    tourId,
+    latitude,
+    longitude,
+  });
+  return response.data;
+}
+
+export async function heartbeatExecution(
+  executionId: string,
+  latitude: number,
+  longitude: number
+) {
+  const response = await apiClient.post('/tours/executions/heartbeat', {
+    executionId,
+    latitude,
+    longitude,
+  });
+  return response.data;
+}
+
+export async function abandonExecution(executionId: string) {
+  const response = await apiClient.post(
+    `/tours/executions/${executionId}/abandon`,
+    {}
+  );
+  return response.data;
+}
+
+export async function getExecution(executionId: string) {
+  const response = await apiClient.get(`/tours/executions/${executionId}`);
+  return response.data;
+}

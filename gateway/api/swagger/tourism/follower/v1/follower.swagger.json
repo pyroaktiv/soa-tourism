@@ -23,7 +23,7 @@
   "paths": {
     "/api/v1/followers/recommendations": {
       "get": {
-        "summary": "Return follow recommendations based on friends-of-friends.\nThe calling user is identified from the Authorization header.",
+        "summary": "Return follow recommendations based on friends-of-friends.\r\nThe calling user is identified from the Authorization header.",
         "operationId": "FollowerService_GetRecommendations",
         "responses": {
           "200": {
