@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package tourism.payment.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/pyroaktiv/soa-tourism/payment-service/gen/go/tourism/payment/v1;paymentv1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Payment API";
+    version: "0.1.0";
+    description: "Shopping cart and purchase token management";
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+message OrderItem {
+  string id = 1;
+  string tour_id = 2;
+  string tour_name = 3;
+  double price = 4;
+  string added_at = 5;
+}
+
+message ShoppingCart {
+  string id = 1;
+  string user_id = 2;
+  repeated OrderItem items = 3;
+  double total_price = 4;
+}
+
+message TourPurchaseToken {
+  string id = 1;
+  string user_id = 2;
+  string tour_id = 3;
+  string tour_name = 4;
+  double price = 5;
+  string purchased_at = 6;
+}
+
+message GetCartRequest {}
+
+message AddToCartRequest {
+  string tour_id = 1;
+}
+
+message RemoveFromCartRequest {
+  string tour_id = 1;
+}
+
+message CheckoutRequest {}
+
+message CheckoutResponse {
+  repeated TourPurchaseToken tokens = 1;
+}
+
+message ListMyTokensRequest {}
+
+message ListMyTokensResponse {
+  repeated TourPurchaseToken tokens = 1;
+}
+
+message HasTokenRequest {
+  string tour_id = 1;
+}
+
+message HasTokenResponse {
+  bool has_token = 1;
+}
+
+service PaymentService {
+  rpc GetCart(GetCartRequest) returns (ShoppingCart) {
+    option (google.api.http) = {
+      get: "/api/v1/cart"
+    };
+  }
+
+  rpc AddToCart(AddToCartRequest) returns (ShoppingCart) {
+    option (google.api.http) = {
+      post: "/api/v1/cart/items"
+      body: "*"
+    };
+  }
+
+  rpc RemoveFromCart(RemoveFromCartRequest) returns (ShoppingCart) {
+    option (google.api.http) = {
+      delete: "/api/v1/cart/items/{tour_id}"
+    };
+  }
+
+  rpc Checkout(CheckoutRequest) returns (CheckoutResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/cart/checkout"
+      body: "*"
+    };
+  }
+
+  rpc ListMyTokens(ListMyTokensRequest) returns (ListMyTokensResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/purchases"
+    };
+  }
+
+  rpc HasToken(HasTokenRequest) returns (HasTokenResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/purchases/check/{tour_id}"
+    };
+  }
+}

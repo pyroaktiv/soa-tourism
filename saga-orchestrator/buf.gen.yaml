@@ -1,0 +1,8 @@
+version: v2
+inputs:
+  - proto_file: ../proto/tourism/saga/v1/saga.proto
+plugins:
+  - local: protoc-gen-go
+    out: gen/go
+    opt:
+      - paths=source_relative

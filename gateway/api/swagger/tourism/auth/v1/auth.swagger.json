@@ -18,13 +18,14 @@
   "paths": {
     "/api/v1/auth/block": {
       "post": {
-        "summary": "BlockUser blocks a user account, preventing login and token usage.\nRequires admin role.",
+        "summary": "BlockUser blocks a user account, preventing login and token usage.\r\nRequires admin role.",
         "operationId": "AuthService_BlockUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1BlockUserResponse"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -283,6 +284,16 @@
         }
       }
     },
+    "v1AccountState": {
+      "type": "string",
+      "enum": [
+        "ACCOUNT_STATE_UNSPECIFIED",
+        "ACCOUNT_STATE_ACTIVE",
+        "ACCOUNT_STATE_BLOCK_PENDING",
+        "ACCOUNT_STATE_BLOCKED"
+      ],
+      "default": "ACCOUNT_STATE_UNSPECIFIED"
+    },
     "v1AuthResponse": {
       "type": "object",
       "properties": {
@@ -299,14 +310,6 @@
       "properties": {
         "userId": {
           "type": "string"
-        }
-      }
-    },
-    "v1BlockUserResponse": {
-      "type": "object",
-      "properties": {
-        "success": {
-          "type": "boolean"
         }
       }
     },
@@ -424,8 +427,8 @@
             "type": "string"
           }
         },
-        "blocked": {
-          "type": "boolean"
+        "state": {
+          "$ref": "#/definitions/v1AccountState"
         }
       }
     }

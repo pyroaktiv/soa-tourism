@@ -1,13 +1,15 @@
 // src/app/tours/[id]/page.tsx
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   getTour,
   addReview,
   uploadReviewImage,
 } from "@/lib/services/tourService";
+import { addToCart, hasPurchased } from "@/lib/services/paymentService";
 import { getUser } from "@/lib/auth";
 import RoleGuard from "@/components/auth/RoleGuard";
 
@@ -19,20 +21,44 @@ const getImageUrl = (path: string) => {
 
 export default function TouristTourPage() {
   const { id } = useParams() as { id: string };
+  const router = useRouter();
   const [tour, setTour] = useState<any>(null);
   const currentUser = getUser();
+  const isTourist = currentUser?.roles?.includes("tourist");
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [visitDate, setVisitDate] = useState("");
   const [reviewFiles, setReviewFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [purchased, setPurchased] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     getTour(id)
       .then(setTour)
       .catch(() => setTour(null));
-  }, [id]);
+    if (isTourist) {
+      hasPurchased(id)
+        .then(setPurchased)
+        .catch(() => setPurchased(false));
+    }
+  }, [id, isTourist]);
+
+  const handleAddToCart = async () => {
+    setAddingToCart(true);
+    try {
+      await addToCart(id);
+      router.push("/cart");
+    } catch (err: any) {
+      alert(
+        err?.response?.data?.message ||
+          "Nije moguće dodati turu u korpu."
+      );
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +99,7 @@ export default function TouristTourPage() {
             </span>
           </div>
           <p className="text-gray-700 text-lg mb-6">{tour.description}</p>
-          <div className="flex gap-2">
+          <div className="flex gap-2 mb-6">
             {tour.tags?.map((tag: string) => (
               <span
                 key={tag}
@@ -83,24 +109,75 @@ export default function TouristTourPage() {
               </span>
             ))}
           </div>
+
+          {isTourist && (
+            <div className="flex items-center justify-between gap-4 border-t pt-4">
+              <div>
+                <p className="text-sm text-gray-500">Cena</p>
+                <p className="text-2xl font-bold">
+                  {Number(tour.price ?? 0).toFixed(2)} RSD
+                </p>
+                {tour.lengthKm > 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Dužina: {Number(tour.lengthKm).toFixed(2)} km
+                  </p>
+                )}
+              </div>
+              {purchased ? (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <span className="bg-green-100 text-green-800 font-bold px-4 py-2 rounded">
+                    Kupljena ✓
+                  </span>
+                  <Link
+                    href={`/tours/${id}/execute`}
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Pokreni izvršenje
+                  </Link>
+                </div>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={addingToCart}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-2 px-4 rounded"
+                >
+                  {addingToCart ? "Dodavanje..." : "Dodaj u korpu"}
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="bg-white p-8 rounded-lg shadow border mb-8">
-          <h2 className="text-2xl font-bold mb-4">Početna tačka ture</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            {purchased ? "Ključne tačke ture" : "Početna tačka ture"}
+          </h2>
           {tour.keypoints && tour.keypoints.length > 0 ? (
-            <div className="flex gap-4 items-center bg-gray-50 p-4 rounded border">
-              {tour.keypoints[0].imageUrl && (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={getImageUrl(tour.keypoints[0].imageUrl)}
-                  alt="KP"
-                  className="w-24 h-24 object-cover rounded"
-                />
+            <div className="space-y-4">
+              {tour.keypoints.map((kp: any, idx: number) => (
+                <div
+                  key={idx}
+                  className="flex gap-4 items-center bg-gray-50 p-4 rounded border"
+                >
+                  {kp.imageUrl && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={getImageUrl(kp.imageUrl)}
+                      alt={`KP ${idx + 1}`}
+                      className="w-24 h-24 object-cover rounded"
+                    />
+                  )}
+                  <div>
+                    <h3 className="font-bold text-lg">{kp.name}</h3>
+                    <p className="text-gray-600">{kp.description}</p>
+                  </div>
+                </div>
+              ))}
+              {!purchased && isTourist && (
+                <p className="text-sm text-gray-500 italic">
+                  Ostale ključne tačke su skrivene dok ne kupite turu.
+                </p>
               )}
-              <div>
-                <h3 className="font-bold text-lg">{tour.keypoints[0].name}</h3>
-                <p className="text-gray-600">{tour.keypoints[0].description}</p>
-              </div>
             </div>
           ) : (
             <p className="text-gray-500">

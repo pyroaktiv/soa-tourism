@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -34,6 +35,11 @@ const (
 	TourService_AddReview_FullMethodName           = "/tourism.tour.v1.TourService/AddReview"
 	TourService_UploadReviewImage_FullMethodName   = "/tourism.tour.v1.TourService/UploadReviewImage"
 	TourService_UploadKeypointImage_FullMethodName = "/tourism.tour.v1.TourService/UploadKeypointImage"
+	TourService_StartExecution_FullMethodName      = "/tourism.tour.v1.TourService/StartExecution"
+	TourService_HeartbeatExecution_FullMethodName  = "/tourism.tour.v1.TourService/HeartbeatExecution"
+	TourService_AbandonExecution_FullMethodName    = "/tourism.tour.v1.TourService/AbandonExecution"
+	TourService_GetExecution_FullMethodName        = "/tourism.tour.v1.TourService/GetExecution"
+	TourService_ListMyExecutions_FullMethodName    = "/tourism.tour.v1.TourService/ListMyExecutions"
 )
 
 // TourServiceClient is the client API for TourService service.
@@ -50,11 +56,16 @@ type TourServiceClient interface {
 	DeleteKeypoint(ctx context.Context, in *DeleteKeypointRequest, opts ...grpc.CallOption) (*Tour, error)
 	AddTransportTime(ctx context.Context, in *AddTransportTimeRequest, opts ...grpc.CallOption) (*Tour, error)
 	PublishTour(ctx context.Context, in *PublishTourRequest, opts ...grpc.CallOption) (*Tour, error)
-	ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*Tour, error)
+	ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ReactivateTour(ctx context.Context, in *ReactivateTourRequest, opts ...grpc.CallOption) (*Tour, error)
 	AddReview(ctx context.Context, in *AddReviewRequest, opts ...grpc.CallOption) (*Tour, error)
 	UploadReviewImage(ctx context.Context, in *UploadReviewImageRequest, opts ...grpc.CallOption) (*UploadReviewImageResponse, error)
 	UploadKeypointImage(ctx context.Context, in *UploadKeypointImageRequest, opts ...grpc.CallOption) (*UploadKeypointImageResponse, error)
+	StartExecution(ctx context.Context, in *StartExecutionRequest, opts ...grpc.CallOption) (*TourExecution, error)
+	HeartbeatExecution(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
+	AbandonExecution(ctx context.Context, in *AbandonExecutionRequest, opts ...grpc.CallOption) (*AbandonExecutionResponse, error)
+	GetExecution(ctx context.Context, in *GetTourRequest, opts ...grpc.CallOption) (*TourExecution, error)
+	ListMyExecutions(ctx context.Context, in *ListMyToursRequest, opts ...grpc.CallOption) (*ListToursResponse, error)
 }
 
 type tourServiceClient struct {
@@ -165,9 +176,9 @@ func (c *tourServiceClient) PublishTour(ctx context.Context, in *PublishTourRequ
 	return out, nil
 }
 
-func (c *tourServiceClient) ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*Tour, error) {
+func (c *tourServiceClient) ArchiveTour(ctx context.Context, in *ArchiveTourRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Tour)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, TourService_ArchiveTour_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -215,6 +226,56 @@ func (c *tourServiceClient) UploadKeypointImage(ctx context.Context, in *UploadK
 	return out, nil
 }
 
+func (c *tourServiceClient) StartExecution(ctx context.Context, in *StartExecutionRequest, opts ...grpc.CallOption) (*TourExecution, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TourExecution)
+	err := c.cc.Invoke(ctx, TourService_StartExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tourServiceClient) HeartbeatExecution(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeartbeatResponse)
+	err := c.cc.Invoke(ctx, TourService_HeartbeatExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tourServiceClient) AbandonExecution(ctx context.Context, in *AbandonExecutionRequest, opts ...grpc.CallOption) (*AbandonExecutionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AbandonExecutionResponse)
+	err := c.cc.Invoke(ctx, TourService_AbandonExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tourServiceClient) GetExecution(ctx context.Context, in *GetTourRequest, opts ...grpc.CallOption) (*TourExecution, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TourExecution)
+	err := c.cc.Invoke(ctx, TourService_GetExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tourServiceClient) ListMyExecutions(ctx context.Context, in *ListMyToursRequest, opts ...grpc.CallOption) (*ListToursResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListToursResponse)
+	err := c.cc.Invoke(ctx, TourService_ListMyExecutions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TourServiceServer is the server API for TourService service.
 // All implementations must embed UnimplementedTourServiceServer
 // for forward compatibility.
@@ -229,11 +290,16 @@ type TourServiceServer interface {
 	DeleteKeypoint(context.Context, *DeleteKeypointRequest) (*Tour, error)
 	AddTransportTime(context.Context, *AddTransportTimeRequest) (*Tour, error)
 	PublishTour(context.Context, *PublishTourRequest) (*Tour, error)
-	ArchiveTour(context.Context, *ArchiveTourRequest) (*Tour, error)
+	ArchiveTour(context.Context, *ArchiveTourRequest) (*emptypb.Empty, error)
 	ReactivateTour(context.Context, *ReactivateTourRequest) (*Tour, error)
 	AddReview(context.Context, *AddReviewRequest) (*Tour, error)
 	UploadReviewImage(context.Context, *UploadReviewImageRequest) (*UploadReviewImageResponse, error)
 	UploadKeypointImage(context.Context, *UploadKeypointImageRequest) (*UploadKeypointImageResponse, error)
+	StartExecution(context.Context, *StartExecutionRequest) (*TourExecution, error)
+	HeartbeatExecution(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
+	AbandonExecution(context.Context, *AbandonExecutionRequest) (*AbandonExecutionResponse, error)
+	GetExecution(context.Context, *GetTourRequest) (*TourExecution, error)
+	ListMyExecutions(context.Context, *ListMyToursRequest) (*ListToursResponse, error)
 	mustEmbedUnimplementedTourServiceServer()
 }
 
@@ -274,7 +340,7 @@ func (UnimplementedTourServiceServer) AddTransportTime(context.Context, *AddTran
 func (UnimplementedTourServiceServer) PublishTour(context.Context, *PublishTourRequest) (*Tour, error) {
 	return nil, status.Error(codes.Unimplemented, "method PublishTour not implemented")
 }
-func (UnimplementedTourServiceServer) ArchiveTour(context.Context, *ArchiveTourRequest) (*Tour, error) {
+func (UnimplementedTourServiceServer) ArchiveTour(context.Context, *ArchiveTourRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method ArchiveTour not implemented")
 }
 func (UnimplementedTourServiceServer) ReactivateTour(context.Context, *ReactivateTourRequest) (*Tour, error) {
@@ -288,6 +354,21 @@ func (UnimplementedTourServiceServer) UploadReviewImage(context.Context, *Upload
 }
 func (UnimplementedTourServiceServer) UploadKeypointImage(context.Context, *UploadKeypointImageRequest) (*UploadKeypointImageResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UploadKeypointImage not implemented")
+}
+func (UnimplementedTourServiceServer) StartExecution(context.Context, *StartExecutionRequest) (*TourExecution, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartExecution not implemented")
+}
+func (UnimplementedTourServiceServer) HeartbeatExecution(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method HeartbeatExecution not implemented")
+}
+func (UnimplementedTourServiceServer) AbandonExecution(context.Context, *AbandonExecutionRequest) (*AbandonExecutionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AbandonExecution not implemented")
+}
+func (UnimplementedTourServiceServer) GetExecution(context.Context, *GetTourRequest) (*TourExecution, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetExecution not implemented")
+}
+func (UnimplementedTourServiceServer) ListMyExecutions(context.Context, *ListMyToursRequest) (*ListToursResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMyExecutions not implemented")
 }
 func (UnimplementedTourServiceServer) mustEmbedUnimplementedTourServiceServer() {}
 func (UnimplementedTourServiceServer) testEmbeddedByValue()                     {}
@@ -580,6 +661,96 @@ func _TourService_UploadKeypointImage_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TourService_StartExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).StartExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_StartExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).StartExecution(ctx, req.(*StartExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TourService_HeartbeatExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HeartbeatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).HeartbeatExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_HeartbeatExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).HeartbeatExecution(ctx, req.(*HeartbeatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TourService_AbandonExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbandonExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).AbandonExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_AbandonExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).AbandonExecution(ctx, req.(*AbandonExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TourService_GetExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTourRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).GetExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_GetExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).GetExecution(ctx, req.(*GetTourRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TourService_ListMyExecutions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMyToursRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourServiceServer).ListMyExecutions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourService_ListMyExecutions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourServiceServer).ListMyExecutions(ctx, req.(*ListMyToursRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TourService_ServiceDesc is the grpc.ServiceDesc for TourService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -646,6 +817,26 @@ var TourService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadKeypointImage",
 			Handler:    _TourService_UploadKeypointImage_Handler,
+		},
+		{
+			MethodName: "StartExecution",
+			Handler:    _TourService_StartExecution_Handler,
+		},
+		{
+			MethodName: "HeartbeatExecution",
+			Handler:    _TourService_HeartbeatExecution_Handler,
+		},
+		{
+			MethodName: "AbandonExecution",
+			Handler:    _TourService_AbandonExecution_Handler,
+		},
+		{
+			MethodName: "GetExecution",
+			Handler:    _TourService_GetExecution_Handler,
+		},
+		{
+			MethodName: "ListMyExecutions",
+			Handler:    _TourService_ListMyExecutions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
