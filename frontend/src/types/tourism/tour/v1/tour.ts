@@ -165,3 +165,49 @@ export interface DeleteKeypointRequest {
   tourId: string;
   order: number;
 }
+
+export interface StartExecutionRequest {
+  tourId: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface ExecutionKeypoint {
+  order: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  visitedAt: string;
+}
+
+export interface TourExecution {
+  id: string;
+  tourId: string;
+  userId: string;
+  status: string;
+  startedAt: string;
+  lastActivityAt: string;
+  completedAt: string;
+  abandonedAt: string;
+  visitedKeypoints: ExecutionKeypoint[];
+}
+
+export interface HeartbeatRequest {
+  executionId: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface HeartbeatResponse {
+  execution: TourExecution | undefined;
+  newlyVisited: boolean;
+  visitedOrder: number;
+}
+
+export interface AbandonExecutionRequest {
+  executionId: string;
+}
+
+export interface AbandonExecutionResponse {
+  execution: TourExecution | undefined;
+}
