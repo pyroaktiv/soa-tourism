@@ -7,6 +7,12 @@ from uuid import uuid4
 
 import grpc
 import requests
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
 
@@ -432,7 +438,21 @@ class TourService(tour_pb2_grpc.TourServiceServicer):
         )
 
 
+_OTEL_ENDPOINT = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT", "otel-collector:4317")
+
+
+def _setup_tracing():
+    resource = Resource.create({"service.name": "tour", "service.version": "1.0.0"})
+    exporter = OTLPSpanExporter(endpoint=_OTEL_ENDPOINT, insecure=True)
+    provider = TracerProvider(resource=resource)
+    provider.add_span_processor(BatchSpanProcessor(exporter))
+    trace.set_tracer_provider(provider)
+    GrpcInstrumentorServer().instrument()
+    logging.info("tracing initialized, exporting to %s", _OTEL_ENDPOINT)
+
+
 def serve():
+    _setup_tracing()
     db = MongoClient(_MONGO_URI)[_MONGO_DB]
     auth_channel = grpc.insecure_channel(_AUTH_SERVICE_ADDR)
 

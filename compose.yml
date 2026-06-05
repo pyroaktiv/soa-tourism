@@ -120,12 +120,14 @@ services:
       MONGO_DB: "tourdb"
       AUTH_SERVICE_ADDR: "auth-service:9090"
       SEAWEEDFS_FILER_URL: "http://seaweedfs:8888"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "otel-collector:4317"
     expose:
       - "9090"
     depends_on:
       - mongo
       - auth-service
       - seaweedfs
+      - otel-collector
 
   gateway:
     build:
@@ -141,12 +143,14 @@ services:
       BLOG_SERVICE_ADDR: "blog-service:9090"
       TOUR_SERVICE_ADDR: "tour:9090"
       CORS_ALLOWED_ORIGINS: "*"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "otel-collector:4317"
     depends_on:
       - auth-service
       - stakeholders
       - follower
       - blog-service
       - tour
+      - otel-collector
 
   frontend:
     build:
@@ -159,7 +163,123 @@ services:
     depends_on:
       - gateway
 
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    pid: "host"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - "9100"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    expose:
+      - "8080"
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+    depends_on:
+      - node-exporter
+      - cadvisor
+      - otel-collector
+
+  loki:
+    image: grafana/loki:latest
+    restart: unless-stopped
+    expose:
+      - "3100"
+    volumes:
+      - ./monitoring/loki.yml:/etc/loki/loki.yml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/loki.yml
+
+  promtail:
+    image: grafana/promtail:latest
+    restart: unless-stopped
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./monitoring/promtail.yml:/etc/promtail/promtail.yml:ro
+    command: -config.file=/etc/promtail/promtail.yml
+    depends_on:
+      - loki
+
+  tempo:
+    image: grafana/tempo:latest
+    restart: unless-stopped
+    expose:
+      - "3200"
+      - "4317"
+    volumes:
+      - ./monitoring/tempo.yml:/etc/tempo/tempo.yml:ro
+      - tempo_data:/var/tempo
+    command: -config.file=/etc/tempo/tempo.yml
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    restart: unless-stopped
+    expose:
+      - "4317"
+      - "8889"
+    volumes:
+      - ./monitoring/otel-collector.yml:/etc/otelcol-contrib/config.yaml:ro
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    depends_on:
+      - tempo
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      # GF_LOG_LEVEL: "debug"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+
 volumes:
   mongo_data:
   seaweedfs_data:
   neo4j_data:
+  prometheus_data:
+  loki_data:
+  tempo_data:
+  grafana_data:
