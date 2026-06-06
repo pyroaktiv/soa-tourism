@@ -10,6 +10,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/nats-io/nats.go"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -17,10 +18,17 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	authv1 "github.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/auth/v1"
+	sagav1 "github.com/pyroaktiv/soa-tourism/auth-service/gen/go/tourism/saga/v1"
 	"github.com/pyroaktiv/soa-tourism/auth-service/internal/config"
+)
+
+const (
+	SubjectAuthBlockStarted    = "saga.block_author.auth.started"
+	SubjectAuthFinalizeCommand = "saga.block_author.auth.finalize_command"
 )
 
 type Service struct {
@@ -29,6 +37,7 @@ type Service struct {
 	cfg      config.Config
 	users    *mongo.Collection
 	sessions *mongo.Collection
+	nc       *nats.Conn
 }
 
 type userDocument struct {
@@ -37,7 +46,7 @@ type userDocument struct {
 	Email        string   `bson:"email"`
 	PasswordHash []byte   `bson:"password_hash"`
 	Roles        []string `bson:"roles"`
-	Blocked      bool     `bson:"blocked"`
+	State        string   `bson:"state"`
 }
 
 type sessionDocument struct {
@@ -55,7 +64,7 @@ type tokenClaims struct {
 	jwt.RegisteredClaims
 }
 
-func NewService(cfg config.Config, db *mongo.Database) *Service {
+func NewService(cfg config.Config, db *mongo.Database, nc *nats.Conn) *Service {
 	users := db.Collection("users")
 	sessions := db.Collection("refresh_sessions")
 
@@ -82,11 +91,18 @@ func NewService(cfg config.Config, db *mongo.Database) *Service {
 		},
 	})
 
-	return &Service{
+	s := &Service{
 		cfg:      cfg,
 		users:    users,
 		sessions: sessions,
+		nc:       nc,
 	}
+
+	if nc != nil {
+		go s.startSagaSubscriber()
+	}
+
+	return s
 }
 
 func (s *Service) Register(ctx context.Context, req *authv1.RegisterRequest) (*authv1.AuthResponse, error) {
@@ -115,7 +131,7 @@ func (s *Service) Register(ctx context.Context, req *authv1.RegisterRequest) (*a
 		Email:        email,
 		PasswordHash: passwordHash,
 		Roles:        roles,
-		Blocked:      false,
+		State:        "ACTIVE",
 	}
 
 	if _, err := s.users.InsertOne(ctx, doc); err != nil {
@@ -152,7 +168,7 @@ func (s *Service) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.
 		}
 		return nil, status.Error(codes.Internal, "database error")
 	}
-	if doc.Blocked {
+	if doc.State == "BLOCKED" || doc.State == "BLOCK_PENDING" {
 		return nil, status.Error(codes.PermissionDenied, "account is blocked")
 	}
 	if bcrypt.CompareHashAndPassword(doc.PasswordHash, []byte(password)) != nil {
@@ -192,7 +208,7 @@ func (s *Service) Refresh(ctx context.Context, req *authv1.RefreshRequest) (*aut
 		return nil, status.Error(codes.Internal, "database error")
 	}
 
-	if user.Blocked {
+	if user.State == "BLOCKED" || user.State == "BLOCK_PENDING" {
 		return nil, status.Error(codes.PermissionDenied, "account is blocked")
 	}
 
@@ -209,7 +225,7 @@ func (s *Service) Validate(ctx context.Context, req *authv1.ValidateRequest) (*a
 	if err := s.users.FindOne(ctx, bson.D{{Key: "_id", Value: claims.UserID}}).Decode(&user); err != nil {
 		return &authv1.ValidateResponse{Valid: false}, nil
 	}
-	if user.Blocked {
+	if user.State == "BLOCKED" || user.State == "BLOCK_PENDING" {
 		return &authv1.ValidateResponse{Valid: false}, nil
 	}
 
@@ -298,7 +314,7 @@ func (s *Service) SearchUsers(ctx context.Context, req *authv1.SearchUsersReques
 	return &authv1.SearchUsersResponse{Users: users}, nil
 }
 
-func (s *Service) BlockUser(ctx context.Context, req *authv1.BlockUserRequest) (*authv1.BlockUserResponse, error) {
+func (s *Service) BlockUser(ctx context.Context, req *authv1.BlockUserRequest) (*emptypb.Empty, error) {
 	// 1. extract and validate token from context
 	token := getTokenFromContext(ctx)
 	if token == "" {
@@ -319,7 +335,7 @@ func (s *Service) BlockUser(ctx context.Context, req *authv1.BlockUserRequest) (
 	}
 	// 4. find and update the target user
 	filter := bson.D{{Key: "_id", Value: req.GetUserId()}}
-	update := bson.D{{Key: "$set", Value: bson.D{{Key: "blocked", Value: true}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "state", Value: "BLOCK_PENDING"}}}}
 	result, err := s.users.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "database error")
@@ -328,7 +344,56 @@ func (s *Service) BlockUser(ctx context.Context, req *authv1.BlockUserRequest) (
 		return nil, status.Error(codes.NotFound, "user not found")
 	}
 
-	return &authv1.BlockUserResponse{Success: true}, nil
+	log.Printf("[Auth Service] User %s state set to BLOCK_PENDING. Triggering Saga.", req.GetUserId())
+
+	event := &sagav1.StartBlockAuthorEvent{UserId: req.GetUserId()}
+
+	data, err := proto.Marshal(event)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to marshal saga event: %v", err)
+	}
+
+	if err := s.nc.Publish(SubjectAuthBlockStarted, data); err != nil {
+		log.Printf("[Auth Service] Failed to publish NATS event: %v", err)
+		// U realnom sistemu ovde bismo vratili error ili radili retry, ali za happy-path idemo dalje
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) startSagaSubscriber() {
+	_, err := s.nc.Subscribe(SubjectAuthFinalizeCommand, func(msg *nats.Msg) {
+		var cmd sagav1.FinalizeBlockAuthorCommand
+		if err := proto.Unmarshal(msg.Data, &cmd); err != nil {
+			log.Printf("[Auth Saga] Error unmarshalling finalize command: %v", err)
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		var targetState string
+		if cmd.Status == sagav1.SagaStatus_SAGA_STATUS_SUCCESS {
+			targetState = "BLOCKED"
+			log.Printf("[Auth Saga] COMMIT received for user %s. Setting state to BLOCKED.", cmd.UserId)
+		} else {
+			targetState = "ACTIVE"
+			log.Printf("[Auth Saga] ROLLBACK received for user %s. Reverting state to ACTIVE.", cmd.UserId)
+		}
+
+		_, err := s.users.UpdateOne(
+			ctx,
+			bson.M{"_id": cmd.UserId},
+			bson.M{"$set": bson.M{"state": targetState}},
+		)
+		if err != nil {
+			log.Printf("[Auth Saga] Failed to update user state in DB: %v", err)
+		}
+	})
+
+	if err != nil {
+		log.Fatalf("Failed to subscribe to Auth finalization subject: %v", err)
+	}
 }
 
 func (s *Service) issueTokenPair(ctx context.Context, user *userDocument) (*authv1.TokenPair, error) {
@@ -469,12 +534,24 @@ func containsRole(roles []string, role string) bool {
 }
 
 func toProtoUser(user *userDocument) *authv1.User {
+	var protoState authv1.AccountState
+	switch user.State {
+	case "ACTIVE":
+		protoState = authv1.AccountState_ACCOUNT_STATE_ACTIVE
+	case "BLOCK_PENDING":
+		protoState = authv1.AccountState_ACCOUNT_STATE_BLOCK_PENDING
+	case "BLOCKED":
+		protoState = authv1.AccountState_ACCOUNT_STATE_BLOCKED
+	default:
+		protoState = authv1.AccountState_ACCOUNT_STATE_UNSPECIFIED
+	}
+
 	return &authv1.User{
 		Id:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
 		Roles:    append([]string(nil), user.Roles...),
-		Blocked:  user.Blocked,
+		State:    protoState,
 	}
 }
 

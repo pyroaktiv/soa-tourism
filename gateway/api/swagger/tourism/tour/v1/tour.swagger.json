@@ -95,6 +95,160 @@
         ]
       }
     },
+    "/api/v1/tours/executions": {
+      "get": {
+        "operationId": "TourService_ListMyExecutions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListToursResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
+    "/api/v1/tours/executions/heartbeat": {
+      "post": {
+        "operationId": "TourService_HeartbeatExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1HeartbeatResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1HeartbeatRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
+    "/api/v1/tours/executions/{executionId}/abandon": {
+      "post": {
+        "operationId": "TourService_AbandonExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AbandonExecutionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TourServiceAbandonExecutionBody"
+            }
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
+    "/api/v1/tours/executions/{id}": {
+      "get": {
+        "operationId": "TourService_GetExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TourExecution"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
+    "/api/v1/tours/keypoints/images": {
+      "post": {
+        "operationId": "TourService_UploadKeypointImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadKeypointImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UploadKeypointImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
     "/api/v1/tours/reviews/images": {
       "post": {
         "operationId": "TourService_UploadReviewImage",
@@ -200,7 +354,8 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Tour"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -307,6 +462,44 @@
         ]
       }
     },
+    "/api/v1/tours/{tourId}/executions:start": {
+      "post": {
+        "operationId": "TourService_StartExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TourExecution"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tourId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TourServiceStartExecutionBody"
+            }
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
     "/api/v1/tours/{tourId}/keypoints": {
       "post": {
         "operationId": "TourService_AddKeypoint",
@@ -337,6 +530,86 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/TourServiceAddKeypointBody"
+            }
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      }
+    },
+    "/api/v1/tours/{tourId}/keypoints/{order}": {
+      "delete": {
+        "operationId": "TourService_DeleteKeypoint",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Tour"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tourId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "TourService"
+        ]
+      },
+      "put": {
+        "operationId": "TourService_UpdateKeypoint",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Tour"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tourId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TourServiceUpdateKeypointBody"
             }
           }
         ],
@@ -423,6 +696,9 @@
     }
   },
   "definitions": {
+    "TourServiceAbandonExecutionBody": {
+      "type": "object"
+    },
     "TourServiceAddKeypointBody": {
       "type": "object",
       "properties": {
@@ -439,6 +715,9 @@
         "longitude": {
           "type": "number",
           "format": "double"
+        },
+        "imageUrl": {
+          "type": "string"
         }
       }
     },
@@ -483,6 +762,41 @@
     },
     "TourServiceReactivateTourBody": {
       "type": "object"
+    },
+    "TourServiceStartExecutionBody": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "TourServiceUpdateKeypointBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "imageUrl": {
+          "type": "string"
+        }
+      }
     },
     "TourServiceUpdateTourBody": {
       "type": "object",
@@ -537,6 +851,14 @@
         }
       }
     },
+    "v1AbandonExecutionResponse": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "$ref": "#/definitions/v1TourExecution"
+        }
+      }
+    },
     "v1CreateTourRequest": {
       "type": "object",
       "properties": {
@@ -555,6 +877,60 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "v1ExecutionKeypoint": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "visitedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "v1HeartbeatRequest": {
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "v1HeartbeatResponse": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "$ref": "#/definitions/v1TourExecution"
+        },
+        "newlyVisited": {
+          "type": "boolean"
+        },
+        "visitedOrder": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -578,6 +954,9 @@
         "order": {
           "type": "integer",
           "format": "int32"
+        },
+        "imageUrl": {
+          "type": "string"
         }
       }
     },
@@ -694,12 +1073,49 @@
         }
       }
     },
+    "v1TourExecution": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tourId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "startedAt": {
+          "type": "string"
+        },
+        "lastActivityAt": {
+          "type": "string"
+        },
+        "completedAt": {
+          "type": "string"
+        },
+        "abandonedAt": {
+          "type": "string"
+        },
+        "visitedKeypoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExecutionKeypoint"
+          }
+        }
+      }
+    },
     "v1TourStatus": {
       "type": "string",
       "enum": [
         "TOUR_STATUS_UNSPECIFIED",
         "TOUR_STATUS_DRAFT",
         "TOUR_STATUS_PUBLISHED",
+        "TOUR_STATUS_ARCHIVE_PENDING",
         "TOUR_STATUS_ARCHIVED"
       ],
       "default": "TOUR_STATUS_UNSPECIFIED"
@@ -725,6 +1141,26 @@
         "TRANSPORT_TYPE_CAR"
       ],
       "default": "TRANSPORT_TYPE_UNSPECIFIED"
+    },
+    "v1UploadKeypointImageRequest": {
+      "type": "object",
+      "properties": {
+        "imageData": {
+          "type": "string",
+          "format": "byte"
+        },
+        "contentType": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UploadKeypointImageResponse": {
+      "type": "object",
+      "properties": {
+        "imageUrl": {
+          "type": "string"
+        }
+      }
     },
     "v1UploadReviewImageRequest": {
       "type": "object",

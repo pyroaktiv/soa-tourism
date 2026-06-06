@@ -2,6 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from tourism.tour.v1 import tour_pb2 as tourism_dot_tour_dot_v1_dot_tour__pb2
 
 
@@ -44,6 +45,16 @@ class TourServiceStub(object):
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddKeypointRequest.SerializeToString,
                 response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
                 _registered_method=True)
+        self.UpdateKeypoint = channel.unary_unary(
+                '/tourism.tour.v1.TourService/UpdateKeypoint',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UpdateKeypointRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+                _registered_method=True)
+        self.DeleteKeypoint = channel.unary_unary(
+                '/tourism.tour.v1.TourService/DeleteKeypoint',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.DeleteKeypointRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+                _registered_method=True)
         self.AddTransportTime = channel.unary_unary(
                 '/tourism.tour.v1.TourService/AddTransportTime',
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddTransportTimeRequest.SerializeToString,
@@ -57,7 +68,7 @@ class TourServiceStub(object):
         self.ArchiveTour = channel.unary_unary(
                 '/tourism.tour.v1.TourService/ArchiveTour',
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ArchiveTourRequest.SerializeToString,
-                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.ReactivateTour = channel.unary_unary(
                 '/tourism.tour.v1.TourService/ReactivateTour',
@@ -73,6 +84,36 @@ class TourServiceStub(object):
                 '/tourism.tour.v1.TourService/UploadReviewImage',
                 request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageRequest.SerializeToString,
                 response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageResponse.FromString,
+                _registered_method=True)
+        self.UploadKeypointImage = channel.unary_unary(
+                '/tourism.tour.v1.TourService/UploadKeypointImage',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageResponse.FromString,
+                _registered_method=True)
+        self.StartExecution = channel.unary_unary(
+                '/tourism.tour.v1.TourService/StartExecution',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.StartExecutionRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.TourExecution.FromString,
+                _registered_method=True)
+        self.HeartbeatExecution = channel.unary_unary(
+                '/tourism.tour.v1.TourService/HeartbeatExecution',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.HeartbeatRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.HeartbeatResponse.FromString,
+                _registered_method=True)
+        self.AbandonExecution = channel.unary_unary(
+                '/tourism.tour.v1.TourService/AbandonExecution',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AbandonExecutionRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AbandonExecutionResponse.FromString,
+                _registered_method=True)
+        self.GetExecution = channel.unary_unary(
+                '/tourism.tour.v1.TourService/GetExecution',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.GetTourRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.TourExecution.FromString,
+                _registered_method=True)
+        self.ListMyExecutions = channel.unary_unary(
+                '/tourism.tour.v1.TourService/ListMyExecutions',
+                request_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ListMyToursRequest.SerializeToString,
+                response_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ListToursResponse.FromString,
                 _registered_method=True)
 
 
@@ -115,6 +156,18 @@ class TourServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UpdateKeypoint(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteKeypoint(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def AddTransportTime(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -146,6 +199,42 @@ class TourServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def UploadReviewImage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UploadKeypointImage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StartExecution(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def HeartbeatExecution(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AbandonExecution(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetExecution(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListMyExecutions(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -184,6 +273,16 @@ def add_TourServiceServicer_to_server(servicer, server):
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddKeypointRequest.FromString,
                     response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
             ),
+            'UpdateKeypoint': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateKeypoint,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UpdateKeypointRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
+            ),
+            'DeleteKeypoint': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteKeypoint,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.DeleteKeypointRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
+            ),
             'AddTransportTime': grpc.unary_unary_rpc_method_handler(
                     servicer.AddTransportTime,
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AddTransportTimeRequest.FromString,
@@ -197,7 +296,7 @@ def add_TourServiceServicer_to_server(servicer, server):
             'ArchiveTour': grpc.unary_unary_rpc_method_handler(
                     servicer.ArchiveTour,
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ArchiveTourRequest.FromString,
-                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.SerializeToString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
             'ReactivateTour': grpc.unary_unary_rpc_method_handler(
                     servicer.ReactivateTour,
@@ -213,6 +312,36 @@ def add_TourServiceServicer_to_server(servicer, server):
                     servicer.UploadReviewImage,
                     request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageRequest.FromString,
                     response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageResponse.SerializeToString,
+            ),
+            'UploadKeypointImage': grpc.unary_unary_rpc_method_handler(
+                    servicer.UploadKeypointImage,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageResponse.SerializeToString,
+            ),
+            'StartExecution': grpc.unary_unary_rpc_method_handler(
+                    servicer.StartExecution,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.StartExecutionRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.TourExecution.SerializeToString,
+            ),
+            'HeartbeatExecution': grpc.unary_unary_rpc_method_handler(
+                    servicer.HeartbeatExecution,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.HeartbeatRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.HeartbeatResponse.SerializeToString,
+            ),
+            'AbandonExecution': grpc.unary_unary_rpc_method_handler(
+                    servicer.AbandonExecution,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AbandonExecutionRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.AbandonExecutionResponse.SerializeToString,
+            ),
+            'GetExecution': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetExecution,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.GetTourRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.TourExecution.SerializeToString,
+            ),
+            'ListMyExecutions': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListMyExecutions,
+                    request_deserializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ListMyToursRequest.FromString,
+                    response_serializer=tourism_dot_tour_dot_v1_dot_tour__pb2.ListToursResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -388,6 +517,60 @@ class TourService(object):
             _registered_method=True)
 
     @staticmethod
+    def UpdateKeypoint(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/UpdateKeypoint',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.UpdateKeypointRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteKeypoint(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/DeleteKeypoint',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.DeleteKeypointRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def AddTransportTime(request,
             target,
             options=(),
@@ -457,7 +640,7 @@ class TourService(object):
             target,
             '/tourism.tour.v1.TourService/ArchiveTour',
             tourism_dot_tour_dot_v1_dot_tour__pb2.ArchiveTourRequest.SerializeToString,
-            tourism_dot_tour_dot_v1_dot_tour__pb2.Tour.FromString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,
@@ -539,6 +722,168 @@ class TourService(object):
             '/tourism.tour.v1.TourService/UploadReviewImage',
             tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageRequest.SerializeToString,
             tourism_dot_tour_dot_v1_dot_tour__pb2.UploadReviewImageResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UploadKeypointImage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/UploadKeypointImage',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.UploadKeypointImageResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StartExecution(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/StartExecution',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.StartExecutionRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.TourExecution.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def HeartbeatExecution(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/HeartbeatExecution',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.HeartbeatRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.HeartbeatResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AbandonExecution(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/AbandonExecution',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.AbandonExecutionRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.AbandonExecutionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetExecution(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/GetExecution',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.GetTourRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.TourExecution.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListMyExecutions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/tourism.tour.v1.TourService/ListMyExecutions',
+            tourism_dot_tour_dot_v1_dot_tour__pb2.ListMyToursRequest.SerializeToString,
+            tourism_dot_tour_dot_v1_dot_tour__pb2.ListToursResponse.FromString,
             options,
             channel_credentials,
             insecure,

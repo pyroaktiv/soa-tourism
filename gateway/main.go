@@ -23,8 +23,10 @@ import (
 	authv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/auth/v1"
 	blogv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/blog/v1"
 	followerv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/follower/v1"
+	paymentv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/payment/v1"
 	stakeholdersv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/stakeholders/v1"
 	tourv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/tour/v1"
+	simulatorv1 "github.com/pyroaktiv/soa-tourism/gateway/gen/go/tourism/simulator/v1"
 	"github.com/pyroaktiv/soa-tourism/gateway/internal/config"
 )
 
@@ -115,6 +117,18 @@ func main() {
 		ctx, grpcMux, cfg.ServiceAddr("tour"), dialOpts,
 	); err != nil {
 		log.Fatalf("register TourService: %v", err)
+	}
+
+	if err := simulatorv1.RegisterSimulatorServiceHandlerFromEndpoint(
+		ctx, grpcMux, cfg.ServiceAddr("simulator"), dialOpts,
+	); err != nil {
+		log.Fatalf("register SimulatorService: %v", err)
+	}
+
+	if err := paymentv1.RegisterPaymentServiceHandlerFromEndpoint(
+		ctx, grpcMux, cfg.ServiceAddr("payment"), dialOpts,
+	); err != nil {
+		log.Fatalf("register PaymentService: %v", err)
 	}
 
 	// Strip the "api/swagger" embed prefix so files are at /swagger/<path>.

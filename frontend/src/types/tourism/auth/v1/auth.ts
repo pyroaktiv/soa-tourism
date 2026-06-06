@@ -8,12 +8,20 @@
 
 export const protobufPackage = "tourism.auth.v1";
 
+export enum AccountState {
+  ACCOUNT_STATE_UNSPECIFIED = 0,
+  ACCOUNT_STATE_ACTIVE = 1,
+  ACCOUNT_STATE_BLOCK_PENDING = 2,
+  ACCOUNT_STATE_BLOCKED = 3,
+  UNRECOGNIZED = -1,
+}
+
 export interface User {
   id: string;
   username: string;
   email: string;
   roles: string[];
-  blocked: boolean;
+  state: AccountState;
 }
 
 export interface TokenPair {

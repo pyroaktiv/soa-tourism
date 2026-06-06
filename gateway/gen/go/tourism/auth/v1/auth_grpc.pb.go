@@ -53,7 +53,7 @@ type AuthServiceClient interface {
 	SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...grpc.CallOption) (*SearchUsersResponse, error)
 	// BlockUser blocks a user account, preventing login and token usage.
 	// Requires admin role.
-	BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockUserResponse, error)
+	BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type authServiceClient struct {
@@ -144,9 +144,9 @@ func (c *authServiceClient) SearchUsers(ctx context.Context, in *SearchUsersRequ
 	return out, nil
 }
 
-func (c *authServiceClient) BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockUserResponse, error) {
+func (c *authServiceClient) BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BlockUserResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, AuthService_BlockUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -176,7 +176,7 @@ type AuthServiceServer interface {
 	SearchUsers(context.Context, *SearchUsersRequest) (*SearchUsersResponse, error)
 	// BlockUser blocks a user account, preventing login and token usage.
 	// Requires admin role.
-	BlockUser(context.Context, *BlockUserRequest) (*BlockUserResponse, error)
+	BlockUser(context.Context, *BlockUserRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -211,7 +211,7 @@ func (UnimplementedAuthServiceServer) ListUsers(context.Context, *ListUsersReque
 func (UnimplementedAuthServiceServer) SearchUsers(context.Context, *SearchUsersRequest) (*SearchUsersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchUsers not implemented")
 }
-func (UnimplementedAuthServiceServer) BlockUser(context.Context, *BlockUserRequest) (*BlockUserResponse, error) {
+func (UnimplementedAuthServiceServer) BlockUser(context.Context, *BlockUserRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method BlockUser not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
