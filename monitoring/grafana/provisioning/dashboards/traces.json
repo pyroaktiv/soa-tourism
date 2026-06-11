@@ -1,0 +1,149 @@
+{
+  "id": null,
+  "uid": "service-traces",
+  "title": "Service Traces (RED Metrics)",
+  "description": "Request rate, error rate and latency derived from OTel spans via spanmetrics connector",
+  "tags": ["tracing", "RED", "otel"],
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "includeAll": false,
+        "label": "Datasource",
+        "name": "ds_prometheus",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      }
+    ]
+  },
+  "annotations": {"list": []},
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Rate (per service)",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+          "expr": "sum(rate(soa_tourism_traces_calls_total[5m])) by (service_name)",
+          "legendFormat": "{{service_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "min": 0,
+          "custom": {"lineWidth": 1, "fillOpacity": 10}
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi", "sort": "desc"},
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}
+      }
+    },
+    {
+      "id": 2,
+      "title": "Error Rate (per service)",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+          "expr": "sum(rate(soa_tourism_traces_calls_total{status_code=\"STATUS_CODE_ERROR\"}[5m])) by (service_name)",
+          "legendFormat": "{{service_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "min": 0,
+          "custom": {"lineWidth": 1, "fillOpacity": 10}
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi", "sort": "desc"},
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}
+      }
+    },
+    {
+      "id": 3,
+      "title": "P95 Latency (per service)",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+          "expr": "histogram_quantile(0.95, sum(rate(soa_tourism_traces_duration_milliseconds_bucket[5m])) by (le, service_name))",
+          "legendFormat": "p95 {{service_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0,
+          "custom": {"lineWidth": 1, "fillOpacity": 10}
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi", "sort": "desc"},
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}
+      }
+    },
+    {
+      "id": 4,
+      "title": "P50 Latency (per service)",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "${ds_prometheus}"},
+          "expr": "histogram_quantile(0.50, sum(rate(soa_tourism_traces_duration_milliseconds_bucket[5m])) by (le, service_name))",
+          "legendFormat": "p50 {{service_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0,
+          "custom": {"lineWidth": 1, "fillOpacity": 10}
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi", "sort": "desc"},
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}
+      }
+    },
+    {
+      "id": 5,
+      "title": "How to explore individual traces",
+      "type": "text",
+      "gridPos": {"x": 0, "y": 16, "w": 24, "h": 3},
+      "options": {
+        "mode": "markdown",
+        "content": "## Raw Trace Exploration\n\nTo browse individual traces, go to **Explore** → select **Tempo** datasource → search by `service.name = gateway` or `service.name = tour`.\n\nThe panels above derive **rate, error rate and latency** from span metadata (spanmetrics connector). They update every 15 seconds as Prometheus scrapes the OTel Collector."
+      }
+    }
+  ]
+}

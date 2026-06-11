@@ -5,9 +5,18 @@ import (
 	"embed"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/rs/cors"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -24,17 +33,55 @@ import (
 //go:embed api/swagger
 var swaggerFS embed.FS
 
+func initTracer(ctx context.Context) (func(context.Context) error, error) {
+	otelAddr := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+	if otelAddr == "" {
+		otelAddr = "otel-collector:4317"
+	}
+
+	exp, err := otlptracegrpc.New(ctx,
+		otlptracegrpc.WithEndpoint(otelAddr),
+		otlptracegrpc.WithInsecure(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	res, _ := resource.New(ctx,
+		resource.WithAttributes(semconv.ServiceNameKey.String("gateway")),
+	)
+
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exp),
+		sdktrace.WithResource(res),
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+	)
+	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{},
+		propagation.Baggage{},
+	))
+	return tp.Shutdown, nil
+}
+
 func main() {
 	cfg := config.Load()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	shutdownTracer, err := initTracer(ctx)
+	if err != nil {
+		log.Fatalf("init tracer: %v", err)
+	}
+	defer shutdownTracer(context.Background())
+
 	// grpcMux translates incoming HTTP requests into gRPC calls.
 	grpcMux := runtime.NewServeMux()
 
 	dialOpts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
 	}
 
 	// To add a new service:
@@ -107,8 +154,10 @@ func main() {
 		},
 	}).Handler(httpMux)
 
+	tracingHandler := otelhttp.NewHandler(handler, "gateway")
+
 	log.Printf("gateway listening on %s", cfg.HTTPAddr)
-	if err := http.ListenAndServe(cfg.HTTPAddr, handler); err != nil {
+	if err := http.ListenAndServe(cfg.HTTPAddr, tracingHandler); err != nil {
 		log.Fatalf("server: %v", err)
 	}
 }
